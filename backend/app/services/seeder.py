@@ -7,6 +7,7 @@ from app.models.announcement import Announcement
 from app.models.menu import MenuItem
 from app.models.event import Event, EventCategory
 from app.models.document import Document, DocumentChunk, DocumentCategory
+from app.models.ticket import Ticket, TicketMessage, TicketStatus, TicketPriority, TicketCategory
 from app.core.security import get_password_hash
 from app.services.navigation_service import DEFAULT_MENUS
 
@@ -499,3 +500,119 @@ Bitte gebt bis zum 10. April eure Rückmeldung im Mitarbeiterportal ab, damit da
         ]
         db.add_all(demo_announcements)
         db.commit()
+
+    # 6. Seed Helpdesk Tickets (only if empty)
+    if db.query(Ticket).count() == 0:
+        demo_tickets = [
+            Ticket(
+                ticket_nr="TK-2026-001",
+                titel="2FA-Einrichtung für neues Firmen-Smartphone",
+                beschreibung="Ich habe ein neues Firmen-iPhone erhalten und benötige Hilfe bei der Übertragung des Microsoft Authenticators und VPN-Zertifikats.",
+                kategorie=TicketCategory.IT_SUPPORT,
+                prioritaet=TicketPriority.MITTEL,
+                status=TicketStatus.GELOEST,
+                ersteller_id=4,  # Mateo
+                zugewiesen_an_id=3,  # Tobias (IT Admin)
+                loesung_dokumentation="Zwei-Faktor-Authentifizierung im Intranet-Sicherheitsportal zurückgesetzt, neuen QR-Code gescannt und Funktion des VPN-Tunnels erfolgreich getestet.",
+                loesungs_schlagwoerter=["2FA", "Authenticator", "VPN", "iPhone"],
+                erstellt_am=datetime.utcnow() - timedelta(days=3),
+                aktualisiert_am=datetime.utcnow() - timedelta(days=2),
+                geloest_am=datetime.utcnow() - timedelta(days=2)
+            ),
+            Ticket(
+                ticket_nr="TK-2026-002",
+                titel="CAD/BIM-Softwarelizenzierung Allplan aktualisieren",
+                beschreibung="Die Lizenz für Allplan 2026 am Arbeitsplatz der Statik läuft in 5 Tagen ab. Bitte Floating-Lizenz auf dem Lizenzserver verlängern.",
+                kategorie=TicketCategory.SOFTWARE,
+                prioritaet=TicketPriority.HOCH,
+                status=TicketStatus.IN_BEARBEITUNG,
+                ersteller_id=7,  # Elena
+                zugewiesen_an_id=3,  # Tobias
+                loesungs_schlagwoerter=["CAD", "Allplan", "BIM", "Lizenz"],
+                erstellt_am=datetime.utcnow() - timedelta(days=1),
+                aktualisiert_am=datetime.utcnow() - timedelta(hours=4)
+            ),
+            Ticket(
+                ticket_nr="TK-2026-003",
+                titel="Portalkran Demag 32t: Wartungsanzeige Sensor Halle 1",
+                beschreibung="Sensor an der Seilwinde meldet sporadisch 'Fehlercode S-14' bei Volllast. Kranbetrieb läuft derzeit mit reduzierter Geschwindigkeit.",
+                kategorie=TicketCategory.HARDWARE,
+                prioritaet=TicketPriority.KRITISCH,
+                status=TicketStatus.OFFEN,
+                ersteller_id=8,  # Alexander
+                zugewiesen_an_id=None,
+                loesungs_schlagwoerter=["Kran", "Demag", "Sensor", "Halle1", "Wartung"],
+                erstellt_am=datetime.utcnow() - timedelta(hours=6),
+                aktualisiert_am=datetime.utcnow() - timedelta(hours=6)
+            ),
+            Ticket(
+                ticket_nr="TK-2026-004",
+                titel="Leistungsverzeichnis-Vorlagen für Vertrieb aktualisieren",
+                beschreibung="Die GAEB-Vorlagen für Spannbetonelemente im OneDrive-Vertriebsordner benötigen das aktualisierte Preisdatenblatt Q2 2026.",
+                kategorie=TicketCategory.VERTRIEB,
+                prioritaet=TicketPriority.NIEDRIG,
+                status=TicketStatus.WARTET_AUF_BENUTZER,
+                ersteller_id=6,  # Sofia
+                zugewiesen_an_id=1,  # Carlos
+                loesungs_schlagwoerter=["GAEB", "OneDrive", "Preise", "Vertrieb"],
+                erstellt_am=datetime.utcnow() - timedelta(days=2),
+                aktualisiert_am=datetime.utcnow() - timedelta(hours=12)
+            ),
+            Ticket(
+                ticket_nr="TK-2026-005",
+                titel="Klimaanlage im Besprechungsraum München kühlt nicht",
+                beschreibung="Die Raumtemperatur im Konferenzraum München liegt bei 27 °C, Klimasteuerung reagiert nicht auf Temperaturregler.",
+                kategorie=TicketCategory.GEBAEUDE,
+                prioritaet=TicketPriority.MITTEL,
+                status=TicketStatus.OFFEN,
+                ersteller_id=2,  # Lucia
+                zugewiesen_an_id=None,
+                loesungs_schlagwoerter=["Klima", "Gebäude", "München", "Besprechungsraum"],
+                erstellt_am=datetime.utcnow() - timedelta(hours=2),
+                aktualisiert_am=datetime.utcnow() - timedelta(hours=2)
+            )
+        ]
+        db.add_all(demo_tickets)
+        db.commit()
+
+        # Seed initial messages for demo tickets
+        demo_messages = [
+            TicketMessage(
+                ticket_id=demo_tickets[0].id,
+                autor_id=4,
+                nachricht="Ich habe ein neues Firmen-iPhone erhalten und benötige Hilfe bei der Übertragung des Microsoft Authenticators und VPN-Zertifikats.",
+                ist_interne_notiz=False,
+                erstellt_am=datetime.utcnow() - timedelta(days=3)
+            ),
+            TicketMessage(
+                ticket_id=demo_tickets[0].id,
+                autor_id=3,
+                nachricht="Hallo Mateo, ich habe den 2FA-Token im Admin-Portal zurückgesetzt. Bitte melde dich kurz per Teams für den neuen QR-Code.",
+                ist_interne_notiz=False,
+                erstellt_am=datetime.utcnow() - timedelta(days=2, hours=2)
+            ),
+            TicketMessage(
+                ticket_id=demo_tickets[0].id,
+                autor_id=3,
+                nachricht="Intern: Neues Gerät ist ein iPhone 15 Pro, Seriennummer im Asset-Management hinterlegt.",
+                ist_interne_notiz=True,
+                erstellt_am=datetime.utcnow() - timedelta(days=2, hours=1)
+            ),
+            TicketMessage(
+                ticket_id=demo_tickets[1].id,
+                autor_id=7,
+                nachricht="Die Lizenz für Allplan 2026 am Arbeitsplatz der Statik läuft in 5 Tagen ab. Bitte Floating-Lizenz auf dem Lizenzserver verlängern.",
+                ist_interne_notiz=False,
+                erstellt_am=datetime.utcnow() - timedelta(days=1)
+            ),
+            TicketMessage(
+                ticket_id=demo_tickets[1].id,
+                autor_id=3,
+                nachricht="Intern: Lizenzkey beim Allplan-Support angefragt, Ticket #44129 dort offen.",
+                ist_interne_notiz=True,
+                erstellt_am=datetime.utcnow() - timedelta(hours=4)
+            )
+        ]
+        db.add_all(demo_messages)
+        db.commit()
+

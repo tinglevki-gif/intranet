@@ -49,6 +49,7 @@ from app.models.schulung import TrainingDocument, TrainingChunk
 from app.models.announcement import Announcement
 from app.models.language import LanguageConfig
 from app.models.system_setting import SystemSetting
+from app.models.ticket import Ticket, TicketMessage
 from app.services.role_service import seed_default_roles
 from app.services.training_ai_service import seed_default_training_manuals
 from app.services.language_service import seed_default_languages

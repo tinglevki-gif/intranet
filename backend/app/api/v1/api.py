@@ -11,7 +11,8 @@ from app.api.v1.endpoints import (
     documents, 
     admin_users,
     admin_roles,
-    schulungen
+    schulungen,
+    tickets
 )
 
 api_router = APIRouter()
@@ -30,3 +31,4 @@ api_router.include_router(admin_roles.router, prefix="/admin/roles", tags=["Supe
 api_router.include_router(languages.admin_router, prefix="/admin/languages", tags=["SuperAdmin Sprachverwaltung"])
 api_router.include_router(settings.admin_router, prefix="/admin/settings", tags=["SuperAdmin System-Einstellungen"])
 api_router.include_router(schulungen.router, prefix="/schulungen", tags=["Schulungen & KI-Chatbot"])
+api_router.include_router(tickets.router, prefix="/tickets", tags=["Helpdesk & Ticket-System"])
