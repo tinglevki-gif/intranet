@@ -292,7 +292,7 @@ def seed_database(db: Session):
                 "original_name": "IT_Sicherheitsrichtlinie_und_Passwort_Policy_2026.pdf",
                 "file_type": "pdf",
                 "file_size": 1420000,
-                "category": DocumentCategory.IT,
+                "category": DocumentCategory.IT_POLICIES,
                 "summary": "Verbindliche Richtlinien zur IT-Sicherheit, Multi-Faktor-Authentifizierung (MFA), Passwortkomplexität und Clean-Desk-Policy.",
                 "uploader_id": admin_id,
                 "chunks": [

@@ -6,6 +6,7 @@ from app.core.database import Base
 
 class DocumentCategory(str, enum.Enum):
     HR = "HR"                      # Personal, Urlaub, Betriebsvereinbarungen
+    IT = "IT"                      # IT & Technik
     IT_POLICIES = "IT_POLICIES"    # IT-Sicherheit, 2FA, VPN, Passwörter
     FINANCE = "FINANCE"            # Spesen, Reisekosten, Abrechnungen
     GENERAL = "GENERAL"            # Code of Conduct, Compliance, Leitbilder
