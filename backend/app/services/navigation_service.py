@@ -283,12 +283,12 @@ DEFAULT_MENUS = [
     {
         "key": "it-helpdesk",
         "label": "IT-Helpdesk & Tickets",
-        "path": "/it/helpdesk",
+        "path": "/tickets",
         "icon": "Headphones",
         "section": "IT & Systeme",
         "order": 17,
-        "allowed_roles": ["ADMIN", "IT_ADMIN"],
-        "badge": "SLA OK",
+        "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
+        "badge": "Helpdesk",
     },
 
     # 5. Administration (SuperAdmin / ADMIN)

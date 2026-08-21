@@ -26,6 +26,7 @@ import { TechnikPage } from './pages/TechnikPage';
 import { AbwicklungPage } from './pages/AbwicklungPage';
 import { PlanungPage } from './pages/PlanungPage';
 import { SchulungenPage } from './pages/SchulungenPage';
+import { TicketsPage } from './pages/TicketsPage';
 
 // Placeholder view for secondary HR / IT sub-modules
 function PlaceholderModule({ title, description, badge }) {
@@ -215,24 +216,15 @@ export function App() {
                 }
               />
 
-              {/* 4. IT & Systeme (IT_ADMIN & ADMIN) */}
+              {/* 4. IT & Systeme */}
+              <Route path="tickets" element={<TicketsPage />} />
+              <Route path="it-helpdesk" element={<Navigate to="/tickets" replace />} />
+              <Route path="it/helpdesk" element={<TicketsPage />} />
               <Route
                 path="it/management"
                 element={
                   <ProtectedRoute allowedRoles={['IT_ADMIN', 'ADMIN']}>
                     <ITManagementPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="it/helpdesk"
-                element={
-                  <ProtectedRoute allowedRoles={['IT_ADMIN', 'ADMIN']}>
-                    <PlaceholderModule
-                      title="IT-Helpdesk & Ticket-Zentrale"
-                      description="Ticket-Zuweisung, Hardware-Ausgabe, VPN-Provisionierung und Benutzer-Support."
-                      badge="IT_Admin Bereich"
-                    />
                   </ProtectedRoute>
                 }
               />
