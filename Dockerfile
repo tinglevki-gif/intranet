@@ -29,14 +29,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (including build tools for native extensions)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    gcc \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python backend dependencies
 COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source code into container
 COPY backend/ ./
