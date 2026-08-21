@@ -1,0 +1,50 @@
+# Git
+.git
+.github
+.gitignore
+
+# Node & Frontend Build Artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Python Build & Cache
+backend/__pycache__/
+backend/app/**/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Databases
+backend/*.db
+backend/*.sqlite3
+*.db
+*.sqlite3
+
+# Uploads & Temporary media
+uploads/
+backend/uploads/avatars/*
+!backend/uploads/avatars/.gitkeep
+backend/uploads/documents/*
+!backend/uploads/documents/.gitkeep
+backend/uploads/news/*
+!backend/uploads/news/.gitkeep
+backend/uploads/schulungen/*
+!backend/uploads/schulungen/.gitkeep
+
+# IDEs & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Test Scripts
+test_*.py

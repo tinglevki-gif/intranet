@@ -106,16 +106,44 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_ROOT), name="uploads")
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.include_router(api_router, prefix="/api")
 
-@app.get("/", tags=["General"])
-def root():
-    return {
-        "app": settings.PROJECT_NAME,
-        "version": settings.VERSION,
-        "status": "online",
-        "docs": f"{settings.API_V1_STR}/docs",
-        "ical_feed": f"{settings.API_V1_STR}/calendar/feed.ics"
-    }
+from fastapi.responses import FileResponse
 
-@app.get("/health", tags=["General"])
-def health_check():
-    return {"status": "healthy"}
+# Production Frontend SPA Serving
+FRONTEND_DIST = os.path.join(BASE_DIR, "frontend_dist")
+if not os.path.exists(FRONTEND_DIST):
+    alt_dist = os.path.join(os.path.dirname(BASE_DIR), "frontend", "dist")
+    if os.path.exists(alt_dist):
+        FRONTEND_DIST = alt_dist
+
+if os.path.exists(FRONTEND_DIST) and os.path.isfile(os.path.join(FRONTEND_DIST, "index.html")):
+    assets_dir = os.path.join(FRONTEND_DIST, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="spa_assets")
+
+    @app.get("/health", tags=["General"])
+    def health_check():
+        return {"status": "healthy"}
+
+    @app.get("/{full_path:path}", tags=["Frontend"])
+    async def serve_spa(full_path: str):
+        # Serve static file if exists in frontend dist
+        if full_path:
+            file_path = os.path.join(FRONTEND_DIST, full_path)
+            if os.path.isfile(file_path):
+                return FileResponse(file_path)
+        # Fallback to index.html for React Router SPA
+        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+else:
+    @app.get("/", tags=["General"])
+    def root():
+        return {
+            "app": settings.PROJECT_NAME,
+            "version": settings.VERSION,
+            "status": "online",
+            "docs": f"{settings.API_V1_STR}/docs",
+            "ical_feed": f"{settings.API_V1_STR}/calendar/feed.ics"
+        }
+
+    @app.get("/health", tags=["General"])
+    def health_check():
+        return {"status": "healthy"}
