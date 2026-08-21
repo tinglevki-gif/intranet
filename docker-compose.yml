@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # 1. PostgreSQL Database with pgvector Extension
+  # -------------------------------------------------------------
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: tiglev-intranet-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-intranet_corp}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-intranet_corp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - intranet-network
+
+  # -------------------------------------------------------------
+  # 2. FastAPI Backend Application (REST API & AI RAG Service)
+  # -------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tiglev-intranet-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PROJECT_NAME: "Tiglev Elementfabrik Intranet"
+      VERSION: "6.0.0"
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-intranet_corp}
+      SECRET_KEY: ${SECRET_KEY:-tiglev-elementfabrik-super-secret-jwt-key-2026-production-change-me}
+      ACCESS_TOKEN_EXPIRE_MINUTES: 1440
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads_data:/app/uploads
+    networks:
+      - intranet-network
+
+  # -------------------------------------------------------------
+  # 3. React Frontend with Nginx Webserver & Reverse Proxy
+  # -------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tiglev-intranet-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - intranet-network
+
+# ---------------------------------------------------------------
+# Persistent Data Volumes & Network Definition
+# ---------------------------------------------------------------
+volumes:
+  postgres_data:
+    name: tiglev_intranet_postgres_data
+  uploads_data:
+    name: tiglev_intranet_uploads_data
+
+networks:
+  intranet-network:
+    name: tiglev_intranet_network
+    driver: bridge

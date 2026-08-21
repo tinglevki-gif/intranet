@@ -1,0 +1,9 @@
+=== IT_Sicherheitsleitfaden_und_2FA_Richtlinie_2026.pdf ===
+
+Zwei-Faktor-Authentifizierung (2FA): Für den Zugriff auf das Intranet, Firmen-E-Mails und Cloud-Ressourcen ist eine Zwei-Faktor-Authentifizierung via Microsoft Authenticator oder FIDO2-Hardware-Token (YubiKey) zwingend vorgeschrieben.
+
+VPN-Infrastruktur & Remote Access: Bei Verbindungen außerhalb des Unternehmensnetzwerks muss stets der gesicherte WireGuard- oder IPsec-VPN-Tunnel aktiviert werden. VPN-Sitzungen werden nach 12 Stunden Inaktivität automatisch getrennt.
+
+Passwort-Komplexität: Passwörter müssen mindestens 14 Zeichen lang sein und Großbuchstaben, Kleinbuchstaben, Zahlen sowie Sonderzeichen enthalten. Ein Passwortwechsel ist alle 180 Tage erforderlich.
+
+Phishing & Incident Response: Verdächtige E-Mails oder Anhänge dürfen unter keinen Umständen geöffnet werden. Bitte leiten Sie Phishing-Versuche unverzüglich an den IT-Helpdesk (Durchwahl #300 oder it_admin@empresa.com) weiter.
