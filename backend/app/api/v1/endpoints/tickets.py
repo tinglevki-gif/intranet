@@ -1,5 +1,6 @@
+import re
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
@@ -17,11 +18,74 @@ from app.schemas.ticket import (
     TicketResponse,
     TicketDetailResponse,
     TicketListResponse,
-    TicketStatsSummary
+    TicketStatsSummary,
+    KnowledgeBaseItemResponse,
+    KnowledgeBaseSearchResponse,
+    SolutionSuggestionResponse
 )
 from app.services.auth_service import get_current_user
 
 router = APIRouter()
+
+# Stopwords for Knowledge Base & Smart-Assist search
+STOP_WORDS_SEARCH = {
+    "der", "die", "das", "und", "oder", "für", "mit", "von", "bei", "den", "dem", "des",
+    "ein", "eine", "einer", "eines", "einem", "einen", "wie", "ist", "sind", "was", "wer",
+    "kann", "können", "ich", "du", "er", "sie", "es", "wir", "ihr", "im", "in", "an", "am",
+    "auf", "nach", "zu", "zum", "zur", "nicht", "bitte", "habe", "hat", "mein", "meine",
+    "the", "and", "or", "for", "with", "from", "at", "in", "on", "to", "is", "are", "how"
+}
+
+def tokenize_query(query: str) -> List[str]:
+    """Tokenizes text into lowercase keywords, removing stop words."""
+    cleaned = re.sub(r'[^\w\s-]', ' ', query.lower())
+    words = [w.strip() for w in re.split(r'[\s-]+', cleaned) if len(w.strip()) >= 2]
+    meaningful = [w for w in words if w not in STOP_WORDS_SEARCH]
+    return meaningful or words
+
+def score_ticket_relevance(ticket: Ticket, query_tokens: List[str], raw_query: str) -> float:
+    """Computes relevance score between a search query and a solved ticket."""
+    score = 0.0
+    raw_lower = raw_query.lower().strip()
+    
+    titel_lower = (ticket.titel or "").lower()
+    beschr_lower = (ticket.beschreibung or "").lower()
+    loesung_lower = (ticket.loesung_dokumentation or "").lower()
+    tags = [str(t).lower() for t in (ticket.loesungs_schlagwoerter or [])]
+
+    # Exact phrase matching boost
+    if raw_lower and len(raw_lower) >= 3:
+        if raw_lower in titel_lower:
+            score += 10.0
+        if raw_lower in loesung_lower:
+            score += 8.0
+        if any(raw_lower in t for t in tags):
+            score += 12.0
+        if raw_lower in beschr_lower:
+            score += 4.0
+
+    # Token-level scoring
+    for token in query_tokens:
+        # Tags (weight 5.0)
+        for tag in tags:
+            if token == tag:
+                score += 5.0
+            elif token in tag or tag in token:
+                score += 3.0
+
+        # Title (weight 3.5)
+        if token in titel_lower:
+            score += 3.5
+
+        # Solution documentation (weight 2.5)
+        if token in loesung_lower:
+            score += 2.5
+
+        # Description (weight 1.0)
+        if token in beschr_lower:
+            score += 1.0
+
+    return round(score, 2)
 
 def is_support_staff(user: User) -> bool:
     """Checks if the user has IT / Support / SuperAdmin permissions for Helpdesk."""
@@ -99,6 +163,129 @@ def map_ticket_to_response(t: Ticket, db: Session) -> TicketResponse:
         geloest_am=t.geloest_am,
         messages_count=msg_count
     )
+
+def map_ticket_to_kb_item(t: Ticket, score: Optional[float] = None) -> KnowledgeBaseItemResponse:
+    techniker_name = t.zugewiesen_an.full_name if t.zugewiesen_an else (t.ersteller.full_name if t.ersteller else "IT-Support")
+    techniker_avatar = t.zugewiesen_an.avatar_url if t.zugewiesen_an else (t.ersteller.avatar_url if t.ersteller else None)
+
+    return KnowledgeBaseItemResponse(
+        id=t.id,
+        ticket_nr=t.ticket_nr,
+        titel=t.titel,
+        kategorie=t.kategorie,
+        prioritaet=t.prioritaet,
+        status=t.status,
+        problembeschreibung=t.beschreibung,
+        loesungsschritte=t.loesung_dokumentation or "",
+        loesungs_schlagwoerter=t.loesungs_schlagwoerter or [],
+        geloest_am=t.geloest_am or t.aktualisiert_am,
+        techniker_name=techniker_name,
+        techniker_avatar=techniker_avatar,
+        relevance_score=score
+    )
+
+# =========================================================================
+# 1. KNOWLEDGE BASE & SMART ASSIST ENDPOINTS
+# =========================================================================
+
+@router.get("/knowledge-base/search", response_model=KnowledgeBaseSearchResponse)
+def search_knowledge_base(
+    q: Optional[str] = None,
+    kategorie: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Searches solved tickets and documented solutions (Knowledge Base).
+    Accessible to all authenticated employees with weighted relevance scoring.
+    """
+    base_q = db.query(Ticket).filter(
+        Ticket.status.in_([TicketStatus.GELOEST, TicketStatus.GESCHLOSSEN]),
+        Ticket.loesung_dokumentation != None,
+        Ticket.loesung_dokumentation != ""
+    )
+
+    if kategorie and kategorie != "ALL":
+        base_q = base_q.filter(Ticket.kategorie == kategorie)
+
+    solved_tickets = base_q.all()
+
+    if not q or not q.strip():
+        # Return recent solved tickets ordered by geloest_am
+        sorted_tickets = sorted(solved_tickets, key=lambda x: x.geloest_am or x.aktualisiert_am, reverse=True)
+        results = [map_ticket_to_kb_item(t, None) for t in sorted_tickets]
+        return KnowledgeBaseSearchResponse(
+            total=len(results),
+            query="",
+            category_filter=kategorie,
+            results=results
+        )
+
+    query_tokens = tokenize_query(q)
+    scored_items: List[Tuple[Ticket, float]] = []
+    for t in solved_tickets:
+        score = score_ticket_relevance(t, query_tokens, q)
+        if score > 0.0:
+            scored_items.append((t, score))
+
+    # Sort by score descending, then date
+    scored_items.sort(key=lambda x: (x[1], x[0].geloest_am or x[0].aktualisiert_am), reverse=True)
+    results = [map_ticket_to_kb_item(t, score) for t, score in scored_items]
+
+    return KnowledgeBaseSearchResponse(
+        total=len(results),
+        query=q,
+        category_filter=kategorie,
+        results=results
+    )
+
+@router.get("/suggest-solutions", response_model=SolutionSuggestionResponse)
+def suggest_solutions(
+    titel: Optional[str] = None,
+    kategorie: Optional[str] = None,
+    beschreibung: Optional[str] = None,
+    limit: int = Query(4, ge=1, le=10),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Smart Assist: Real-time solution suggestions while user drafts a new ticket to prevent duplicates.
+    """
+    combined_text = f"{titel or ''} {beschreibung or ''}".strip()
+    if not combined_text or len(combined_text) < 3:
+        return SolutionSuggestionResponse(has_suggestions=False, suggestions_count=0, suggestions=[])
+
+    base_q = db.query(Ticket).filter(
+        Ticket.status.in_([TicketStatus.GELOEST, TicketStatus.GESCHLOSSEN]),
+        Ticket.loesung_dokumentation != None,
+        Ticket.loesung_dokumentation != ""
+    )
+
+    solved_tickets = base_q.all()
+
+    query_tokens = tokenize_query(combined_text)
+    scored_items: List[Tuple[Ticket, float]] = []
+    for t in solved_tickets:
+        score = score_ticket_relevance(t, query_tokens, combined_text)
+        # Boost if category matches user's selection
+        if kategorie and kategorie != "ALL" and t.kategorie == kategorie:
+            score += 3.0
+        if score >= 2.0:  # Minimum relevance threshold for smart suggestion
+            scored_items.append((t, score))
+
+    scored_items.sort(key=lambda x: x[1], reverse=True)
+    top_suggestions = scored_items[:limit]
+    results = [map_ticket_to_kb_item(t, score) for t, score in top_suggestions]
+
+    return SolutionSuggestionResponse(
+        has_suggestions=len(results) > 0,
+        suggestions_count=len(results),
+        suggestions=results
+    )
+
+# =========================================================================
+# 2. STANDARD TICKET CRUD & STATS ENDPOINTS
+# =========================================================================
 
 @router.get("/stats/summary", response_model=TicketStatsSummary)
 def get_ticket_stats(

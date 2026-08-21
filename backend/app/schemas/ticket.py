@@ -93,3 +93,33 @@ class TicketStatsSummary(BaseModel):
     kritisch: int
     nach_kategorie: Dict[str, int]
     nach_prioritaet: Dict[str, int]
+
+# Knowledge Base & Smart-Assist Solution Suggestion Schemas
+class KnowledgeBaseItemResponse(BaseModel):
+    id: int
+    ticket_nr: str
+    titel: str
+    kategorie: TicketCategory
+    prioritaet: TicketPriority
+    status: TicketStatus
+    problembeschreibung: str
+    loesungsschritte: str
+    loesungs_schlagwoerter: List[str] = []
+    geloest_am: Optional[datetime] = None
+    techniker_name: Optional[str] = None
+    techniker_avatar: Optional[str] = None
+    relevance_score: Optional[float] = None
+
+    class Config:
+        from_attributes = True
+
+class KnowledgeBaseSearchResponse(BaseModel):
+    total: int
+    query: str
+    category_filter: Optional[str] = None
+    results: List[KnowledgeBaseItemResponse]
+
+class SolutionSuggestionResponse(BaseModel):
+    has_suggestions: bool
+    suggestions_count: int
+    suggestions: List[KnowledgeBaseItemResponse]
