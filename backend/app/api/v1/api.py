@@ -30,5 +30,6 @@ api_router.include_router(admin_users.router, prefix="/admin/users", tags=["Supe
 api_router.include_router(admin_roles.router, prefix="/admin/roles", tags=["SuperAdmin Rollen- & Berechtigungsverwaltung"])
 api_router.include_router(languages.admin_router, prefix="/admin/languages", tags=["SuperAdmin Sprachverwaltung"])
 api_router.include_router(settings.admin_router, prefix="/admin/settings", tags=["SuperAdmin System-Einstellungen"])
+api_router.include_router(calendar.admin_router, prefix="/admin/calendar-sources", tags=["SuperAdmin Kalender-Quellen"])
 api_router.include_router(schulungen.router, prefix="/schulungen", tags=["Schulungen & KI-Chatbot"])
 api_router.include_router(tickets.router, prefix="/tickets", tags=["Helpdesk & Ticket-System"])

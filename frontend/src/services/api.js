@@ -373,6 +373,41 @@ class ApiService {
     return `${API_BASE_URL}/calendar/feed.ics`;
   }
 
+  // External Outlook / iCal Calendar Sources
+  getCalendarSources() {
+    return this.request('/calendar/sources');
+  }
+
+  getAdminCalendarSources() {
+    return this.request('/admin/calendar-sources');
+  }
+
+  createCalendarSource(sourceData) {
+    return this.request('/admin/calendar-sources', {
+      method: 'POST',
+      body: JSON.stringify(sourceData),
+    });
+  }
+
+  updateCalendarSource(sourceId, sourceData) {
+    return this.request(`/admin/calendar-sources/${sourceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(sourceData),
+    });
+  }
+
+  deleteCalendarSource(sourceId) {
+    return this.request(`/admin/calendar-sources/${sourceId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  syncCalendarSource(sourceId) {
+    return this.request(`/admin/calendar-sources/${sourceId}/sync`, {
+      method: 'POST',
+    });
+  }
+
   // Documents & AI Search Module
   getDocuments(category = 'ALL', department = 'ALL', search = '') {
     const params = new URLSearchParams();

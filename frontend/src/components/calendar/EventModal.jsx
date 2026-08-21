@@ -300,13 +300,25 @@ export function EventModal({
                 </div>
               </div>
 
+              {event?.is_external && (
+                <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-blue-950">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-3.5 h-3.5 rounded-full shrink-0 shadow-xs" style={{ backgroundColor: event.source_color || '#0078D4' }}></span>
+                    <span>Synchronisiert aus <strong>Microsoft Outlook ({event.source_name || 'iCal'})</strong></span>
+                  </div>
+                  <span className="self-start sm:self-auto text-[10px] font-bold bg-blue-100/80 text-blue-800 px-2 py-0.5 rounded-md border border-blue-200">
+                    Schreibgeschützt
+                  </span>
+                </div>
+              )}
+
               {event?.description && (
                 <div>
                   <h4 className="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5 flex items-center space-x-1.5">
                     <AlignLeft className="w-3.5 h-3.5 text-slate-400" />
                     <span>{t('calendar.description')}</span>
                   </h4>
-                  <p className="text-slate-600 leading-relaxed bg-white p-3.5 rounded-xl border border-slate-100 text-xs">
+                  <p className="text-slate-600 leading-relaxed bg-white p-3.5 rounded-xl border border-slate-100 text-xs whitespace-pre-line">
                     {event.description}
                   </p>
                 </div>

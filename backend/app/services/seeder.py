@@ -8,6 +8,7 @@ from app.models.menu import MenuItem
 from app.models.event import Event, EventCategory
 from app.models.document import Document, DocumentChunk, DocumentCategory
 from app.models.ticket import Ticket, TicketMessage, TicketStatus, TicketPriority, TicketCategory
+from app.models.calendar_source import ExternalCalendarSource
 from app.core.security import get_password_hash
 from app.services.navigation_service import DEFAULT_MENUS
 
@@ -615,4 +616,72 @@ Bitte gebt bis zum 10. April eure Rückmeldung im Mitarbeiterportal ab, damit da
         ]
         db.add_all(demo_messages)
         db.commit()
+
+    # 7. Seed External Outlook / iCal Calendar Sources (only if empty)
+    if db.query(ExternalCalendarSource).count() == 0:
+        # Provide sample iCal content for demo feed
+        sample_ics_content = """BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Microsoft Corporation//Outlook 16.0 MIMEDIR//EN
+X-WR-CALNAME:Microsoft 365 Feiertage & Brückentage 2026
+BEGIN:VEVENT
+UID:outlook-sync-001@microsoft365.corp
+DTSTAMP:20260101T000000Z
+DTSTART;VALUE=DATE:20260501
+DTEND;VALUE=DATE:20260502
+SUMMARY:🇩🇪 Tag der Arbeit (Gesetzlicher Feiertag)
+DESCRIPTION:Offizieller bundesweiter Feiertag. Werk und Verwaltung bleiben geschlossen.
+LOCATION:Deutschlandweit
+CATEGORIES:HOLIDAY
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:outlook-sync-002@microsoft365.corp
+DTSTAMP:20260101T000000Z
+DTSTART;VALUE=DATE:20260514
+DTEND;VALUE=DATE:20260515
+SUMMARY:✝️ Christi Himmelfahrt / Brückentag
+DESCRIPTION:Gesetzlicher Feiertag und empfohlener Brückentag. Notbesetzung in der Instandhaltung.
+LOCATION:Tinglev Werk
+CATEGORIES:HOLIDAY
+STATUS:CONFIRMED
+END:VEVENT
+BEGIN:VEVENT
+UID:outlook-sync-003@microsoft365.corp
+DTSTAMP:20260101T000000Z
+DTSTART:20260610T090000Z
+DTEND:20260610T170000Z
+SUMMARY:🏗️ Messe BAU 2026: Standbetreuung & Vertriebsmeeting
+DESCRIPTION:Internationaler Branchentreff für Betonfertigteile und serielle Bauelemente. Standhalle B2.
+LOCATION:Messegelände München
+CATEGORIES:MEETING
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR"""
+
+        demo_sources = [
+            ExternalCalendarSource(
+                name="Microsoft 365 Feiertage & Werksferien",
+                ics_url=sample_ics_content,
+                farbe="#0078D4",  # Outlook Blue
+                ist_aktiv=True,
+                abteilung=None,
+                letzter_status="OK",
+                anzahl_termine=3,
+                letzte_synchronisation=datetime.utcnow()
+            ),
+            ExternalCalendarSource(
+                name="Outlook Vertriebsmeilensteine & Messen",
+                ics_url="https://outlook.office365.com/owa/calendar/sales_feed_demo/reachcalendar.ics",
+                farbe="#107C41",  # Office Excel / Sales Green
+                ist_aktiv=True,
+                abteilung="Vertrieb",
+                letzter_status="NEU",
+                anzahl_termine=0,
+                letzte_synchronisation=None
+            )
+        ]
+        db.add_all(demo_sources)
+        db.commit()
+
 
