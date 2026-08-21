@@ -345,6 +345,39 @@ class ApiService {
     });
   }
 
+  // SuperAdmin Navigation & Menu Management (Reorder, Toggle, Visibility)
+  getAdminMenuItems() {
+    return this.request('/admin/menu');
+  }
+
+  toggleMenuItemActive(itemId, isActive = null) {
+    const payload = isActive !== null ? { is_active: isActive } : null;
+    return this.request(`/admin/menu/${itemId}/toggle-active`, {
+      method: 'PATCH',
+      body: payload ? JSON.stringify(payload) : JSON.stringify({}),
+    });
+  }
+
+  reorderMenuItems(items) {
+    return this.request('/admin/menu/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ items }),
+    });
+  }
+
+  updateMenuItem(itemId, data) {
+    return this.request(`/admin/menu/${itemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  resetDefaultMenus() {
+    return this.request('/admin/menu/reset-defaults', {
+      method: 'POST',
+    });
+  }
+
   // Calendar Module
   getCalendarEvents(category = 'ALL', department = 'ALL', start = null, end = null) {
     const params = new URLSearchParams();

@@ -5,9 +5,10 @@ import { ShieldCheck, Sliders, Server, Database, Key, CheckCircle, RefreshCw } f
 import { RoleBadge } from '../components/common/Badge';
 import { LanguageManagementCard } from '../components/admin/LanguageManagementCard';
 import { OneDriveConfigCard } from '../components/admin/OneDriveConfigCard';
+import { MenuManagementCard } from '../components/admin/MenuManagementCard';
 
 export function AdminSettingsPage() {
-  const { user, menuSections, refreshMenu } = useAuth();
+  const { user, refreshMenu } = useAuth();
   const { t } = useLanguage();
   const [reseeded, setReseeded] = useState(false);
 
@@ -29,7 +30,7 @@ export function AdminSettingsPage() {
   };
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-8 pb-12 animate-fade-in">
       {/* Header */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -37,109 +38,77 @@ export function AdminSettingsPage() {
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{t('admin.title')}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t('admin.title', 'System-Konfiguration & Administration')}</h1>
             <p className="text-xs sm:text-sm text-slate-500">
-              {t('admin.subtitle')}
+              {t('admin.subtitle', 'Zentrale Verwaltung von Menüs, Sprachen, Cloud-Speicher und Systemparametern')}
             </p>
           </div>
         </div>
         <RoleBadge role={user?.role} />
       </div>
 
-      {/* 1. Dynamic System Languages (i18n) Management Card */}
+      {/* 1. SuperAdmin Menu & Navigation Management Card (Reorder, Toggle Active, Global Impact) */}
+      <MenuManagementCard />
+
+      {/* 2. Dynamic System Languages (i18n) Management Card */}
       <LanguageManagementCard />
 
-      {/* 2. Microsoft OneDrive & SharePoint Cloud Storage Integrations */}
+      {/* 3. Microsoft OneDrive & SharePoint Cloud Storage Integrations */}
       <OneDriveConfigCard />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Dynamic RBAC Structure Inspection */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6">
-          <div className="flex items-center space-x-3 pb-4 border-b border-slate-100">
-            <Sliders className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-base font-bold text-slate-900">{t('admin.rbac_title')}</h2>
+      {/* Backend & Security Parameters */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6">
+        <div className="flex items-center space-x-3 pb-4 border-b border-slate-100">
+          <Server className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-base font-bold text-slate-900">{t('admin.server_title', 'Server- & Sicherheitsstatus')}</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Key className="w-4 h-4 text-indigo-500" />
+              <span className="font-semibold text-slate-700">{t('admin.jwt_label', 'JWT Auth Token')}</span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+              {t('admin.jwt_status', 'Aktiv (HS256)')}
+            </span>
           </div>
 
-          <p className="text-xs text-slate-500">
-            {t('admin.rbac_desc')} (<strong className="text-slate-800">{user?.role}</strong>):
-          </p>
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Database className="w-4 h-4 text-indigo-500" />
+              <span className="font-semibold text-slate-700">{t('admin.db_label', 'Datenbank')}</span>
+            </div>
+            <span className="font-mono text-slate-600">{t('admin.db_status', 'SQLite / PostgreSQL')}</span>
+          </div>
 
-          <div className="space-y-4">
-            {menuSections.map((sec, idx) => {
-              const translatedSection = t(`nav_sections.${sec.section}`, sec.section);
-              return (
-                <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60">
-                  <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">
-                    {translatedSection}
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {sec.items.map((it) => {
-                      const translatedLabel = t(`nav_items.${it.key}`, it.label);
-                      return (
-                        <div key={it.key} className="p-2 bg-white rounded-xl border border-slate-100 flex items-center justify-between text-xs">
-                          <span className="font-medium text-slate-800">{translatedLabel}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">{it.path}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <ShieldCheck className="w-4 h-4 text-indigo-500" />
+              <span className="font-semibold text-slate-700">{t('admin.policy_label', 'RBAC & Schutz')}</span>
+            </div>
+            <span className="font-semibold text-slate-700">{t('admin.policy_status', 'Global Erzwungen')}</span>
           </div>
         </div>
 
-        {/* Backend & Security Parameters */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6">
-          <div className="flex items-center space-x-3 pb-4 border-b border-slate-100">
-            <Server className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-base font-bold text-slate-900">{t('admin.server_title')}</h2>
-          </div>
-
-          <div className="space-y-3 text-xs">
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Key className="w-4 h-4 text-indigo-500" />
-                <span className="font-semibold text-slate-700">{t('admin.jwt_label')}</span>
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
-                {t('admin.jwt_status')}
-              </span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Database className="w-4 h-4 text-indigo-500" />
-                <span className="font-semibold text-slate-700">{t('admin.db_label')}</span>
-              </div>
-              <span className="font-mono text-slate-600">{t('admin.db_status')}</span>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                <span className="font-semibold text-slate-700">{t('admin.policy_label')}</span>
-              </div>
-              <span className="font-semibold text-slate-700">{t('admin.policy_status')}</span>
-            </div>
-          </div>
-
-          {/* Database Seeder Button */}
-          <div className="pt-4 border-t border-slate-100">
-            <button
-              onClick={handleReseed}
-              className="w-full flex items-center justify-center space-x-2 p-3 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-semibold transition-all shadow-md"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>{t('admin.reseed_button')}</span>
-            </button>
-            {reseeded && (
-              <p className="mt-2 text-center text-xs text-emerald-600 font-semibold flex items-center justify-center space-x-1">
-                <CheckCircle className="w-3.5 h-3.5" />
-                <span>{t('admin.reseed_success')}</span>
-              </p>
-            )}
-          </div>
+        {/* Database Seeder Button */}
+        <div className="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-4">
+          <p className="text-xs text-slate-500">
+            Initialisiert fehlende Standard-Datensätze (ohne bestehende Benutzer oder Passwörter zu überschreiben).
+          </p>
+          <button
+            onClick={handleReseed}
+            className="flex items-center space-x-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-semibold transition-all shadow-md"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>{t('admin.reseed_button', 'Demodaten synchronisieren')}</span>
+          </button>
+          {reseeded && (
+            <p className="w-full text-center text-xs text-emerald-600 font-semibold flex items-center justify-center space-x-1">
+              <CheckCircle className="w-3.5 h-3.5" />
+              <span>{t('admin.reseed_success', 'Synchronisation erfolgreich!')}</span>
+            </p>
+          )}
         </div>
       </div>
     </div>
