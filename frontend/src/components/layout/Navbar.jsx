@@ -64,7 +64,7 @@ export function Navbar({ onToggleSidebar }) {
           <input
             type="text"
             placeholder={t('navbar.search_placeholder')}
-            className="w-full pl-10 pr-12 py-2 text-xs md:text-sm bg-slate-100/80 hover:bg-slate-100 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl border border-transparent focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+            className="w-full pl-10 pr-12 py-2 text-xs md:text-sm bg-slate-100/80 hover:bg-slate-100 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl border border-transparent focus:border-[#009FE3] focus:ring-2 focus:ring-[#009FE3]/20 transition-all outline-none"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-0.5 pointer-events-none">
             <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">⌘K</kbd>
@@ -72,53 +72,10 @@ export function Navbar({ onToggleSidebar }) {
         </div>
       </div>
 
-      {/* Right side: Language Selector, Weather Widget, Status, Notifications, User Menu */}
+      {/* Right side: Weather Widget, Status, Notifications, User Menu */}
       <div className="flex items-center space-x-2 sm:space-x-3">
         {/* Open-Meteo Weather Widget */}
         <WeatherWidget />
-
-        {/* Language Selector Dropdown in Navbar */}
-        <div className="relative" ref={langMenuRef}>
-          <button
-            onClick={() => setShowLangMenu(!showLangMenu)}
-            className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-xs font-bold text-slate-700 transition-all border border-slate-200/60 shadow-2xs"
-            title={currentLanguage?.label || 'Sprache'}
-          >
-            <span className="text-sm leading-none">{currentLanguage?.flag || '🌐'}</span>
-            <span className="uppercase text-[11px] font-extrabold">{currentLanguage?.code || 'DE'}</span>
-            <ChevronDown className="w-3 h-3 text-slate-400" />
-          </button>
-
-          {showLangMenu && (
-            <div className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-2xl border border-slate-100 py-1.5 z-50 animate-fade-in">
-              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                Sprache / Language
-              </div>
-              <div className="py-1">
-                {languages.map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => {
-                      setLanguage(l.code);
-                      setShowLangMenu(false);
-                    }}
-                    className={`w-full px-3 py-2 text-xs font-medium flex items-center justify-between transition-colors ${
-                      language === l.code
-                        ? 'bg-indigo-50 text-indigo-700 font-bold'
-                        : 'text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-base">{l.flag}</span>
-                      <span>{l.label || l.name}</span>
-                    </div>
-                    {language === l.code && <span className="w-2 h-2 rounded-full bg-indigo-600"></span>}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Live Status indicator */}
         <div className="hidden 2xl:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
@@ -130,22 +87,22 @@ export function Navbar({ onToggleSidebar }) {
         <div className="relative" ref={notifMenuRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2 text-slate-600 hover:text-indigo-600 rounded-xl hover:bg-slate-100 transition-colors"
+            className="relative p-2 text-slate-600 hover:text-[#009FE3] rounded-xl hover:bg-slate-100 transition-colors"
           >
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white"></span>
+            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#F05A22] rounded-full ring-2 ring-white"></span>
           </button>
 
           {showNotifications && (
             <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fade-in">
               <div className="flex items-center justify-between px-4 pb-2 border-b border-slate-100">
                 <span className="font-semibold text-slate-900 text-sm">{t('navbar.notifications')}</span>
-                <span className="text-[11px] font-medium text-indigo-600 hover:underline cursor-pointer">{t('navbar.mark_all_read')}</span>
+                <span className="text-[11px] font-medium text-[#009FE3] hover:underline cursor-pointer">{t('navbar.mark_all_read')}</span>
               </div>
               <div className="divide-y divide-slate-50 max-h-80 overflow-y-auto">
                 {notifications.map((notif) => (
-                  <div key={notif.id} className={`p-3.5 hover:bg-slate-50 transition-colors flex items-start space-x-3 ${notif.unread ? 'bg-indigo-50/30' : ''}`}>
-                    <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600 mt-0.5">
+                  <div key={notif.id} className={`p-3.5 hover:bg-slate-50 transition-colors flex items-start space-x-3 ${notif.unread ? 'bg-[#eef8fd]/60' : ''}`}>
+                    <div className="p-2 rounded-lg bg-[#F05A22]/10 text-[#F05A22] mt-0.5">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
@@ -169,7 +126,7 @@ export function Navbar({ onToggleSidebar }) {
             <img
               src={getAvatarUrl(user?.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
               alt={user?.full_name}
-              className="w-9 h-9 rounded-xl object-cover ring-2 ring-indigo-500/20"
+              className="w-9 h-9 rounded-xl object-cover ring-2 ring-[#009FE3]/30"
             />
             <div className="hidden sm:block text-left">
               <p className="text-xs font-bold text-slate-800 leading-tight">{user?.full_name}</p>

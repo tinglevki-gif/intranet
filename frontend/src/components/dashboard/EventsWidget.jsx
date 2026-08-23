@@ -21,7 +21,7 @@ export function EventsWidget({ events }) {
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card">
       <div className="flex items-center space-x-3 pb-6 border-b border-slate-100">
-        <div className="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600">
+        <div className="p-2.5 rounded-2xl bg-[#eef8fd] text-[#009FE3]">
           <Calendar className="w-5 h-5" />
         </div>
         <div>
@@ -39,19 +39,19 @@ export function EventsWidget({ events }) {
           return (
             <div
               key={evt.id}
-              className="p-4 rounded-2xl bg-slate-50/50 hover:bg-white border border-slate-100 hover:border-indigo-100 hover:shadow-md transition-all group"
+              className="p-4 rounded-2xl bg-slate-50/50 hover:bg-white border border-slate-100 hover:border-[#72ccf0] hover:shadow-md transition-all group"
             >
               <div className="flex items-start justify-between">
                 <span className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badge.bg}`}>
                   <BadgeIcon className="w-3 h-3 mr-1" />
                   {badge.label}
                 </span>
-                <span className="text-xs font-bold text-indigo-600">
+                <span className="text-xs font-bold text-[#009FE3]">
                   {evt.date}
                 </span>
               </div>
 
-              <h4 className="text-xs sm:text-sm font-bold text-slate-900 mt-2 group-hover:text-indigo-600 transition-colors">
+              <h4 className="text-xs sm:text-sm font-bold text-slate-900 mt-2 group-hover:text-[#009FE3] transition-colors">
                 {evt.title}
               </h4>
 

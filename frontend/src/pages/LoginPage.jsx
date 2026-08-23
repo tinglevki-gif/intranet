@@ -2,18 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { LanguageSelector } from '../components/layout/LanguageSelector';
+import { TinglevMark } from '../components/common/TinglevLogo';
 import { 
-  Building2, 
   Lock, 
   Mail, 
   ArrowRight, 
-  ShieldCheck, 
-  Users, 
-  Server,
-  UserCheck, 
-  AlertCircle,
-  Sparkles
+  AlertCircle
 } from 'lucide-react';
 
 export function LoginPage() {
@@ -44,38 +38,29 @@ export function LoginPage() {
     }
   };
 
-  const handleQuickFill = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    setError(null);
-  };
-
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Ambient background glows */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
-
-      {/* Language Switcher in top right of login screen */}
-      <div className="absolute top-6 right-6 z-20 flex items-center space-x-2 bg-slate-900/80 p-2 rounded-2xl border border-slate-800 backdrop-blur-md">
-        <LanguageSelector />
-      </div>
+    <div className="min-h-screen bg-[#001424] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Ambient background glows with Tinglev Blue and Orange */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#009FE3]/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F05A22]/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-lg relative z-10 text-center">
         {/* Logo */}
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 text-white shadow-xl shadow-indigo-500/30 mb-4">
-          <Building2 className="w-8 h-8" />
+        <div className="inline-flex items-center justify-center w-18 h-18 p-3 rounded-3xl bg-gradient-to-br from-[#00243F] to-[#001E36] border border-[#003E6B]/80 shadow-2xl shadow-[#001424]/60 mb-4 relative group">
+          <TinglevMark className="w-10 h-10 transform group-hover:scale-105 transition-transform" color="#009FE3" />
+          <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#F05A22] rounded-full border-2 border-[#001424]"></span>
         </div>
+        <div className="w-12 h-1 bg-[#F05A22] rounded-full mx-auto mb-3"></div>
         <h2 className="text-3xl font-extrabold text-white tracking-tight font-heading">
-          {t('login.tag')}
+          {t('login.tag', 'TINGLEV ELEMENTFABRIK')}
         </h2>
-        <p className="mt-2 text-sm text-slate-400">
-          {t('login.subtitle')}
+        <p className="mt-2 text-sm text-slate-300">
+          {t('login.subtitle', 'Zentrales Portal für Unternehmenszusammenarbeit & Workflows')}
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg relative z-10">
-        <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 py-8 px-6 sm:px-10 shadow-2xl rounded-3xl">
+        <div className="bg-[#001E36]/90 backdrop-blur-xl border border-[#002B49] py-8 px-6 sm:px-10 shadow-2xl rounded-3xl">
           {error && (
             <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start space-x-3 text-rose-300 text-xs">
               <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
@@ -86,7 +71,7 @@ export function LoginPage() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                {t('login.email_label')}
+                {t('login.email_label', 'GESCHÄFTLICHE E-MAIL')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -97,15 +82,15 @@ export function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder={t('login.email_placeholder')}
+                  className="block w-full pl-10 pr-4 py-2.5 bg-[#001424]/80 border border-[#002B49] rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#009FE3] focus:border-transparent transition-all"
+                  placeholder={t('login.email_placeholder', 'vorname.nachname@firma.de')}
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                {t('login.password_label')}
+                {t('login.password_label', 'PASSWORT')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
@@ -116,8 +101,8 @@ export function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-4 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                  placeholder={t('login.password_placeholder')}
+                  className="block w-full pl-10 pr-4 py-2.5 bg-[#001424]/80 border border-[#002B49] rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#009FE3] focus:border-transparent transition-all"
+                  placeholder={t('login.password_placeholder', '••••••••')}
                 />
               </div>
             </div>
@@ -125,78 +110,24 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#F05A22] to-[#e0460f] hover:from-[#e0460f] hover:to-[#c2360a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F05A22] shadow-lg shadow-[#F05A22]/25 transition-all disabled:opacity-50 cursor-pointer mt-2"
             >
               {isSubmitting ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span>{t('login.submit_button')}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>{t('login.submit_button', 'Im Intranet anmelden')}</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </>
               )}
             </button>
           </form>
-
-          {/* Quick Demo Logins Switcher for all 4 RBAC Roles */}
-          <div className="mt-8 pt-6 border-t border-slate-800/80">
-            <div className="flex items-center space-x-2 mb-3">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
-              <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">
-                {t('login.demo_title')}
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 mb-4">
-              {t('login.demo_subtitle')}
-            </p>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {/* 1. SuperAdmin */}
-              <button
-                type="button"
-                onClick={() => handleQuickFill('admin@empresa.com', 'admin123')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-rose-500/40 text-slate-300 hover:text-white transition-all group"
-              >
-                <ShieldCheck className="w-4 h-4 text-rose-400 mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-[11px] font-bold">{t('login.superadmin_name')}</span>
-                <span className="text-[9px] text-slate-500">{t('login.superadmin_desc')}</span>
-              </button>
-
-              {/* 2. HR_Admin */}
-              <button
-                type="button"
-                onClick={() => handleQuickFill('hr@empresa.com', 'hr123')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-purple-500/40 text-slate-300 hover:text-white transition-all group"
-              >
-                <Users className="w-4 h-4 text-purple-400 mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-[11px] font-bold">{t('login.hr_name')}</span>
-                <span className="text-[9px] text-slate-500">{t('login.hr_desc')}</span>
-              </button>
-
-              {/* 3. IT_Admin */}
-              <button
-                type="button"
-                onClick={() => handleQuickFill('it_admin@empresa.com', 'it123')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-cyan-500/40 text-slate-300 hover:text-white transition-all group"
-              >
-                <Server className="w-4 h-4 text-cyan-400 mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-[11px] font-bold">{t('login.it_name')}</span>
-                <span className="text-[9px] text-slate-500">{t('login.it_desc')}</span>
-              </button>
-
-              {/* 4. Empleado */}
-              <button
-                type="button"
-                onClick={() => handleQuickFill('empleado@empresa.com', 'emp123')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-emerald-500/40 text-slate-300 hover:text-white transition-all group"
-              >
-                <UserCheck className="w-4 h-4 text-emerald-400 mb-1 group-hover:scale-110 transition-transform" />
-                <span className="text-[11px] font-bold">{t('login.emp_name')}</span>
-                <span className="text-[9px] text-slate-500">{t('login.emp_desc')}</span>
-              </button>
-            </div>
-          </div>
         </div>
+
+        {/* German Intellectual Property & Copyright Notice */}
+        <p className="mt-8 text-center text-xs text-slate-400/90 font-medium tracking-wide">
+          Demo ist geistiges Eigentum der Organic Creation Group • Alle Rechte vorbehalten 2026
+        </p>
       </div>
     </div>
   );

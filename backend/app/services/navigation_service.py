@@ -245,6 +245,7 @@ DEFAULT_MENUS = [
         "order": 13,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
+        "is_active": False,
     },
 
     # 3. Personal & HR (HR_MANAGER & ADMIN)
@@ -352,8 +353,20 @@ def get_navigation_for_role(db: Session, user_role: RoleEnum, current_user: Opti
         ]
     else:
         items_to_filter = [
-            MenuItemResponse(id=idx + 1, **item_data, is_active=True)
+            MenuItemResponse(
+                id=idx + 1,
+                key=item_data["key"],
+                label=item_data["label"],
+                path=item_data["path"],
+                icon=item_data["icon"],
+                section=item_data["section"],
+                order=item_data["order"],
+                allowed_roles=item_data["allowed_roles"],
+                badge=item_data["badge"],
+                is_active=item_data.get("is_active", True)
+            )
             for idx, item_data in enumerate(DEFAULT_MENUS)
+            if item_data.get("is_active", True)
         ]
     
     # Filter by user role & individual module permissions

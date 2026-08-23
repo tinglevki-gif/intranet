@@ -21,7 +21,7 @@ export function QuickLauncher({ tools }) {
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card">
       <div className="flex items-center justify-between pb-6 border-b border-slate-100">
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-2xl bg-indigo-50 text-indigo-600">
+          <div className="p-2.5 rounded-2xl bg-[#eef8fd] text-[#009FE3]">
             <LayoutGrid className="w-5 h-5" />
           </div>
           <div>
@@ -32,8 +32,8 @@ export function QuickLauncher({ tools }) {
       </div>
 
       {toastMessage && (
-        <div className="mt-4 p-3 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-2xl flex items-center space-x-2 animate-fade-in">
-          <Check className="w-4 h-4 text-indigo-600" />
+        <div className="mt-4 p-3 bg-[#eef8fd] border border-[#aee0f6] text-[#0070A8] text-xs font-semibold rounded-2xl flex items-center space-x-2 animate-fade-in">
+          <Check className="w-4 h-4 text-[#009FE3]" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -51,15 +51,15 @@ export function QuickLauncher({ tools }) {
             <div
               key={tool.id}
               onClick={() => handleToolClick(tool, title)}
-              className="group relative p-4 rounded-2xl border border-slate-100 hover:border-indigo-200 bg-slate-50/50 hover:bg-white hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
+              className="group relative p-4 rounded-2xl border border-slate-100 hover:border-[#72ccf0] bg-slate-50/50 hover:bg-white hover:shadow-lg hover:shadow-[#009FE3]/5 transition-all duration-200 cursor-pointer flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center text-white shadow-md shadow-indigo-500/10 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center text-white shadow-md shadow-[#009FE3]/10 group-hover:scale-110 transition-transform`}>
                     {renderIcon(tool.icon)}
                   </div>
                   {badge && (
-                    <span className="px-2 py-0.5 text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-full">
+                    <span className="px-2 py-0.5 text-[10px] font-bold bg-[#fff7ed] text-[#F05A22] border border-[#fdba74] rounded-full">
                       {badge}
                     </span>
                   )}
@@ -69,7 +69,7 @@ export function QuickLauncher({ tools }) {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                     {category}
                   </span>
-                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mt-0.5">
+                  <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#009FE3] transition-colors mt-0.5">
                     {title}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
@@ -78,7 +78,7 @@ export function QuickLauncher({ tools }) {
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-indigo-600 font-semibold">
+              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-[#008DD2] font-semibold">
                 <span>{t('tools.open')}</span>
                 <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </div>

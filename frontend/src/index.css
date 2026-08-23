@@ -4,11 +4,11 @@
 
 @layer base {
   body {
-    @apply text-slate-800 bg-slate-50 antialiased font-sans;
+    @apply text-slate-800 bg-[#f8fafc] antialiased font-sans;
   }
 }
 
-/* Custom modern scrollbar */
+/* Custom modern scrollbar with Tinglev Blue accents */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -24,7 +24,15 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #009FE3;
+}
+
+/* Tinglev signature accent line */
+.tinglev-divider-orange {
+  height: 4px;
+  width: 48px;
+  background-color: #F05A22;
+  border-radius: 9999px;
 }
 
 /* Glassmorphism utility classes */
@@ -36,15 +44,67 @@
 }
 
 .glass-nav {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(241, 245, 249, 1);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px -2px rgba(0, 30, 54, 0.04), 0 2px 6px -1px rgba(0, 30, 54, 0.02);
 }
+
+/* =========================================================================
+   FACTORY SHOP FLOOR PRINT ISOLATION (A4 LANDSCAPE)
+   ========================================================================= */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 4mm 4mm 4mm 4mm;
+  }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body, #root {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    font-size: 10px !important;
+  }
+
+  aside, 
+  nav, 
+  header, 
+  footer, 
+  button, 
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .tischplan-container {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+}
+

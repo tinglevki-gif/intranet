@@ -8,42 +8,31 @@ export function LanguageProvider({ children }) {
   const [activeLanguagesList, setActiveLanguagesList] = useState(DEFAULT_LANGUAGES);
   const [defaultLanguageCode, setDefaultLanguageCode] = useState('de');
 
-  // Default to German ('de') or saved language
-  const [language, setLanguageState] = useState(() => {
-    const saved = localStorage.getItem('intranet_lang');
-    return saved || 'de';
-  });
+  // Exclusively German ('de')
+  const [language, setLanguageState] = useState('de');
 
   // Fetch active languages from backend
   const fetchActiveLanguages = useCallback(async () => {
     try {
       const data = await api.getActiveLanguages();
       if (data && data.languages && data.languages.length > 0) {
-        const formatted = data.languages.map((l) => ({
+        const formatted = data.languages.filter(l => l.code === 'de').map((l) => ({
           code: l.code,
           label: l.native_name || l.name,
           name: l.name,
           flag: l.flag,
           country: l.code.toUpperCase(),
           locale: l.locale,
-          is_default: l.is_default,
-          is_active: l.is_active,
+          is_default: true,
+          is_active: true,
           order: l.order,
         }));
-        setActiveLanguagesList(formatted);
-        
-        const defCode = data.default_language || 'de';
-        setDefaultLanguageCode(defCode);
-
-        // Check if current user language is still active; if not, fallback to default
-        setLanguageState((currentLang) => {
-          const isStillActive = formatted.some((l) => l.code === currentLang);
-          if (!isStillActive) {
-            localStorage.setItem('intranet_lang', defCode);
-            return defCode;
-          }
-          return currentLang;
-        });
+        if (formatted.length > 0) {
+          setActiveLanguagesList(formatted);
+        }
+        setDefaultLanguageCode('de');
+        setLanguageState('de');
+        localStorage.setItem('intranet_lang', 'de');
       }
     } catch (err) {
       console.warn('Backend-Sprachkonfiguration konnte nicht geladen werden, verwende lokale Fallbacks:', err);
@@ -54,18 +43,12 @@ export function LanguageProvider({ children }) {
     fetchActiveLanguages();
   }, [fetchActiveLanguages]);
 
-  const setLanguage = (langCode) => {
-    const isAvailable = activeLanguagesList.some((l) => l.code === langCode);
-    if (isAvailable || ['de', 'en', 'es', 'pl', 'tr', 'da'].includes(langCode)) {
-      setLanguageState(langCode);
-      localStorage.setItem('intranet_lang', langCode);
-    }
+  const setLanguage = () => {
+    setLanguageState('de');
+    localStorage.setItem('intranet_lang', 'de');
   };
 
-  const currentLanguage = 
-    activeLanguagesList.find((l) => l.code === language) || 
-    DEFAULT_LANGUAGES.find((l) => l.code === language) || 
-    DEFAULT_LANGUAGES[0];
+  const currentLanguage = DEFAULT_LANGUAGES[0];
 
   // Translation helper function supporting nested dot keys e.g. "navbar.search_placeholder"
   const t = (keyPath, fallback = null) => {

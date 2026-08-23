@@ -6,51 +6,16 @@ export const LANGUAGES = [
     country: 'DE',
     locale: 'de-DE',
   },
-  {
-    code: 'en',
-    label: 'English',
-    flag: '🇬🇧',
-    country: 'GB',
-    locale: 'en-US',
-  },
-  {
-    code: 'es',
-    label: 'Español',
-    flag: '🇪🇸',
-    country: 'ES',
-    locale: 'es-ES',
-  },
-  {
-    code: 'pl',
-    label: 'Polski',
-    flag: '🇵🇱',
-    country: 'PL',
-    locale: 'pl-PL',
-  },
-  {
-    code: 'tr',
-    label: 'Türkçe',
-    flag: '🇹🇷',
-    country: 'TR',
-    locale: 'tr-TR',
-  },
-  {
-    code: 'da',
-    label: 'Dansk',
-    flag: '🇩🇰',
-    country: 'DK',
-    locale: 'da-DK',
-  },
 ];
 
 export const translations = {
   de: {
     // Brand & General
     brand: {
-      name: 'TIGLEV ELEMENTFABRIK',
+      name: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'PORTAL INTRANET',
       version: 'Version 6.0.0',
-      rights: '© 2026 Tiglev Elementfabrik Intranet Platform • Alle Rechte vorbehalten',
+      rights: '© 2026 Tinglev Elementfabrik Intranet Platform • Alle Rechte vorbehalten',
     },
 
     // Navigation & Sections
@@ -342,7 +307,7 @@ export const translations = {
       download_manual: 'Handbuch herunterladen',
       clear_chat: 'Chat zurücksetzen',
       empty_chat_title: 'Wie kann ich Ihnen heute helfen?',
-      empty_chat_desc: 'Ich kenne alle Richtlinien, Handbücher und Sicherheitsvorschriften der Tiglev Elementfabrik. Stellen Sie mir einfach eine Frage!',
+      empty_chat_desc: 'Ich kenne alle Richtlinien, Handbücher und Sicherheitsvorschriften der Tinglev Elementfabrik. Stellen Sie mir einfach eine Frage!',
     },
 
     // Calendar Module
@@ -403,7 +368,7 @@ export const translations = {
     // Organigramm / Org Chart
     org_chart: {
       title: 'Interaktives Unternehmens-Organigramm',
-      subtitle: 'Visuelle Hierarchiestruktur, Berichtslinien und Teamzuständigkeiten der Tiglev Elementfabrik',
+      subtitle: 'Visuelle Hierarchiestruktur, Berichtslinien und Teamzuständigkeiten der Tinglev Elementfabrik',
       search_placeholder: 'Mitarbeiter im Organigramm suchen...',
       expand_all: 'Alle aufklappen',
       collapse_all: 'Alle einklappen',
@@ -569,7 +534,7 @@ export const translations = {
 
     // Login Page
     login: {
-      tag: 'TIGLEV ELEMENTFABRIK',
+      tag: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'Zentrales Portal für Unternehmenszusammenarbeit & Workflows',
       email_label: 'Geschäftliche E-Mail',
       email_placeholder: 'vorname.nachname@firma.de',
@@ -657,10 +622,10 @@ export const translations = {
 
   en: {
     brand: {
-      name: 'TIGLEV ELEMENTFABRIK',
+      name: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'PORTAL INTRANET',
       version: 'Version 6.0.0',
-      rights: '© 2026 Tiglev Elementfabrik Intranet Platform • All rights reserved',
+      rights: '© 2026 Tinglev Elementfabrik Intranet Platform • All rights reserved',
     },
     nav_sections: {
       'Principal': 'Main',
@@ -928,7 +893,7 @@ export const translations = {
     },
     org_chart: {
       title: 'Interactive Corporate Org Chart',
-      subtitle: 'Visual hierarchical reporting tree and team leadership of Tiglev Elementfabrik',
+      subtitle: 'Visual hierarchical reporting tree and team leadership of Tinglev Elementfabrik',
       search_placeholder: 'Search employee in org chart...',
       expand_all: 'Expand All',
       collapse_all: 'Collapse All',
@@ -1051,7 +1016,7 @@ export const translations = {
       loading: 'Loading team directory...',
     },
     login: {
-      tag: 'TIGLEV ELEMENTFABRIK',
+      tag: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'Unified Corporate Collaboration & Operations Hub',
       email_label: 'Corporate Email',
       email_placeholder: 'first.last@company.com',
@@ -1099,10 +1064,10 @@ export const translations = {
 
   pl: {
     brand: {
-      name: 'TIGLEV ELEMENTFABRIK',
+      name: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'PORTAL INTRANET',
       version: 'Wersja 6.0.0',
-      rights: '© 2026 Tiglev Elementfabrik Platforma Intranetowa • Wszelkie prawa zastrzeżone',
+      rights: '© 2026 Tinglev Elementfabrik Platforma Intranetowa • Wszelkie prawa zastrzeżone',
     },
     nav_sections: {
       'Principal': 'Główny',
@@ -1370,7 +1335,7 @@ export const translations = {
     },
     org_chart: {
       title: 'Interaktywny organigram firmy',
-      subtitle: 'Wizualna hierarchia i linie raportowania w Tiglev Elementfabrik',
+      subtitle: 'Wizualna hierarchia i linie raportowania w Tinglev Elementfabrik',
       search_placeholder: 'Szukaj pracownika w organigramie...',
       expand_all: 'Rozwiń wszystko',
       collapse_all: 'Zwiń wszystko',
@@ -1492,7 +1457,7 @@ export const translations = {
       loading: 'Ładowanie katalogu...',
     },
     login: {
-      tag: 'TIGLEV ELEMENTFABRIK',
+      tag: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'Zintegrowany portal współpracy i procesów korporacyjnych',
       email_label: 'Służbowy adres e-mail',
       email_placeholder: 'imie.nazwisko@firma.pl',
@@ -1540,10 +1505,10 @@ export const translations = {
 
   tr: {
     brand: {
-      name: 'TIGLEV ELEMENTFABRIK',
+      name: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'PORTAL INTRANET',
       version: 'Sürüm 6.0.0',
-      rights: '© 2026 Tiglev Elementfabrik İntranet Platformu • Tüm hakları saklıdır',
+      rights: '© 2026 Tinglev Elementfabrik İntranet Platformu • Tüm hakları saklıdır',
     },
     nav_sections: {
       'Principal': 'Ana Bölüm',
@@ -1811,7 +1776,7 @@ export const translations = {
     },
     org_chart: {
       title: 'İnteraktif Şirket Organizasyon Şeması',
-      subtitle: 'Tiglev Elementfabrik kurumsal hiyerarşisi, raporlama çizgileri ve liderlik yapısı',
+      subtitle: 'Tinglev Elementfabrik kurumsal hiyerarşisi, raporlama çizgileri ve liderlik yapısı',
       search_placeholder: 'Şemada çalışan ara...',
       expand_all: 'Tümünü Genişlet',
       collapse_all: 'Tümünü Daralt',
@@ -1934,7 +1899,7 @@ export const translations = {
       loading: 'Rehber yükleniyor...',
     },
     login: {
-      tag: 'TIGLEV ELEMENTFABRIK',
+      tag: 'TINGLEV ELEMENTFABRIK',
       subtitle: 'Merkezi Kurumsal İş Birliği ve Yönetim Portalı',
       email_label: 'Kurumsal E-posta',
       email_placeholder: 'ad.soyad@sirket.com',

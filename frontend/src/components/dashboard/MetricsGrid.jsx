@@ -12,10 +12,10 @@ export function MetricsGrid({ stats }) {
   };
 
   const colorVariants = [
-    { bg: 'bg-indigo-50/70', border: 'border-indigo-100', text: 'text-indigo-600', iconBg: 'bg-indigo-600' },
+    { bg: 'bg-[#eef8fd]', border: 'border-[#aee0f6]', text: 'text-[#009FE3]', iconBg: 'bg-[#009FE3]' },
+    { bg: 'bg-[#fff7ed]', border: 'border-[#fdba74]', text: 'text-[#F05A22]', iconBg: 'bg-[#F05A22]' },
     { bg: 'bg-emerald-50/70', border: 'border-emerald-100', text: 'text-emerald-600', iconBg: 'bg-emerald-600' },
     { bg: 'bg-amber-50/70', border: 'border-amber-100', text: 'text-amber-600', iconBg: 'bg-amber-600' },
-    { bg: 'bg-purple-50/70', border: 'border-purple-100', text: 'text-purple-600', iconBg: 'bg-purple-600' },
   ];
 
   const formatStatValue = (statKey, rawValue) => {
