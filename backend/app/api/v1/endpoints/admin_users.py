@@ -221,7 +221,8 @@ def create_admin_user(
     custom_role_id = user_in.custom_role_id
     if not custom_role_id and user_in.role:
         # Fallback find role by slug
-        r = db.query(Role).filter(Role.slug == user_in.role.value).first()
+        role_str = user_in.role.value if hasattr(user_in.role, 'value') else str(user_in.role)
+        r = db.query(Role).filter(Role.slug == role_str).first()
         if r:
             custom_role_id = r.id
 
@@ -269,11 +270,13 @@ def update_admin_user(
                 status_code=400,
                 detail="Ein SuperAdmin kann sein eigenes Konto nicht deaktivieren."
             )
-        if user_in.role is not None and user_in.role != RoleEnum.ADMIN:
-            raise HTTPException(
-                status_code=400,
-                detail="Ein SuperAdmin kann seine eigene Administrator-Rolle nicht entziehen."
-            )
+        if user_in.role is not None:
+            user_in_role_str = user_in.role.value if hasattr(user_in.role, 'value') else str(user_in.role)
+            if user_in_role_str != "ADMIN":
+                raise HTTPException(
+                    status_code=400,
+                    detail="Ein SuperAdmin kann seine eigene Administrator-Rolle nicht entziehen."
+                )
 
     # Check email uniqueness if email is modified
     if user_in.email:
@@ -327,17 +330,17 @@ def update_admin_user(
     if user_in.location is not None:
         user.location = user_in.location.strip()
     if user_in.role is not None:
-        user.role = user_in.role
+        user_role_str = user_in.role.value if hasattr(user_in.role, 'value') else str(user_in.role)
+        user.role = user_role_str
         if not user_in.custom_role_id:
-            r = db.query(Role).filter(Role.slug == user_in.role.value).first()
+            r = db.query(Role).filter(Role.slug == user_role_str).first()
             if r:
                 user.custom_role_id = r.id
     if user_in.custom_role_id is not None:
         user.custom_role_id = user_in.custom_role_id
-        # Also sync RoleEnum if matching system role slug
         r = db.query(Role).filter(Role.id == user_in.custom_role_id).first()
-        if r and r.slug in [e.value for e in RoleEnum]:
-            user.role = RoleEnum(r.slug)
+        if r:
+            user.role = r.slug
     if user_in.allowed_modules is not None:
         user.allowed_modules = user_in.allowed_modules
     if user_in.is_active is not None:
