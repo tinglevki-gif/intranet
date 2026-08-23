@@ -19,32 +19,15 @@ def test_login(email, password):
         return None
 
 print("=== 1. Testing Logins for SuperAdmin & Corporate Users ===")
-admin_token = test_login('admin@empresa.com', 'admin123')
 humbert_token = test_login('h.senf@tinglev.de', 'Passwort123!')
 robert_token = test_login('r.kuhaupt@tinglev.de', 'Passwort123!')
 anja_token = test_login('a.knoll@tinglev.de', 'Passwort123!')
 
-if admin_token:
-    print("\n=== 2. Testing SuperAdmin Access with Carlos Mendoza Token ===")
-    endpoints = [
-        '/auth/me',
-        '/navigation/menu',
-        '/admin/users?limit=5',
-        '/admin/roles',
-        '/admin/settings',
-        '/admin/languages',
-        '/admin/menu',
-        '/users/directory',
-        '/users/org-chart',
-        '/dashboard/overview'
-    ]
-    for ep in endpoints:
-        req = urllib.request.Request(f'http://127.0.0.1:8000/api/v1{ep}', headers={'Authorization': f'Bearer {admin_token}'})
-        try:
-            with urllib.request.urlopen(req) as resp:
-                print(f"  [200 OK] {ep}")
-        except Exception as e:
-            print(f"  [FAIL]   {ep}: {e}")
+# Verify Carlos Mendoza is deleted
+print("\n=== 2. Verifying Deleted Account Carlos Mendoza ===")
+carlos_attempt = test_login('admin@empresa.com', 'admin123')
+if not carlos_attempt:
+    print("[OK] Confirmed: Carlos Mendoza account is completely deleted from the database.")
 
 if humbert_token:
     print("\n=== 3. Testing Full SuperAdmin Access with Humbert Senf Token ===")

@@ -63,20 +63,20 @@ def seed_database(db: Session):
     has_superadmin = db.query(User).filter(User.role == "ADMIN").first() is not None
 
     corporate_users_data = [
-        # Root: SuperAdmin Carlos Mendoza
+        # Root: SuperAdmin Humbert Senf
         {
-            "email": "admin@empresa.com",
-            "first_name": "Carlos",
-            "last_name": "Mendoza",
-            "full_name": "Carlos Mendoza",
-            "password": "admin123",
+            "email": "h.senf@tinglev.de",
+            "first_name": "Humbert",
+            "last_name": "Senf",
+            "full_name": "Humbert Senf",
+            "password": "Passwort123!",
             "role": "ADMIN",
-            "department": "Geschäftsführung & IT",
-            "position": "Chief Technology Officer & SuperAdmin (CM)",
+            "department": "IT \\ SuperAdmin",
+            "position": "IT-Leiter & SuperAdmin (HUSE)",
             "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-100",
-            "mobile": "+49 170 1234100",
-            "location": "München Headquarter",
+            "phone": "+49 33439 86-245",
+            "mobile": "0162 / 25 66 144",
+            "location": "Werk Tinglev",
             "supervisor_id": None,
             "is_active": True
         }

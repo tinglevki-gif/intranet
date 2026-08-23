@@ -78,44 +78,44 @@ def migrate_users():
         roles_by_slug = {r.slug: r.id for r in roles}
         print(f"Available roles: {list(roles_by_slug.keys())}")
 
-        print("\n2. Preserving SuperAdmin Carlos Mendoza and updating references...")
-        carlos = db.query(User).filter(User.email == 'admin@empresa.com').first()
-        if not carlos:
-            print("Creating Carlos Mendoza as SuperAdmin...")
-            carlos = User(
-                email="admin@empresa.com",
-                first_name="Carlos",
-                last_name="Mendoza",
-                full_name="Carlos Mendoza",
-                hashed_password=get_password_hash("admin123"),
+        print("\n2. Preserving SuperAdmin Humbert Senf and updating references...")
+        humbert = db.query(User).filter(User.email == 'h.senf@tinglev.de').first()
+        if not humbert:
+            print("Creating Humbert Senf as SuperAdmin...")
+            humbert = User(
+                email="h.senf@tinglev.de",
+                first_name="Humbert",
+                last_name="Senf",
+                full_name="Humbert Senf",
+                hashed_password=get_password_hash("Passwort123!"),
                 role="ADMIN",
                 custom_role_id=roles_by_slug.get("ADMIN"),
-                department="Geschäftsführung & IT",
-                position="Chief Technology Officer & SuperAdmin (CM)",
-                phone="+49 89 1234-100",
-                mobile="+49 170 1234100",
-                location="München Headquarter",
+                department="IT \\ SuperAdmin",
+                position="IT-Leiter & SuperAdmin (HUSE)",
+                phone="+49 33439 86-245",
+                mobile="0162 / 25 66 144",
+                location="Werk Tinglev",
                 is_active=True
             )
-            db.add(carlos)
+            db.add(humbert)
             db.flush()
         else:
-            carlos.role = "ADMIN"
-            carlos.custom_role_id = roles_by_slug.get("ADMIN")
-            carlos.is_active = True
+            humbert.role = "ADMIN"
+            humbert.custom_role_id = roles_by_slug.get("ADMIN")
+            humbert.is_active = True
 
-        # Reassign all existing foreign key records to Carlos (id=carlos.id)
-        db.query(Announcement).filter(Announcement.author_id != carlos.id).update({Announcement.author_id: carlos.id})
-        db.query(Event).filter(Event.created_by_id != carlos.id).update({Event.created_by_id: carlos.id})
-        db.query(Document).filter(Document.uploaded_by_id != carlos.id).update({Document.uploaded_by_id: carlos.id})
-        db.query(Ticket).filter(Ticket.ersteller_id != carlos.id).update({Ticket.ersteller_id: carlos.id})
-        db.query(Ticket).filter(Ticket.zugewiesen_an_id != carlos.id, Ticket.zugewiesen_an_id != None).update({Ticket.zugewiesen_an_id: carlos.id})
-        db.query(TicketMessage).filter(TicketMessage.autor_id != carlos.id).update({TicketMessage.autor_id: carlos.id})
-        db.query(TrainingDocument).filter(TrainingDocument.uploaded_by != carlos.id).update({TrainingDocument.uploaded_by: carlos.id})
+        # Reassign all existing foreign key records to Humbert (id=humbert.id)
+        db.query(Announcement).filter(Announcement.author_id != humbert.id).update({Announcement.author_id: humbert.id})
+        db.query(Event).filter(Event.created_by_id != humbert.id).update({Event.created_by_id: humbert.id})
+        db.query(Document).filter(Document.uploaded_by_id != humbert.id).update({Document.uploaded_by_id: humbert.id})
+        db.query(Ticket).filter(Ticket.ersteller_id != humbert.id).update({Ticket.ersteller_id: humbert.id})
+        db.query(Ticket).filter(Ticket.zugewiesen_an_id != humbert.id, Ticket.zugewiesen_an_id != None).update({Ticket.zugewiesen_an_id: humbert.id})
+        db.query(TicketMessage).filter(TicketMessage.autor_id != humbert.id).update({TicketMessage.autor_id: humbert.id})
+        db.query(TrainingDocument).filter(TrainingDocument.uploaded_by != humbert.id).update({TrainingDocument.uploaded_by: humbert.id})
         db.commit()
 
-        print("\n3. Deleting all previous demo users (except Carlos Mendoza)...")
-        deleted_count = db.query(User).filter(User.id != carlos.id).delete(synchronize_session=False)
+        print("\n3. Deleting all previous demo users (except Humbert Senf)...")
+        deleted_count = db.query(User).filter(User.id != humbert.id).delete(synchronize_session=False)
         db.commit()
         print(f"Deleted {deleted_count} old demo users.")
 
@@ -163,11 +163,17 @@ def migrate_users():
         # Default password for all corporate users
         default_pwd_hash = get_password_hash("Passwort123!")
 
-        created_users_map = {}
+        created_users_map = {
+            'Humbert Senf': humbert
+        }
 
         print("\n5. Creating user accounts in DB...")
         for u in excel_users:
             full_name = u['name']
+            if full_name == 'Humbert Senf':
+                # Already preserved as SuperAdmin anchor
+                continue
+
             # Remove (Azubi) from name split
             name_for_split = full_name.replace('(Azubi)', '').strip()
             name_parts = name_for_split.split()
@@ -175,7 +181,7 @@ def migrate_users():
             last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
 
             dept = u['department']
-            role_slug = 'ADMIN' if full_name == 'Humbert Senf' else DEPT_ROLE_MAP.get(dept, 'EMPLOYEE')
+            role_slug = DEPT_ROLE_MAP.get(dept, 'EMPLOYEE')
             role_id = roles_by_slug.get(role_slug, roles_by_slug.get('EMPLOYEE'))
 
             # External Phone Number (+49 33439 86- Durchwahl)
@@ -210,10 +216,10 @@ def migrate_users():
             created_users_map[full_name] = user_obj
 
         # 6. Establish Organizational Hierarchy (Supervisors)
-        # CEO / Managing Director: Anja Knoll
+        # CEO / Managing Director: Anja Knoll (Root)
         ceo = created_users_map.get('Anja Knoll')
         if ceo:
-            ceo.supervisor_id = carlos.id
+            ceo.supervisor_id = None
 
             # Department heads report to CEO Anja Knoll
             dept_heads = [
