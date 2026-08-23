@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from sqlalchemy.orm import Session
 from app.models.menu import MenuItem
 from app.models.user import User, RoleEnum
@@ -325,12 +325,15 @@ DEFAULT_MENUS = [
     }
 ]
 
-def get_navigation_for_role(db: Session, user_role: RoleEnum, current_user: Optional[User] = None) -> NavigationResponse:
+def get_navigation_for_role(db: Session, user_role: Any, current_user: Optional[User] = None) -> NavigationResponse:
     """
     Returns grouped navigation sections filtered by:
-    1. Role hierarchy (RoleEnum)
+    1. Role hierarchy (RoleEnum or str)
     2. Granular module permissions (current_user.allowed_modules or current_user.custom_role)
     """
+    user_role_str = user_role.value if hasattr(user_role, 'value') else str(user_role)
+    is_admin = user_role_str == "ADMIN" or user_role == RoleEnum.ADMIN
+
     db_items = db.query(MenuItem).filter(MenuItem.is_active == True).order_by(MenuItem.order).all()
     
     # If no items in DB yet, fallback to DEFAULT_MENUS
@@ -371,7 +374,6 @@ def get_navigation_for_role(db: Session, user_role: RoleEnum, current_user: Opti
     
     # Filter by user role & individual module permissions
     filtered_items: List[MenuItemResponse] = []
-    is_admin = user_role == RoleEnum.ADMIN
 
     # If current_user has granular restrictions:
     user_allowed_modules = current_user.allowed_modules if (current_user and current_user.allowed_modules is not None) else None
@@ -379,7 +381,7 @@ def get_navigation_for_role(db: Session, user_role: RoleEnum, current_user: Opti
 
     for item in items_to_filter:
         # 1. Role Check
-        role_allowed = is_admin or user_role.value in item.allowed_roles
+        role_allowed = is_admin or user_role_str in item.allowed_roles
         if not role_allowed:
             continue
 
@@ -412,4 +414,4 @@ def get_navigation_for_role(db: Session, user_role: RoleEnum, current_user: Opti
         for section_name, items in sections_map.items()
     ]
     
-    return NavigationResponse(sections=sections, user_role=user_role.value)
+    return NavigationResponse(sections=sections, user_role=user_role_str)
