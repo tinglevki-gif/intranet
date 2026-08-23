@@ -9,12 +9,12 @@ class UserBase(BaseModel):
     last_name: Optional[str] = None
     full_name: str
     department: str = "General"
-    position: str = "Colaborador"
+    position: str = "Mitarbeiter"
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
     mobile: Optional[str] = None
     location: str = "Tinglev Headquarter"
-    role: RoleEnum = RoleEnum.EMPLOYEE
+    role: str = "EMPLOYEE"
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
     allowed_modules: Optional[List[str]] = None
@@ -34,7 +34,7 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     mobile: Optional[str] = None
     location: Optional[str] = None
-    role: Optional[RoleEnum] = None
+    role: Optional[str] = None
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
     allowed_modules: Optional[List[str]] = None
@@ -87,7 +87,7 @@ class UserPermissionsResponse(BaseModel):
     user_id: int
     full_name: str
     email: str
-    role: RoleEnum
+    role: str
     is_admin: bool
     allowed_modules: List[str]
     available_modules: List[ModuleDefinition]
@@ -108,9 +108,10 @@ class OrgChartNodeResponse(BaseModel):
     mobile: Optional[str] = None
     avatar_url: Optional[str] = None
     location: str
-    role: RoleEnum
+    role: str
     supervisor_id: Optional[int] = None
     children: List['OrgChartNodeResponse'] = []
 
     class Config:
         from_attributes = True
+

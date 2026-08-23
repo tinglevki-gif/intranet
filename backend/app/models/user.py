@@ -5,10 +5,19 @@ from sqlalchemy.orm import relationship, backref
 from app.core.database import Base
 
 class RoleEnum(str, enum.Enum):
-    ADMIN = "ADMIN"               # SuperAdmin (Vollzugriff)
-    HR_MANAGER = "HR_MANAGER"     # HR_Admin (Personal & Talent)
-    IT_ADMIN = "IT_ADMIN"         # IT_Admin (Infrastruktur & Sicherheit)
-    EMPLOYEE = "EMPLOYEE"         # Empleado (Mitarbeiter / Colleague)
+    ADMIN = "ADMIN"                         # SuperAdmin (Vollzugriff)
+    IT_ADMIN = "IT_ADMIN"                   # IT & SuperAdmin
+    HR_MANAGER = "HR_MANAGER"               # HR-Manager / Personal
+    MANAGEMENT = "MANAGEMENT"               # Geschäftsführung
+    BUSINESS_DEV = "BUSINESS_DEV"           # Geschäftsentwicklung
+    RECEPTION = "RECEPTION"                 # Rezeption & Empfang
+    SALES = "SALES"                         # Vertriebsabteilung
+    CONTROLLING_QS = "CONTROLLING_QS"       # Kontrolle & QS
+    TECHNIK = "TECHNIK"                     # Technik & Statik
+    ACCOUNTING = "ACCOUNTING"               # Buchhaltung & Finanzen
+    PRODUKTION = "PRODUKTION"               # Produktion & Planung
+    ABWICKLUNG = "ABWICKLUNG"               # Auftragsabwicklung & Disposition
+    EMPLOYEE = "EMPLOYEE"                   # Mitarbeiter (Standard)
 
 class User(Base):
     __tablename__ = "users"
@@ -19,7 +28,7 @@ class User(Base):
     last_name = Column(String, nullable=True)
     full_name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
-    role = Column(Enum(RoleEnum), default=RoleEnum.EMPLOYEE, nullable=False)
+    role = Column(String, default="EMPLOYEE", nullable=False)
     department = Column(String, default="General", nullable=False)
     position = Column(String, default="Colaborador", nullable=False)
     avatar_url = Column(String, nullable=True)

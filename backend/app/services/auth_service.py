@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -51,13 +51,15 @@ def get_current_user(
         
     return user
 
-def require_roles(allowed_roles: List[RoleEnum]):
+def require_roles(allowed_roles: List[Any]):
     """Role-based access control dependency factory."""
+    allowed_values = [r.value if hasattr(r, 'value') else str(r) for r in allowed_roles]
     def role_checker(current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role not in allowed_roles and current_user.role != RoleEnum.ADMIN:
+        user_role_val = current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role)
+        if user_role_val not in allowed_values and user_role_val != "ADMIN":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permiso denegado. Se requiere uno de los siguientes roles: {[r.value for r in allowed_roles]}",
+                detail=f"Permiso denegado. Se requiere uno de los siguientes roles: {allowed_values}",
             )
         return current_user
     return role_checker
@@ -70,7 +72,8 @@ def require_module_permission(module_key: str, min_level: str = "read"):
     3. User dynamic custom_role permissions (if set) are evaluated.
     """
     def module_checker(current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role == RoleEnum.ADMIN:
+        user_role_val = current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role)
+        if user_role_val == "ADMIN":
             return current_user
         
         # 1. Check explicit user allowed_modules override
@@ -90,6 +93,5 @@ def require_module_permission(module_key: str, min_level: str = "read"):
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail=f"Zugriff verweigert: Ihre Rolle '{current_user.custom_role.name}' besitzt keinen Zugriff auf das Modul '{module_key}'.",
                 )
-
         return current_user
     return module_checker

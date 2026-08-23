@@ -60,174 +60,33 @@ def seed_database(db: Session):
             db.commit()
 
     # 2. Seed Users (NON-DESTRUCTIVE: Never delete or overwrite existing users!)
-    total_users_count = db.query(User).count()
-    has_superadmin = db.query(User).filter(User.role == RoleEnum.ADMIN).first() is not None
+    has_superadmin = db.query(User).filter(User.role == "ADMIN").first() is not None
 
-    demo_users_data = [
-        # 1. Root: SuperAdmin
+    corporate_users_data = [
+        # Root: SuperAdmin Carlos Mendoza
         {
             "email": "admin@empresa.com",
             "first_name": "Carlos",
             "last_name": "Mendoza",
             "full_name": "Carlos Mendoza",
             "password": "admin123",
-            "role": RoleEnum.ADMIN,
+            "role": "ADMIN",
             "department": "Geschäftsführung & IT",
-            "position": "Chief Technology Officer & SuperAdmin",
+            "position": "Chief Technology Officer & SuperAdmin (CM)",
             "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
             "phone": "+49 89 1234-100",
             "mobile": "+49 170 1234100",
             "location": "München Headquarter",
             "supervisor_id": None,
             "is_active": True
-        },
-        # 2. HR_Admin
-        {
-            "email": "hr@empresa.com",
-            "first_name": "Lucía",
-            "last_name": "Fernández",
-            "full_name": "Lucía Fernández",
-            "password": "hr123",
-            "role": RoleEnum.HR_MANAGER,
-            "department": "Personal & Talent",
-            "position": "Head of People & Culture (HR_Admin)",
-            "avatar_url": "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-200",
-            "mobile": "+49 170 1234200",
-            "location": "München Headquarter",
-            "supervisor_id": None,
-            "is_active": True
-        },
-        # 3. IT_Admin
-        {
-            "email": "it_admin@empresa.com",
-            "first_name": "Tobias",
-            "last_name": "Weber",
-            "full_name": "Tobias Weber",
-            "password": "it123",
-            "role": RoleEnum.IT_ADMIN,
-            "department": "IT & Infrastruktur",
-            "position": "Senior System & Security Engineer (IT_Admin)",
-            "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-300",
-            "mobile": "+49 170 1234300",
-            "location": "Frankfurt Office",
-            "supervisor_id": None,
-            "is_active": True
-        },
-        # 4. Lead Frontend Dev / Empleado
-        {
-            "email": "empleado@empresa.com",
-            "first_name": "Mateo",
-            "last_name": "Silva",
-            "full_name": "Mateo Silva",
-            "password": "emp123",
-            "role": RoleEnum.EMPLOYEE,
-            "department": "Softwareentwicklung",
-            "position": "Lead Frontend Engineer (Empleado)",
-            "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-401",
-            "mobile": "+49 170 1234401",
-            "location": "Berlin Hub",
-            "supervisor_id": None,
-            "is_active": True
-        },
-        # 5. DevOps Engineer
-        {
-            "email": "alejandro.gomez@empresa.com",
-            "first_name": "Alejandro",
-            "last_name": "Gómez",
-            "full_name": "Alejandro Gómez",
-            "password": "emp123",
-            "role": RoleEnum.EMPLOYEE,
-            "department": "IT & Infrastruktur",
-            "position": "Cloud & DevOps Specialist",
-            "avatar_url": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-302",
-            "mobile": "+49 170 1234302",
-            "location": "Frankfurt Office",
-            "supervisor_id": None,
-            "is_active": True
-        },
-        # 6. Communications Specialist
-        {
-            "email": "sofia.ramos@empresa.com",
-            "first_name": "Sofía",
-            "last_name": "Ramos",
-            "full_name": "Sofía Ramos",
-            "password": "emp123",
-            "role": RoleEnum.EMPLOYEE,
-            "department": "Marketing & Kommunikation",
-            "position": "Corporate Communications Manager",
-            "avatar_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-500",
-            "mobile": "+49 170 1234500",
-            "location": "München Headquarter",
-            "supervisor_id": None,
-            "is_active": True
-        },
-        # 7. UI/UX Designer
-        {
-            "email": "elena.torres@empresa.com",
-            "first_name": "Elena",
-            "last_name": "Torres",
-            "full_name": "Elena Torres",
-            "password": "emp123",
-            "role": RoleEnum.EMPLOYEE,
-            "department": "Produktdesign & UX",
-            "position": "Lead UI/UX Designer",
-            "avatar_url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-402",
-            "mobile": "+49 170 1234402",
-            "location": "Berlin Hub",
-            "supervisor_id": None,
-            "is_active": True
-        },
-        # 8. Finance Specialist
-        {
-            "email": "alex.schmidt@empresa.com",
-            "first_name": "Alexander",
-            "last_name": "Schmidt",
-            "full_name": "Alexander Schmidt",
-            "password": "emp123",
-            "role": RoleEnum.EMPLOYEE,
-            "department": "Finanzen & Controlling",
-            "position": "Senior Financial Controller",
-            "avatar_url": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
-            "phone": "+49 89 1234-600",
-            "mobile": "+49 170 1234600",
-            "location": "Frankfurt Office",
-            "supervisor_id": None,
-            "is_active": True
         }
     ]
 
-    if total_users_count == 0:
-        # Initial fresh bootstrap
-        for u_data in demo_users_data:
-            pwd = u_data.pop("password")
-            user = User(
-                **u_data,
-                hashed_password=get_password_hash(pwd)
-            )
-            db.add(user)
+    if not has_superadmin:
+        admin_data = corporate_users_data[0].copy()
+        pwd = admin_data.pop("password")
+        db.add(User(**admin_data, hashed_password=get_password_hash(pwd)))
         db.commit()
-    else:
-        # If users already exist, only create missing base users if their email doesn't exist
-        # If SuperAdmin exists (even renamed / changed email), do NOT touch him!
-        if not has_superadmin:
-            admin_data = demo_users_data[0].copy()
-            pwd = admin_data.pop("password")
-            db.add(User(**admin_data, hashed_password=get_password_hash(pwd)))
-            db.commit()
-
-        for u_data in demo_users_data[1:]:
-            existing_user = db.query(User).filter(User.email == u_data["email"].lower()).first()
-            if not existing_user:
-                copy_data = u_data.copy()
-                pwd = copy_data.pop("password")
-                db.add(User(**copy_data, hashed_password=get_password_hash(pwd)))
-                db.commit()
 
     # 3. Seed Calendar Events (only if empty)
     if db.query(Event).count() == 0:

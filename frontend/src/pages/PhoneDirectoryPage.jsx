@@ -29,13 +29,16 @@ export function PhoneDirectoryPage() {
 
   const departments = [
     'ALL',
-    'Geschäftsführung & IT',
-    'Personal & Talent',
-    'IT & Infrastruktur',
-    'Softwareentwicklung',
-    'Produktdesign & UX',
-    'Marketing & Kommunikation',
-    'Finanzen & Controlling'
+    'Geschäftsführung',
+    'Geschäftsentwicklung',
+    'Rezeption',
+    'Vertriebsabteilung',
+    'Kontrolle',
+    'Technik',
+    'Buchhaltung',
+    'Produktion \\ Planung',
+    'Abwicklung',
+    'IT \\ SuperAdmin'
   ];
 
   useEffect(() => {

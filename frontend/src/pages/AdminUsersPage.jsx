@@ -274,12 +274,15 @@ export function AdminUsersPage() {
           >
             <option value="ALL">🏢 {t('admin_users.filter_all_departments')}</option>
             <option value="Geschäftsführung">Geschäftsführung</option>
-            <option value="Softwareentwicklung">Softwareentwicklung</option>
-            <option value="IT & Infrastruktur">IT & Infrastruktur</option>
-            <option value="Personalwesen">Personalwesen</option>
-            <option value="Finanzen & Controlling">Finanzen & Controlling</option>
-            <option value="Marketing & Brand">Marketing & Brand</option>
-            <option value="Produktion & Logistik">Produktion & Logistik</option>
+            <option value="Geschäftsentwicklung">Geschäftsentwicklung</option>
+            <option value="Rezeption">Rezeption & Empfang</option>
+            <option value="Vertriebsabteilung">Vertriebsabteilung</option>
+            <option value="Kontrolle">Kontrolle & QS</option>
+            <option value="Technik">Technik & Statik</option>
+            <option value="Buchhaltung">Buchhaltung & Finanzen</option>
+            <option value="Produktion \ Planung">Produktion \ Planung</option>
+            <option value="Abwicklung">Abwicklung & Disposition</option>
+            <option value="IT \ SuperAdmin">IT \ SuperAdmin</option>
           </select>
 
           {/* Role Filter */}
@@ -290,9 +293,18 @@ export function AdminUsersPage() {
           >
             <option value="ALL">🛡️ {t('admin_users.filter_all_roles')}</option>
             <option value="ADMIN">SuperAdmin</option>
-            <option value="HR_MANAGER">HR_Admin</option>
-            <option value="IT_ADMIN">IT_Admin</option>
-            <option value="EMPLOYEE">Empleado</option>
+            <option value="IT_ADMIN">IT-Administration</option>
+            <option value="MANAGEMENT">Geschäftsführung</option>
+            <option value="BUSINESS_DEV">Geschäftsentwicklung</option>
+            <option value="RECEPTION">Rezeption</option>
+            <option value="SALES">Vertrieb</option>
+            <option value="CONTROLLING_QS">Kontrolle & QS</option>
+            <option value="TECHNIK">Technik</option>
+            <option value="ACCOUNTING">Buchhaltung</option>
+            <option value="PRODUKTION">Produktion</option>
+            <option value="ABWICKLUNG">Abwicklung</option>
+            <option value="HR_MANAGER">HR-Manager</option>
+            <option value="EMPLOYEE">Mitarbeiter</option>
           </select>
 
           {/* Status Filter */}

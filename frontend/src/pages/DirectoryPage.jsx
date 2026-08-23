@@ -13,14 +13,16 @@ export function DirectoryPage() {
 
   const departments = [
     { key: 'ALL', label: t('directory.all_departments') },
-    { key: 'Geschäftsleitung', label: 'Geschäftsleitung' },
-    { key: 'Fertigung & Produktion', label: 'Fertigung & Produktion' },
-    { key: 'Technik & Instandhaltung', label: 'Technik & Instandhaltung' },
-    { key: 'Statik & Konstruktion', label: 'Statik & Konstruktion' },
-    { key: 'Vertrieb & Kalkulation', label: 'Vertrieb & Kalkulation' },
-    { key: 'Logistik & Fuhrpark', label: 'Logistik & Fuhrpark' },
-    { key: 'Personal & HR', label: 'Personal & HR' },
-    { key: 'IT & Systeme', label: 'IT & Systeme' }
+    { key: 'Geschäftsführung', label: 'Geschäftsführung' },
+    { key: 'Geschäftsentwicklung', label: 'Geschäftsentwicklung' },
+    { key: 'Rezeption', label: 'Rezeption & Empfang' },
+    { key: 'Vertriebsabteilung', label: 'Vertriebsabteilung' },
+    { key: 'Kontrolle', label: 'Kontrolle & QS' },
+    { key: 'Technik', label: 'Technik & Statik' },
+    { key: 'Buchhaltung', label: 'Buchhaltung & Finanzen' },
+    { key: 'Produktion \\ Planung', label: 'Produktion & Planung' },
+    { key: 'Abwicklung', label: 'Abwicklung & Disposition' },
+    { key: 'IT \\ SuperAdmin', label: 'IT & SuperAdmin' }
   ];
 
   useEffect(() => {

@@ -470,13 +470,16 @@ export function UserModal({
                 onChange={handleChange}
                 className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
               >
-                <option value="Geschäftsführung">Geschäftsführung (Executive)</option>
-                <option value="Softwareentwicklung">Softwareentwicklung (Engineering)</option>
-                <option value="IT & Infrastruktur">IT & Infrastruktur</option>
-                <option value="Personalwesen">Personalwesen (HR)</option>
-                <option value="Finanzen & Controlling">Finanzen & Controlling</option>
-                <option value="Marketing & Brand">Marketing & Brand</option>
-                <option value="Produktion & Logistik">Produktion & Logistik</option>
+                <option value="Geschäftsführung">Geschäftsführung</option>
+                <option value="Geschäftsentwicklung">Geschäftsentwicklung</option>
+                <option value="Rezeption">Rezeption & Empfang</option>
+                <option value="Vertriebsabteilung">Vertriebsabteilung</option>
+                <option value="Kontrolle">Kontrolle & QS</option>
+                <option value="Technik">Technik & Statik</option>
+                <option value="Buchhaltung">Buchhaltung & Finanzen</option>
+                <option value="Produktion \ Planung">Produktion \ Planung</option>
+                <option value="Abwicklung">Abwicklung & Disposition</option>
+                <option value="IT \ SuperAdmin">IT \ SuperAdmin</option>
                 <option value="General">Allgemein (General)</option>
               </select>
             </div>
