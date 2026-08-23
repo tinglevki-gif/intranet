@@ -50,7 +50,7 @@ export function HeroBanner() {
               <Sparkles className="w-3.5 h-3.5 text-[#009FE3]" />
               <span>{t('hero.tag', 'TINGLEV ELEMENTFABRIK')}</span>
             </span>
-            <RoleBadge role={user?.role} />
+            <RoleBadge role={user?.role} customRoleName={user?.custom_role_name} />
           </div>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white font-heading">

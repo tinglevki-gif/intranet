@@ -141,7 +141,7 @@ export function Navbar({ onToggleSidebar }) {
                 <p className="text-sm font-bold text-slate-900">{user?.full_name}</p>
                 <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                 <div className="mt-2">
-                  <RoleBadge role={user?.role} />
+                  <RoleBadge role={user?.role} customRoleName={user?.custom_role_name} />
                 </div>
               </div>
 

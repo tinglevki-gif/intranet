@@ -140,7 +140,7 @@ export function AdminUsersPage() {
   };
 
   // Role Badge Helper
-  const getRoleBadge = (role) => {
+  const getRoleBadge = (role, customRoleName) => {
     switch (role) {
       case 'ADMIN':
         return (
@@ -149,24 +149,79 @@ export function AdminUsersPage() {
             SuperAdmin
           </span>
         );
-      case 'HR_MANAGER':
+      case 'MANAGEMENT':
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-            <Users className="w-3 h-3 mr-1 text-rose-600" />
-            HR_Admin
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs">
+            <Shield className="w-3 h-3 mr-1 text-amber-600" />
+            Geschäftsführung
           </span>
         );
       case 'IT_ADMIN':
         return (
           <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
             <Shield className="w-3 h-3 mr-1 text-sky-600" />
-            IT_Admin
+            IT-Administration
+          </span>
+        );
+      case 'TECHNIK':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-cyan-100 text-cyan-800 border border-cyan-200">
+            Technik & Statik
+          </span>
+        );
+      case 'SALES':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+            Vertriebsabteilung
+          </span>
+        );
+      case 'PRODUKTION':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-orange-100 text-orange-800 border border-orange-200">
+            Produktion & Planung
+          </span>
+        );
+      case 'ABWICKLUNG':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-violet-100 text-violet-800 border border-violet-200">
+            Auftragsabwicklung
+          </span>
+        );
+      case 'ACCOUNTING':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+            Finanzbuchhaltung
+          </span>
+        );
+      case 'CONTROLLING_QS':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
+            Qualitätssicherung (QS)
+          </span>
+        );
+      case 'RECEPTION':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-pink-100 text-pink-800 border border-pink-200">
+            Empfang & Rezeption
+          </span>
+        );
+      case 'BUSINESS_DEV':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+            Geschäftsentwicklung
+          </span>
+        );
+      case 'HR_MANAGER':
+        return (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+            <Users className="w-3 h-3 mr-1 text-rose-600" />
+            Personalwesen (HR)
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-            Empleado
+          <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+            {customRoleName || 'Mitarbeiter'}
           </span>
         );
     }
@@ -386,7 +441,7 @@ export function AdminUsersPage() {
 
                       {/* Role */}
                       <td className="py-3.5 px-4">
-                        {getRoleBadge(userItem.role)}
+                        {getRoleBadge(userItem.role, userItem.custom_role_name)}
                       </td>
 
                       {/* Department & Position */}

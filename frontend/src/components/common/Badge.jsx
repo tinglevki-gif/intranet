@@ -2,21 +2,42 @@ import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 
 const roleStyles = {
-  ADMIN: 'bg-rose-50 text-rose-700 border-rose-200 ring-rose-500/20',
-  HR_MANAGER: 'bg-purple-50 text-purple-700 border-purple-200 ring-purple-500/20',
-  EMPLOYEE: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-500/20',
+  ADMIN: 'bg-purple-50 text-purple-700 border-purple-200 ring-purple-500/20',
+  IT_ADMIN: 'bg-sky-50 text-sky-700 border-sky-200 ring-sky-500/20',
+  HR_MANAGER: 'bg-rose-50 text-rose-700 border-rose-200 ring-rose-500/20',
+  MANAGEMENT: 'bg-amber-50 text-amber-800 border-amber-300 ring-amber-500/20 font-bold',
+  BUSINESS_DEV: 'bg-indigo-50 text-indigo-700 border-indigo-200 ring-indigo-500/20',
+  RECEPTION: 'bg-pink-50 text-pink-700 border-pink-200 ring-pink-500/20',
+  SALES: 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-500/20',
+  CONTROLLING_QS: 'bg-teal-50 text-teal-700 border-teal-200 ring-teal-500/20',
+  TECHNIK: 'bg-cyan-50 text-cyan-700 border-cyan-200 ring-cyan-500/20',
+  ACCOUNTING: 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-emerald-500/20',
+  PRODUKTION: 'bg-orange-50 text-orange-700 border-orange-200 ring-orange-500/20',
+  ABWICKLUNG: 'bg-violet-50 text-violet-700 border-violet-200 ring-violet-500/20',
+  EMPLOYEE: 'bg-slate-50 text-slate-700 border-slate-200 ring-slate-500/20',
 };
 
-const categoryStyles = {
-  COMPANY: 'bg-[#eef8fd] text-[#0070A8] border-[#aee0f6]',
-  HR: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  TECH: 'bg-cyan-50 text-cyan-700 border-cyan-200',
-  SOCIAL: 'bg-amber-50 text-amber-700 border-amber-200',
+const defaultGermanRoleLabels = {
+  ADMIN: 'SuperAdmin',
+  IT_ADMIN: 'IT-Administration',
+  HR_MANAGER: 'Personalwesen (HR)',
+  MANAGEMENT: 'Geschäftsführung',
+  BUSINESS_DEV: 'Geschäftsentwicklung',
+  RECEPTION: 'Empfang & Rezeption',
+  SALES: 'Vertriebsabteilung',
+  CONTROLLING_QS: 'Qualitätssicherung & QS',
+  TECHNIK: 'Technik & Statik',
+  ACCOUNTING: 'Finanzbuchhaltung',
+  PRODUKTION: 'Produktion & Planung',
+  ABWICKLUNG: 'Auftragsabwicklung',
+  EMPLOYEE: 'Mitarbeiter',
+  SALES_LEAD: 'Vertriebsleiter',
+  WORKING_STUDENT: 'Werkstudent / Praktikant',
 };
 
-export function RoleBadge({ role }) {
+export function RoleBadge({ role, customRoleName }) {
   const { t } = useLanguage();
-  const label = t(`roles.${role}`, role);
+  const label = customRoleName || t(`roles.${role}`, defaultGermanRoleLabels[role] || role || 'Mitarbeiter');
   const style = roleStyles[role] || 'bg-slate-50 text-slate-700 border-slate-200';
 
   return (

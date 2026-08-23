@@ -115,7 +115,7 @@ export function DirectoryPage() {
                     alt={user.full_name}
                     className="w-14 h-14 rounded-2xl object-cover ring-4 ring-slate-50 shadow-sm"
                   />
-                  <RoleBadge role={user.role} />
+                  <RoleBadge role={user.role} customRoleName={user.custom_role_name} />
                 </div>
 
                 <div className="mt-4">

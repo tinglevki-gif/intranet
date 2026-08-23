@@ -44,7 +44,7 @@ export function AdminSettingsPage() {
             </p>
           </div>
         </div>
-        <RoleBadge role={user?.role} />
+        <RoleBadge role={user?.role} customRoleName={user?.custom_role_name} />
       </div>
 
       {/* 1. SuperAdmin Menu & Navigation Management Card (Reorder, Toggle Active, Global Impact) */}
