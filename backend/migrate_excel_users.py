@@ -51,7 +51,7 @@ POSITIONS_MAP = {
     'Jenny Rudolph': 'Sachbearbeiterin Abwicklung',
     'Torsten Anton': 'Baustellen-Logistik & Disposition',
     'Robert Kuhaupt': 'Senior IT-Administrator & Security',
-    'Humbert Senf': 'IT-Leitung & Softwareentwicklung',
+    'Humbert Senf': 'IT-Leiter & SuperAdmin',
 }
 
 # Role slug mappings based on Excel department
@@ -175,7 +175,7 @@ def migrate_users():
             last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
 
             dept = u['department']
-            role_slug = DEPT_ROLE_MAP.get(dept, 'EMPLOYEE')
+            role_slug = 'ADMIN' if full_name == 'Humbert Senf' else DEPT_ROLE_MAP.get(dept, 'EMPLOYEE')
             role_id = roles_by_slug.get(role_slug, roles_by_slug.get('EMPLOYEE'))
 
             # External Phone Number (+49 33439 86- Durchwahl)

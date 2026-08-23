@@ -25,7 +25,7 @@ robert_token = test_login('r.kuhaupt@tinglev.de', 'Passwort123!')
 anja_token = test_login('a.knoll@tinglev.de', 'Passwort123!')
 
 if admin_token:
-    print("\n=== 2. Testing SuperAdmin Access Across All Key System Endpoints ===")
+    print("\n=== 2. Testing SuperAdmin Access with Carlos Mendoza Token ===")
     endpoints = [
         '/auth/me',
         '/navigation/menu',
@@ -45,3 +45,26 @@ if admin_token:
                 print(f"  [200 OK] {ep}")
         except Exception as e:
             print(f"  [FAIL]   {ep}: {e}")
+
+if humbert_token:
+    print("\n=== 3. Testing Full SuperAdmin Access with Humbert Senf Token ===")
+    endpoints = [
+        '/auth/me',
+        '/navigation/menu',
+        '/admin/users?limit=5',
+        '/admin/roles',
+        '/admin/settings',
+        '/admin/languages',
+        '/admin/menu',
+        '/users/directory',
+        '/users/org-chart',
+        '/dashboard/overview'
+    ]
+    for ep in endpoints:
+        req = urllib.request.Request(f'http://127.0.0.1:8000/api/v1{ep}', headers={'Authorization': f'Bearer {humbert_token}'})
+        try:
+            with urllib.request.urlopen(req) as resp:
+                print(f"  [200 OK - SuperAdmin] {ep}")
+        except Exception as e:
+            print(f"  [FAIL]   {ep}: {e}")
+
