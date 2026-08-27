@@ -8,6 +8,11 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import User, RoleEnum
 from app.models.role import Role
+from app.models.announcement import Announcement
+from app.models.ticket import Ticket, TicketMessage
+from app.models.event import Event
+from app.models.document import Document
+from app.models.schulung import TrainingDocument
 from app.schemas.user import (
     UserCreate, 
     UserUpdate, 
@@ -503,7 +508,7 @@ def delete_admin_user(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """SuperAdmin only: Delete user and safely reassign subordinate hierarchy."""
+    """SuperAdmin only: Delete user and safely reassign subordinate hierarchy and FK relationships."""
     if current_user.id == user_id:
         raise HTTPException(
             status_code=400,
@@ -517,10 +522,41 @@ def delete_admin_user(
     # Clean up avatar file if local
     remove_local_avatar_file(user.avatar_url)
 
-    # Safe hierarchy cleanup: Reassign direct reports to the deleted user's supervisor
+    # 1. Safe hierarchy cleanup: Reassign direct reports to the deleted user's supervisor
     subordinates = db.query(User).filter(User.supervisor_id == user_id).all()
     for sub in subordinates:
         sub.supervisor_id = user.supervisor_id
+
+    # 2. Reassign Announcements authored by this user
+    announcements = db.query(Announcement).filter(Announcement.author_id == user_id).all()
+    for ann in announcements:
+        ann.author_id = current_user.id
+
+    # 3. Clean up / Reassign Tickets
+    assigned_tickets = db.query(Ticket).filter(Ticket.zugewiesen_an_id == user_id).all()
+    for t in assigned_tickets:
+        t.zugewiesen_an_id = None
+
+    created_tickets = db.query(Ticket).filter(Ticket.ersteller_id == user_id).all()
+    for t in created_tickets:
+        t.ersteller_id = current_user.id
+
+    ticket_msgs = db.query(TicketMessage).filter(TicketMessage.autor_id == user_id).all()
+    for m in ticket_msgs:
+        m.autor_id = current_user.id
+
+    # 4. Reassign Events, Documents, and Training manuals
+    events = db.query(Event).filter(Event.created_by_id == user_id).all()
+    for ev in events:
+        ev.created_by_id = current_user.id
+
+    docs = db.query(Document).filter(Document.uploaded_by_id == user_id).all()
+    for doc in docs:
+        doc.uploaded_by_id = current_user.id
+
+    trainings = db.query(TrainingDocument).filter(TrainingDocument.uploaded_by == user_id).all()
+    for tr in trainings:
+        tr.uploaded_by = current_user.id
 
     db.delete(user)
     db.commit()

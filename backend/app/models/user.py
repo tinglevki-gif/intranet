@@ -50,8 +50,7 @@ class User(Base):
     supervisor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     subordinates = relationship(
         "User",
-        backref=backref("supervisor", remote_side=[id]),
-        cascade="all"
+        backref=backref("supervisor", remote_side=[id])
     )
 
     is_active = Column(Boolean, default=True, nullable=False)
