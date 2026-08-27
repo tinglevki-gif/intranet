@@ -12,43 +12,48 @@ from sqlalchemy import text
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("main")
 
-# Ensure schema migrations for newly added columns
+# Ensure schema migrations for newly added columns across PostgreSQL and SQLite
 with engine.connect() as conn:
+    dialect = engine.dialect.name
     try:
-        # Users migrations
-        res = conn.execute(text("PRAGMA table_info(users)"))
-        cols = [r[1] for r in res.fetchall()]
-        if "allowed_modules" not in cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN allowed_modules JSON DEFAULT NULL;"))
+        if dialect == "postgresql":
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSON DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_permissions JSON DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_role_id INTEGER DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS views_count INTEGER DEFAULT 0;"))
+            conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_id INTEGER DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_name VARCHAR DEFAULT 'Geschäftsleitung';"))
+            conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT 0;"))
             conn.commit()
-        if "custom_permissions" not in cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN custom_permissions JSON DEFAULT NULL;"))
+            logger.info("PostgreSQL schema migrations verified.")
+        elif dialect == "sqlite":
+            # Users migrations
+            res = conn.execute(text("PRAGMA table_info(users)"))
+            cols = [r[1] for r in res.fetchall()]
+            if "allowed_modules" not in cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN allowed_modules JSON DEFAULT NULL;"))
+            if "custom_permissions" not in cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN custom_permissions JSON DEFAULT NULL;"))
+            if "custom_role_id" not in cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
             conn.commit()
-        if "custom_role_id" not in cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
-            conn.commit()
-    except Exception as e:
-        logger.warning(f"Schema migration note (users): {e}")
 
-    try:
-        # Announcements migrations
-        res = conn.execute(text("PRAGMA table_info(announcements)"))
-        cols = [r[1] for r in res.fetchall()]
-        if cols:
-            if "views_count" not in cols:
-                conn.execute(text("ALTER TABLE announcements ADD COLUMN views_count INTEGER DEFAULT 0;"))
+            # Announcements migrations
+            res_ann = conn.execute(text("PRAGMA table_info(announcements)"))
+            cols_ann = [r[1] for r in res_ann.fetchall()]
+            if cols_ann:
+                if "views_count" not in cols_ann:
+                    conn.execute(text("ALTER TABLE announcements ADD COLUMN views_count INTEGER DEFAULT 0;"))
+                if "author_id" not in cols_ann:
+                    conn.execute(text("ALTER TABLE announcements ADD COLUMN author_id INTEGER DEFAULT NULL;"))
+                if "author_name" not in cols_ann:
+                    conn.execute(text("ALTER TABLE announcements ADD COLUMN author_name VARCHAR DEFAULT 'Geschäftsleitung';"))
+                if "is_pinned" not in cols_ann:
+                    conn.execute(text("ALTER TABLE announcements ADD COLUMN is_pinned BOOLEAN DEFAULT 0;"))
                 conn.commit()
-            if "author_id" not in cols:
-                conn.execute(text("ALTER TABLE announcements ADD COLUMN author_id INTEGER DEFAULT NULL;"))
-                conn.commit()
-            if "author_name" not in cols:
-                conn.execute(text("ALTER TABLE announcements ADD COLUMN author_name VARCHAR DEFAULT 'Geschäftsleitung';"))
-                conn.commit()
-            if "is_pinned" not in cols:
-                conn.execute(text("ALTER TABLE announcements ADD COLUMN is_pinned BOOLEAN DEFAULT 0;"))
-                conn.commit()
+            logger.info("SQLite schema migrations verified.")
     except Exception as e:
-        logger.warning(f"Schema migration note (announcements): {e}")
+        logger.warning(f"Schema migration note: {e}")
 
 from app.models.role import Role
 from app.models.canteen import WeeklyMenu

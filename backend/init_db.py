@@ -27,23 +27,30 @@ BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_ROOT = os.path.join(BACKEND_DIR, "uploads")
 
 def ensure_schema_migrations():
-    """Ensure newly added columns exist in SQLite database if tables already existed."""
+    """Ensure newly added columns exist in SQLite/PostgreSQL database if tables already existed."""
     with engine.connect() as conn:
+        dialect = engine.dialect.name
         try:
-            # Check if allowed_modules column exists in users
-            result = conn.execute(text("PRAGMA table_info(users)"))
-            columns = [row[1] for row in result.fetchall()]
-            if "allowed_modules" not in columns:
-                logger.info("Migrating schema: Adding 'allowed_modules' column to 'users' table...")
-                conn.execute(text("ALTER TABLE users ADD COLUMN allowed_modules JSON DEFAULT NULL;"))
+            if dialect == "postgresql":
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSON DEFAULT NULL;"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_permissions JSON DEFAULT NULL;"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_role_id INTEGER DEFAULT NULL;"))
                 conn.commit()
-                logger.info("Column 'allowed_modules' successfully added.")
-
-            if "custom_role_id" not in columns:
-                logger.info("Migrating schema: Adding 'custom_role_id' column to 'users' table...")
-                conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
+                logger.info("PostgreSQL schema migrations verified.")
+            elif dialect == "sqlite":
+                result = conn.execute(text("PRAGMA table_info(users)"))
+                columns = [row[1] for row in result.fetchall()]
+                if "allowed_modules" not in columns:
+                    logger.info("Migrating schema: Adding 'allowed_modules' column to 'users' table...")
+                    conn.execute(text("ALTER TABLE users ADD COLUMN allowed_modules JSON DEFAULT NULL;"))
+                if "custom_permissions" not in columns:
+                    logger.info("Migrating schema: Adding 'custom_permissions' column to 'users' table...")
+                    conn.execute(text("ALTER TABLE users ADD COLUMN custom_permissions JSON DEFAULT NULL;"))
+                if "custom_role_id" not in columns:
+                    logger.info("Migrating schema: Adding 'custom_role_id' column to 'users' table...")
+                    conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
                 conn.commit()
-                logger.info("Column 'custom_role_id' successfully added.")
+                logger.info("SQLite schema migrations verified.")
         except Exception as e:
             logger.warning(f"Schema migration note: {e}")
 
