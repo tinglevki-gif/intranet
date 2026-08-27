@@ -1,0 +1,7 @@
+=== IT_Sicherheitsrichtlinie_und_Passwort_Policy_2026.pdf ===
+
+Passwort-Richtlinie & Komplexität: Alle Passwörter für Unternehmenssysteme müssen mindestens 12 Zeichen umfassen und Großbuchstaben, Kleinbuchstaben, Ziffern und Sonderzeichen enthalten.
+
+Multi-Faktor-Authentifizierung (MFA): Für den Zugriff auf das Intranet, Microsoft 365, VPN und alle Cloud-Dienste ist 2FA verpflichtend aktiviert.
+
+Clean Desk & Bildschirm-Sperre: Mitarbeiter müssen ihre Arbeitsstationen sperren (Windows-Taste + L), wenn sie ihren Schreibtisch verlassen.

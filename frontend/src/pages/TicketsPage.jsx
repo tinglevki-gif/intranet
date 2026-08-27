@@ -600,10 +600,15 @@ function CreateTicketModal({ isOpen, onClose, onCreated }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // Smart-Assist Suggestions State
+  // Smart-Assist Suggestions State (Database Knowledge Base)
   const [suggestions, setSuggestions] = useState([]);
   const [assistLoading, setAssistLoading] = useState(false);
   const [selectedSolution, setSelectedSolution] = useState(null);
+
+  // Google Gemini AI State
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState(null);
+  const [aiError, setAiError] = useState(null);
 
   // Live Smart-Assist Search with debounce
   useEffect(() => {
@@ -630,6 +635,30 @@ function CreateTicketModal({ isOpen, onClose, onCreated }) {
 
     return () => clearTimeout(timer);
   }, [titel, kategorie, beschreibung]);
+
+  const handleRequestAiSuggestion = async () => {
+    if (!titel.trim() && !beschreibung.trim()) {
+      setError('Bitte geben Sie zuerst einen Titel oder eine Problembeschreibung ein.');
+      return;
+    }
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await ticketService.aiSuggestSolution({
+        title: titel.trim() || 'Störungsmeldung',
+        description: beschreibung.trim() || titel.trim(),
+        category: kategorie
+      });
+      setAiResult(res);
+      // Auto-apply suggested category & priority if returned
+      if (res.suggested_category) setKategorie(res.suggested_category);
+      if (res.suggested_priority) setPrioritaet(res.suggested_priority);
+    } catch (err) {
+      setAiError(err.message || 'KI-Dienst konnte nicht aufgerufen werden.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -680,12 +709,35 @@ function CreateTicketModal({ isOpen, onClose, onCreated }) {
           </div>
         )}
 
+        {aiError && (
+          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>{aiError}</span>
+            </div>
+            <button onClick={() => setAiError(null)} className="text-slate-400 hover:text-slate-600">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="mt-5 space-y-5">
           {/* Titel */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Titel / Kurzbeschreibung <span className="text-rose-500">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                Titel / Kurzbeschreibung <span className="text-rose-500">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={handleRequestAiSuggestion}
+                disabled={aiLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-200 transition-all transform active:scale-95 disabled:opacity-60"
+              >
+                {aiLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-amber-300" />}
+                <span>{aiLoading ? 'Gemini analysiert...' : '✨ KI-Lösungsvorschlag anfordern'}</span>
+              </button>
+            </div>
             <input
               type="text"
               required
@@ -696,8 +748,82 @@ function CreateTicketModal({ isOpen, onClose, onCreated }) {
             />
           </div>
 
-          {/* Smart-Assist Live Widget */}
-          {suggestions.length > 0 && (
+          {/* Gemini AI Solution Box */}
+          {aiResult && (
+            <div className="p-4 bg-gradient-to-r from-violet-50 via-indigo-50 to-purple-50 border border-violet-200 rounded-2xl space-y-3 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-violet-200/80 pb-2">
+                <div className="flex items-center gap-2 text-violet-900 text-xs font-extrabold">
+                  <Sparkles className="w-4 h-4 text-violet-600" />
+                  <span>Google Gemini 2.5 Flash • Intelligente Störungsanalyse</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAiResult(null)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Recommended Category & Priority */}
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <span className="text-slate-600 font-semibold">Empfehlung:</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-violet-100 text-violet-800 font-bold border border-violet-300 text-[11px]">
+                  Kategorie: {aiResult.suggested_category}
+                </span>
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold border border-amber-300 text-[11px]">
+                  Priorität: {aiResult.suggested_priority}
+                </span>
+              </div>
+
+              {/* Possible Root Cause */}
+              {aiResult.possible_root_cause && (
+                <div className="text-xs space-y-1 bg-white/80 p-2.5 rounded-xl border border-violet-100">
+                  <span className="font-bold text-violet-950 block">Mögliche Problemursache:</span>
+                  <p className="text-slate-700 leading-relaxed">{aiResult.possible_root_cause}</p>
+                </div>
+              )}
+
+              {/* Immediate Steps */}
+              {aiResult.immediate_steps && aiResult.immediate_steps.length > 0 && (
+                <div className="text-xs space-y-1.5 bg-white/80 p-2.5 rounded-xl border border-violet-100">
+                  <span className="font-bold text-violet-950 block">Empfohlene Sofortmaßnahmen:</span>
+                  <ul className="space-y-1 text-slate-700">
+                    {aiResult.immediate_steps.map((step, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Draft Response */}
+              {aiResult.draft_response && (
+                <div className="text-xs space-y-1 bg-white/80 p-2.5 rounded-xl border border-violet-100">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-violet-950">Formulierter Lösungsvorschlag:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBeschreibung((prev) => prev ? `${prev}\n\n[KI-Lösungsvorschlag]:\n${aiResult.draft_response}` : aiResult.draft_response);
+                      }}
+                      className="text-[11px] font-bold text-violet-700 hover:text-violet-900 underline"
+                    >
+                      In Beschreibung übernehmen
+                    </button>
+                  </div>
+                  <p className="text-slate-600 whitespace-pre-line leading-relaxed text-[11px] font-mono bg-slate-50 p-2 rounded-lg">
+                    {aiResult.draft_response}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Smart-Assist Live Widget (KB Search) */}
+          {suggestions.length > 0 && !aiResult && (
             <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl space-y-2 animate-fade-in">
               <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold">
                 <Sparkles className="w-4 h-4 text-emerald-600" />
@@ -833,6 +959,11 @@ function TicketDetailModal({ ticketId, ticket, loading, isSupportStaff, supportU
   const [isInternalNote, setIsInternalNote] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
 
+  // Gemini AI Suggestion State
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState(null);
+  const [aiError, setAiError] = useState(null);
+
   // Status Change Dialog
   const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
   const [solutionDoc, setSolutionDoc] = useState('');
@@ -853,6 +984,24 @@ function TicketDetailModal({ ticketId, ticket, loading, isSupportStaff, supportU
 
   const statusConf = STATUS_CONFIG[ticket.status] || STATUS_CONFIG.OFFEN;
   const priorityConf = PRIORITY_CONFIG[ticket.prioritaet] || PRIORITY_CONFIG.MITTEL;
+
+  const handleGenerateAiResponse = async () => {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await ticketService.aiSuggestSolution({
+        title: ticket.titel,
+        description: ticket.beschreibung,
+        category: ticket.kategorie,
+        kb_context: ticket.loesung_dokumentation || null
+      });
+      setAiSuggestion(res);
+    } catch (err) {
+      setAiError(err.message || 'Fehler beim Abrufen des KI-Antwortvorschlags.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -1059,30 +1208,97 @@ function TicketDetailModal({ ticketId, ticket, loading, isSupportStaff, supportU
         </div>
 
         {/* 3. Reply / Message Composer */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200">
-          <form onSubmit={handleSendMessage} className="space-y-2">
-            {isSupportStaff && (
-              <div className="flex items-center gap-3 text-xs pb-1">
-                <button
-                  type="button"
-                  onClick={() => setIsInternalNote(false)}
-                  className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
-                    !isInternalNote ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-200 text-slate-600'
-                  }`}
-                >
-                  💬 Öffentliche Antwort
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsInternalNote(true)}
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg font-semibold transition-colors ${
-                    isInternalNote ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-200 text-slate-600'
-                  }`}
-                >
-                  <Lock className="w-3.5 h-3.5" /> Interne Notiz (nur IT)
+        <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
+          {aiError && (
+            <div className="p-2.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center justify-between">
+              <span>{aiError}</span>
+              <button onClick={() => setAiError(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
+          {/* AI Response Suggestion Box */}
+          {aiSuggestion && (
+            <div className="p-3.5 bg-gradient-to-r from-violet-50 to-indigo-50 border border-violet-200 rounded-2xl space-y-2 animate-fade-in text-xs">
+              <div className="flex items-center justify-between border-b border-violet-200 pb-1.5">
+                <div className="flex items-center gap-1.5 text-violet-900 font-extrabold">
+                  <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+                  <span>Google Gemini 2.5 Flash • Antwort- & Lösungsvorschlag</span>
+                </div>
+                <button onClick={() => setAiSuggestion(null)} className="text-slate-400 hover:text-slate-600">
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
-            )}
+
+              {aiSuggestion.possible_root_cause && (
+                <div>
+                  <span className="font-bold text-violet-950 block">Ursachenanalyse:</span>
+                  <p className="text-slate-700 mt-0.5">{aiSuggestion.possible_root_cause}</p>
+                </div>
+              )}
+
+              {aiSuggestion.draft_response && (
+                <div className="bg-white/80 p-2.5 rounded-xl border border-violet-100 space-y-2">
+                  <span className="font-bold text-violet-950 block">Formulierter Antwortvorschlag:</span>
+                  <p className="text-slate-600 whitespace-pre-line text-[11px] leading-relaxed">
+                    {aiSuggestion.draft_response}
+                  </p>
+                  <div className="flex justify-end pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyText(aiSuggestion.draft_response);
+                        setAiSuggestion(null);
+                      }}
+                      className="px-3 py-1 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-lg font-bold text-xs shadow-sm"
+                    >
+                      ✓ Vorschlag in Antwort übernehmen
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <form onSubmit={handleSendMessage} className="space-y-2">
+            <div className="flex items-center justify-between text-xs pb-1">
+              <div className="flex items-center gap-2">
+                {isSupportStaff && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsInternalNote(false)}
+                      className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                        !isInternalNote ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-200 text-slate-600'
+                      }`}
+                    >
+                      💬 Öffentliche Antwort
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsInternalNote(true)}
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg font-semibold transition-colors ${
+                        isInternalNote ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-200 text-slate-600'
+                      }`}
+                    >
+                      <Lock className="w-3.5 h-3.5" /> Interne Notiz (nur IT)
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Gemini AI Trigger Button */}
+              <button
+                type="button"
+                onClick={handleGenerateAiResponse}
+                disabled={aiLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold shadow-sm transition-all transform active:scale-95 disabled:opacity-50"
+              >
+                {aiLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3 text-amber-300" />}
+                <span>{aiLoading ? 'Gemini generiert...' : '✨ KI-Antwortvorschlag'}</span>
+              </button>
+            </div>
 
             <div className="flex items-center gap-2">
               <input

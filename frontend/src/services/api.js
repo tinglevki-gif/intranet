@@ -76,6 +76,48 @@ class ApiService {
     }
   }
 
+  // Generic HTTP convenience helpers
+  get(endpoint, headers = {}) {
+    return this.request(endpoint, { method: 'GET', headers });
+  }
+
+  post(endpoint, body = {}, headers = {}) {
+    return this.request(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+  }
+
+  put(endpoint, body = {}, headers = {}) {
+    return this.request(endpoint, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(body),
+    });
+  }
+
+  patch(endpoint, body = {}, headers = {}) {
+    return this.request(endpoint, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(body),
+    });
+  }
+
+  delete(endpoint, headers = {}) {
+    return this.request(endpoint, { method: 'DELETE', headers });
+  }
+
+  // Google Gemini AI Services
+  aiSuggestTicketSolution(payload) {
+    return this.post('/ai/tickets/suggest', payload);
+  }
+
+  aiGenerateCanteenMenu(payload) {
+    return this.post('/ai/canteen/generate', payload);
+  }
+
   // Auth
   login(email, password) {
     return this.request('/auth/login', {
@@ -276,6 +318,111 @@ class ApiService {
     return this.request(`/admin/users/${userId}`, {
       method: 'DELETE',
     });
+  }
+
+  // SuperAdmin User Import & Export
+  async exportAdminUsers(format = 'csv', filters = {}) {
+    const params = new URLSearchParams();
+    params.append('format', format);
+    if (filters.query) params.append('query', filters.query);
+    if (filters.department && filters.department !== 'ALL') params.append('department', filters.department);
+    if (filters.role && filters.role !== 'ALL') params.append('role', filters.role);
+    if (filters.is_active !== undefined && filters.is_active !== 'ALL') {
+      params.append('is_active', filters.is_active === 'ACTIVE');
+    }
+
+    const token = this.getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/admin/users/export?${params.toString()}`, {
+      headers,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Fehler beim Exportieren der Benutzer' }));
+      throw new Error(err.detail || 'Fehler beim Exportieren');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = format === 'json' ? 'tinglev_users_export.json' : 'tinglev_users_export.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
+
+  async downloadUserImportTemplate() {
+    const token = this.getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/admin/users/import/template`, {
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error('Fehler beim Herunterladen der Import-Vorlage');
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tinglev_users_import_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
+
+  async previewAdminUsersImport(file) {
+    const token = this.getToken();
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/admin/users/import/preview`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Fehler bei der Import-Vorschau' }));
+      throw new Error(err.detail || 'Fehler bei der Vorschau');
+    }
+
+    return await response.json();
+  }
+
+  async importAdminUsers(file, { updateExisting = true, defaultPassword = 'Passwort123!' } = {}) {
+    const token = this.getToken();
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('update_existing', updateExisting ? 'true' : 'false');
+    formData.append('default_password', defaultPassword);
+
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/admin/users/import`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Fehler beim Importieren der Benutzer' }));
+      throw new Error(err.detail || 'Fehler beim Import');
+    }
+
+    return await response.json();
   }
 
   // Granular Permissions Matrix
@@ -578,8 +725,71 @@ class ApiService {
     });
   }
 
-  getPermissionsCatalog() {
-    return this.request('/admin/roles/permissions-catalog');
+  // Canteen / Speiseplan Module
+  getCurrentCanteenMenu() {
+    return this.request('/canteen/menu/current');
+  }
+
+  getCanteenMenu(week = null, year = null) {
+    const params = new URLSearchParams();
+    if (week !== null && week !== undefined) params.append('week', week);
+    if (year !== null && year !== undefined) params.append('year', year);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/canteen/menu${queryString}`);
+  }
+
+  getAllCanteenMenus() {
+    return this.request('/canteen/menu/all');
+  }
+
+  saveCanteenMenu(menuData) {
+    return this.request('/canteen/menu', {
+      method: 'POST',
+      body: JSON.stringify(menuData),
+    });
+  }
+
+  updateCanteenMenu(menuId, menuData) {
+    return this.request(`/canteen/menu/${menuId}`, {
+      method: 'PUT',
+      body: JSON.stringify(menuData),
+    });
+  }
+
+  deleteCanteenMenu(menuId) {
+    return this.request(`/canteen/menu/${menuId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async uploadCanteenPdf(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = this.getToken();
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/canteen/upload-pdf`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Fehler beim PDF-Upload' }));
+      throw new Error(errorData.detail || 'Fehler beim PDF-Upload');
+    }
+
+    return await response.json();
+  }
+
+  patchUserPermissions(userId, permissions) {
+    return this.request(`/users/${userId}/permissions`, {
+      method: 'PATCH',
+      body: JSON.stringify(permissions),
+    });
   }
 
   // Legacy/Simple Users

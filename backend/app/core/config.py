@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 # Absolute path to backend directory
@@ -18,6 +18,9 @@ class Settings(BaseModel):
     
     # Database (uses persistent absolute path to intranet.db)
     DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_SQLITE_PATH}")
+
+    # Google Gemini AI Integration
+    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", None)
     
     # CORS Origins
     BACKEND_CORS_ORIGINS: List[str] = [

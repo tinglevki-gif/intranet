@@ -112,6 +112,18 @@ export const ticketService = {
   },
 
   /**
+   * Gemini AI: Intelligent Ticket Solution & Classification Suggestion
+   */
+  async aiSuggestSolution({ title, description, category = null, kb_context = null } = {}) {
+    return await api.aiSuggestTicketSolution({
+      title,
+      description,
+      category,
+      kb_context
+    });
+  },
+
+  /**
    * Fetch all users for assignment selector
    */
   async getUsers() {

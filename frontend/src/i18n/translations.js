@@ -203,9 +203,14 @@ export const translations = {
       delete_confirm_desc: 'Möchten Sie diesen Mitarbeiter wirklich aus dem System löschen? Direkte Untergebene werden automatisch bereinigt.',
       delete_btn: 'Benutzer löschen',
       self_delete_forbidden: 'Sie können sich als angemeldeter SuperAdmin nicht selbst löschen oder deaktivieren.',
+      import_users_btn: 'Benutzer importieren',
+      export_users_btn: 'Exportieren',
+      export_csv: 'Excel (CSV)',
+      export_json: 'JSON Format',
       toast_created: 'Mitarbeiter erfolgreich angelegt',
       toast_updated: 'Benutzerdaten wurden erfolgreich aktualisiert',
       toast_deleted: 'Benutzer wurde aus dem System gelöscht',
+      toast_imported: 'Benutzer erfolgreich importiert',
     },
 
     // Documents & AI Search Module

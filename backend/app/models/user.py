@@ -39,6 +39,9 @@ class User(Base):
     # Granular Module Permissions (None = default access based on role, or list of permitted keys)
     allowed_modules = Column(JSON, nullable=True, default=None)
 
+    # Delegated Custom Privileges (e.g. {"manage_canteen": true})
+    custom_permissions = Column(JSON, nullable=True, default=dict)
+
     # Dynamic Role relationship (FK to roles table)
     custom_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     custom_role = relationship("Role", back_populates="users", foreign_keys=[custom_role_id])
@@ -54,3 +57,25 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @property
+    def can_manage_canteen(self) -> bool:
+        """Returns true if user is SuperAdmin or has explicit manage_canteen permission."""
+        role_str = self.role.value if hasattr(self.role, 'value') else str(self.role)
+        if role_str == "ADMIN":
+            return True
+        if self.custom_permissions and isinstance(self.custom_permissions, dict):
+            if self.custom_permissions.get("manage_canteen") is True:
+                return True
+        if self.allowed_modules and isinstance(self.allowed_modules, list):
+            if "manage_canteen" in self.allowed_modules or "canteen_admin" in self.allowed_modules:
+                return True
+        return False
+
+    @can_manage_canteen.setter
+    def can_manage_canteen(self, value: bool):
+        perms = dict(self.custom_permissions or {})
+        perms["manage_canteen"] = bool(value)
+        self.custom_permissions = perms
+
+

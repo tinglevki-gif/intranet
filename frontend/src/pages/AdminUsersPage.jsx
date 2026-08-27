@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, 
   UserPlus, 
@@ -16,7 +16,12 @@ import {
   MapPin, 
   UserCheck, 
   Sparkles,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Upload,
+  Download,
+  FileSpreadsheet,
+  FileCode,
+  ChevronDown
 } from 'lucide-react';
 import { api, getAvatarUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -24,6 +29,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { UserModal } from '../components/admin/UserModal';
 import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
 import { PermissionsModal } from '../components/admin/PermissionsModal';
+import { UserImportModal } from '../components/admin/UserImportModal';
 
 export function AdminUsersPage() {
   const { user: currentUser, updateUser, refreshUser } = useAuth();
@@ -48,6 +54,12 @@ export function AdminUsersPage() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
+  // Import / Export state
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const exportDropdownRef = useRef(null);
+
   // Permissions Matrix Modal
   const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState(false);
   const [userForPermissions, setUserForPermissions] = useState(null);
@@ -55,6 +67,35 @@ export function AdminUsersPage() {
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
+  };
+
+  // Close export dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (exportDropdownRef.current && !exportDropdownRef.current.contains(event.target)) {
+        setExportDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleExport = async (format) => {
+    try {
+      setExporting(true);
+      setExportDropdownOpen(false);
+      await api.exportAdminUsers(format, {
+        query: searchQuery,
+        department: selectedDepartment,
+        role: selectedRole,
+        is_active: selectedStatus === 'ALL' ? undefined : selectedStatus,
+      });
+      showToast(format === 'json' ? 'Benutzerdaten als JSON exportiert' : 'Benutzerdaten als Excel (CSV) exportiert');
+    } catch (err) {
+      alert(err.message || 'Fehler beim Exportieren');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const loadUsers = async () => {
@@ -256,10 +297,59 @@ export function AdminUsersPage() {
           </p>
         </div>
 
-        <div className="relative z-10 flex items-center space-x-3">
+        <div className="relative z-10 flex flex-wrap items-center gap-2.5">
+          {/* Import Button */}
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex items-center space-x-1.5 px-4 py-2.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs sm:text-sm font-bold rounded-2xl border border-white/20 backdrop-blur-md transition-all hover:scale-[1.02]"
+            title="Mitarbeiter per CSV/JSON importieren"
+          >
+            <Upload className="w-4 h-4 text-indigo-300" />
+            <span>{t('admin_users.import_users_btn')}</span>
+          </button>
+
+          {/* Export Dropdown */}
+          <div className="relative" ref={exportDropdownRef}>
+            <button
+              onClick={() => setExportDropdownOpen(!exportDropdownOpen)}
+              disabled={exporting}
+              className="flex items-center space-x-1.5 px-4 py-2.5 bg-white/10 hover:bg-white/20 active:bg-white/30 text-white text-xs sm:text-sm font-bold rounded-2xl border border-white/20 backdrop-blur-md transition-all hover:scale-[1.02] disabled:opacity-50"
+            >
+              {exporting ? (
+                <RefreshCw className="w-4 h-4 text-indigo-300 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 text-indigo-300" />
+              )}
+              <span>{exporting ? 'Wird exportiert...' : t('admin_users.export_users_btn')}</span>
+              <ChevronDown className={`w-3.5 h-3.5 text-indigo-300 transition-transform ${exportDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {exportDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-30 text-slate-800 animate-fade-in">
+                <button
+                  type="button"
+                  onClick={() => handleExport('csv')}
+                  className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-indigo-50 hover:text-indigo-600 flex items-center space-x-2 transition-colors"
+                >
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                  <span>{t('admin_users.export_csv')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport('json')}
+                  className="w-full px-4 py-2 text-left text-xs font-bold hover:bg-indigo-50 hover:text-indigo-600 flex items-center space-x-2 transition-colors"
+                >
+                  <FileCode className="w-4 h-4 text-blue-600" />
+                  <span>{t('admin_users.export_json')}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Add User Button */}
           <button
             onClick={openCreateModal}
-            className="flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02]"
+            className="flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:from-indigo-700 active:to-violet-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-indigo-600/30 transition-all hover:scale-[1.02]"
           >
             <UserPlus className="w-4 h-4" />
             <span>{t('admin_users.add_user_btn')}</span>
@@ -560,6 +650,16 @@ export function AdminUsersPage() {
         onConfirm={handleConfirmDelete}
         userToDelete={userToDelete}
         loading={deleteLoading}
+      />
+
+      {/* User Import Modal */}
+      <UserImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onSuccess={() => {
+          showToast(t('admin_users.toast_imported'));
+          loadUsers();
+        }}
       />
     </div>
   );

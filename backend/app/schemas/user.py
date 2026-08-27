@@ -18,6 +18,8 @@ class UserBase(BaseModel):
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
     allowed_modules: Optional[List[str]] = None
+    custom_permissions: Optional[Dict[str, Any]] = None
+    can_manage_canteen: Optional[bool] = False
     is_active: bool = True
 
 class UserCreate(UserBase):
@@ -38,6 +40,7 @@ class UserUpdate(BaseModel):
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
     allowed_modules: Optional[List[str]] = None
+    custom_permissions: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
     password: Optional[str] = None
 
@@ -90,10 +93,14 @@ class UserPermissionsResponse(BaseModel):
     role: str
     is_admin: bool
     allowed_modules: List[str]
+    custom_permissions: Optional[Dict[str, Any]] = None
+    can_manage_canteen: bool = False
     available_modules: List[ModuleDefinition]
 
 class UserPermissionsUpdate(BaseModel):
-    modules: List[str]
+    modules: Optional[List[str]] = None
+    custom_permissions: Optional[Dict[str, Any]] = None
+    manage_canteen: Optional[bool] = None
 
 # Recursive OrgChart Tree Schema
 class OrgChartNodeResponse(BaseModel):
@@ -114,4 +121,40 @@ class OrgChartNodeResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# User Import & Export Schemas
+class UserImportRow(BaseModel):
+    row_number: int = 1
+    email: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    full_name: Optional[str] = None
+    department: str = "General"
+    position: str = "Mitarbeiter"
+    phone: Optional[str] = None
+    mobile: Optional[str] = None
+    location: str = "Tinglev Headquarter"
+    role: str = "EMPLOYEE"
+    supervisor_email: Optional[str] = None
+    can_manage_canteen: bool = False
+    is_active: bool = True
+    password: Optional[str] = None
+    action: str = "CREATE"  # "CREATE" | "UPDATE" | "ERROR"
+    errors: List[str] = []
+
+class UserImportPreviewResponse(BaseModel):
+    total_rows: int
+    valid_rows: int
+    create_count: int
+    update_count: int
+    error_count: int
+    rows: List[UserImportRow]
+
+class UserImportSummaryResponse(BaseModel):
+    total_processed: int
+    created_count: int
+    updated_count: int
+    skipped_count: int
+    error_count: int
+    errors: List[str] = []
 

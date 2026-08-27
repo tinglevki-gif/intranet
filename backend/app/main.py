@@ -1,4 +1,5 @@
 import os
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -6,8 +7,10 @@ from app.core.config import settings
 from app.core.database import engine, Base, SessionLocal
 from app.api.v1.api import api_router
 from app.services.seeder import seed_database
-
 from sqlalchemy import text
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logger = logging.getLogger("main")
 
 # Ensure schema migrations for newly added columns
 with engine.connect() as conn:
@@ -18,11 +21,14 @@ with engine.connect() as conn:
         if "allowed_modules" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN allowed_modules JSON DEFAULT NULL;"))
             conn.commit()
+        if "custom_permissions" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN custom_permissions JSON DEFAULT NULL;"))
+            conn.commit()
         if "custom_role_id" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
             conn.commit()
     except Exception as e:
-        pass
+        logger.warning(f"Schema migration note (users): {e}")
 
     try:
         # Announcements migrations
@@ -42,9 +48,10 @@ with engine.connect() as conn:
                 conn.execute(text("ALTER TABLE announcements ADD COLUMN is_pinned BOOLEAN DEFAULT 0;"))
                 conn.commit()
     except Exception as e:
-        pass
+        logger.warning(f"Schema migration note (announcements): {e}")
 
 from app.models.role import Role
+from app.models.canteen import WeeklyMenu
 from app.models.schulung import TrainingDocument, TrainingChunk
 from app.models.announcement import Announcement
 from app.models.language import LanguageConfig
@@ -63,23 +70,29 @@ AVATAR_DIR = os.path.join(UPLOAD_ROOT, "avatars")
 DOCS_DIR = os.path.join(UPLOAD_ROOT, "documents")
 SCHULUNGEN_DIR = os.path.join(UPLOAD_ROOT, "schulungen")
 NEWS_DIR = os.path.join(UPLOAD_ROOT, "news")
+CANTEEN_DIR = os.path.join(UPLOAD_ROOT, "canteen")
 
 os.makedirs(AVATAR_DIR, exist_ok=True)
 os.makedirs(DOCS_DIR, exist_ok=True)
 os.makedirs(SCHULUNGEN_DIR, exist_ok=True)
 os.makedirs(NEWS_DIR, exist_ok=True)
+os.makedirs(CANTEEN_DIR, exist_ok=True)
 
 # Create all database tables on startup
 Base.metadata.create_all(bind=engine)
 
-# Seed initial default demo data
+# Seed initial default demo data (strictly idempotent & write-protected)
 db = SessionLocal()
 try:
+    logger.info("Prüfe Datenbank-Initialisierung und Standardkonfigurationen beim Serverstart...")
     seed_database(db)
     seed_default_roles(db)
     seed_default_training_manuals(db, UPLOAD_ROOT)
     seed_default_languages(db)
     seed_default_settings(db)
+    logger.info("Initialisierungsprüfung erfolgreich beendet.")
+except Exception as e:
+    logger.error(f"Fehler bei der Initialisierung beim Serverstart: {e}", exc_info=True)
 finally:
     db.close()
 

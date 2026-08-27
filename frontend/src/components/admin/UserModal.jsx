@@ -16,7 +16,8 @@ import {
   Camera,
   Trash2,
   Upload,
-  RefreshCw
+  RefreshCw,
+  UtensilsCrossed
 } from 'lucide-react';
 import { api, getAvatarUrl } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
@@ -48,6 +49,8 @@ export function UserModal({
     password: '',
     is_active: true,
   });
+
+  const [manageCanteen, setManageCanteen] = useState(false);
 
   // Avatar file state
   const [avatarFile, setAvatarFile] = useState(null);
@@ -93,6 +96,11 @@ export function UserModal({
         is_active: userToEdit.is_active !== undefined ? userToEdit.is_active : true,
       });
       setAvatarPreview(getAvatarUrl(userToEdit.avatar_url));
+      setManageCanteen(
+        userToEdit.can_manage_canteen === true ||
+        userToEdit.custom_permissions?.manage_canteen === true ||
+        (Array.isArray(userToEdit.allowed_modules) && userToEdit.allowed_modules.includes('manage_canteen'))
+      );
     } else {
       setFormData({
         first_name: '',
@@ -111,6 +119,7 @@ export function UserModal({
         is_active: true,
       });
       setAvatarPreview(null);
+      setManageCanteen(false);
     }
     setAvatarFile(null);
     setAvatarRemoved(false);
@@ -233,6 +242,10 @@ export function UserModal({
         ...formData,
         avatar_url: finalAvatarUrl,
         supervisor_id: formData.supervisor_id ? parseInt(formData.supervisor_id, 10) : null,
+        custom_permissions: {
+          ...(userToEdit?.custom_permissions || {}),
+          manage_canteen: manageCanteen,
+        },
       };
 
       if (isEditing && !payload.password) {
@@ -596,6 +609,30 @@ export function UserModal({
                 {isEditing ? t('admin_users.password_hint_edit') : t('admin_users.password_hint_create')}
               </span>
             </div>
+          </div>
+
+          {/* Canteen Management Delegation Toggle */}
+          <div className="flex items-center justify-between p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200/80">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 rounded-xl bg-amber-500/15 text-amber-700">
+                <UtensilsCrossed className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-800">Kantine & Speiseplan verwalten</p>
+                <p className="text-[11px] text-slate-500">
+                  Erlaubt diesem Mitarbeiter das Erstellen, Bearbeiten von Wochenplänen und PDF-Uploads.
+                </p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={manageCanteen}
+                onChange={(e) => setManageCanteen(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+            </label>
           </div>
 
           {/* Active Status Toggle */}

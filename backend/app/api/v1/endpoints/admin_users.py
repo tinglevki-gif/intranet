@@ -2,7 +2,8 @@ import os
 import uuid
 import shutil
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, Response, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import User, RoleEnum
@@ -14,10 +15,19 @@ from app.schemas.user import (
     UserListResponse,
     UserPermissionsResponse,
     UserPermissionsUpdate,
-    ModuleDefinition
+    ModuleDefinition,
+    UserImportPreviewResponse,
+    UserImportSummaryResponse
 )
 from app.services.auth_service import get_current_user, require_roles
 from app.services.navigation_service import AVAILABLE_MODULES, CONTROLLABLE_MODULE_KEYS
+from app.services.user_import_export_service import (
+    export_users_to_csv,
+    export_users_to_json,
+    get_csv_import_template,
+    preview_user_import,
+    execute_user_import
+)
 from app.core.security import get_password_hash
 
 router = APIRouter(dependencies=[Depends(require_roles([RoleEnum.ADMIN]))])
@@ -55,6 +65,8 @@ def map_user_to_admin_response(u: User, db: Session) -> UserAdminResponse:
         supervisor_name=supervisor_name,
         subordinates_count=sub_count,
         allowed_modules=u.allowed_modules,
+        custom_permissions=u.custom_permissions or {},
+        can_manage_canteen=u.can_manage_canteen,
         is_active=u.is_active,
         created_at=u.created_at,
         updated_at=u.updated_at
@@ -115,6 +127,120 @@ def list_admin_users(
     items = [map_user_to_admin_response(u, db) for u in users]
     return UserListResponse(total=total, items=items)
 
+# =========================================================================
+# USER IMPORT & EXPORT ENDPOINTS (SUPERADMIN ONLY)
+# =========================================================================
+
+@router.get("/export")
+def export_users(
+    format: str = Query("csv", pattern="^(csv|json)$"),
+    query: Optional[str] = None,
+    department: Optional[str] = None,
+    role: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """SuperAdmin only: Export user directory to CSV (Excel-ready) or JSON."""
+    q = db.query(User)
+
+    if is_active is not None:
+        q = q.filter(User.is_active == is_active)
+
+    if department and department != "ALL":
+        q = q.filter(User.department == department)
+
+    if role and role != "ALL":
+        q = q.filter(User.role == role)
+
+    if query:
+        search = f"%{query.lower().strip()}%"
+        q = q.filter(
+            (User.full_name.ilike(search)) |
+            (User.first_name.ilike(search)) |
+            (User.last_name.ilike(search)) |
+            (User.email.ilike(search)) |
+            (User.position.ilike(search)) |
+            (User.department.ilike(search))
+        )
+
+    users = q.order_by(User.id.asc()).all()
+
+    if format.lower() == "json":
+        json_data = export_users_to_json(users, db)
+        return JSONResponse(content=json_data)
+
+    csv_data = export_users_to_csv(users, db)
+    return Response(
+        content=csv_data,
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": "attachment; filename=tinglev_users_export.csv",
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
+    )
+
+@router.get("/import/template")
+def download_import_template(
+    current_user: User = Depends(get_current_user)
+):
+    """SuperAdmin only: Download standard CSV template with sample rows for bulk user import."""
+    template_csv = get_csv_import_template()
+    return Response(
+        content=template_csv,
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": "attachment; filename=tinglev_users_import_template.csv",
+            "Access-Control-Expose-Headers": "Content-Disposition"
+        }
+    )
+
+@router.post("/import/preview", response_model=UserImportPreviewResponse)
+async def preview_users_import(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """SuperAdmin only: Parses uploaded CSV or JSON file and returns pre-validation summary & rows."""
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Die hochgeladene Datei ist leer.")
+
+    try:
+        preview = preview_user_import(file_bytes, file.filename or "users.csv", db)
+        return preview
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fehler beim Analysieren der Import-Datei: {str(e)}")
+
+@router.post("/import", response_model=UserImportSummaryResponse)
+async def import_users(
+    file: UploadFile = File(...),
+    update_existing: bool = Form(True),
+    default_password: str = Form("Passwort123!"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """SuperAdmin only: Executes user import, creating new users and optionally updating existing ones."""
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Die hochgeladene Datei ist leer.")
+
+    try:
+        summary = execute_user_import(
+            file_bytes=file_bytes,
+            filename=file.filename or "users.csv",
+            update_existing=update_existing,
+            default_password=default_password,
+            db=db
+        )
+        return summary
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Fehler beim Ausführen des Benutzer-Imports: {str(e)}")
+
 @router.get("/{user_id}", response_model=UserAdminResponse)
 def get_admin_user_by_id(
     user_id: int,
@@ -156,6 +282,7 @@ def get_user_permissions(
     )
 
 @router.put("/{user_id}/permissions", response_model=UserPermissionsResponse)
+@router.patch("/{user_id}/permissions", response_model=UserPermissionsResponse)
 def update_user_permissions(
     user_id: int,
     permissions_in: UserPermissionsUpdate,
@@ -167,21 +294,32 @@ def update_user_permissions(
     if not user:
         raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
 
-    # Filter only valid module keys
-    sanitized_modules = [m for m in permissions_in.modules if m in CONTROLLABLE_MODULE_KEYS]
-    user.allowed_modules = sanitized_modules
+    if permissions_in.modules is not None:
+        sanitized_modules = [m for m in permissions_in.modules if m in CONTROLLABLE_MODULE_KEYS]
+        user.allowed_modules = sanitized_modules
+
+    cur_perms = dict(user.custom_permissions or {})
+    if permissions_in.custom_permissions is not None:
+        cur_perms.update(permissions_in.custom_permissions)
+    if permissions_in.manage_canteen is not None:
+        cur_perms["manage_canteen"] = permissions_in.manage_canteen
+
+    user.custom_permissions = cur_perms
 
     db.commit()
     db.refresh(user)
 
-    is_admin = user.role == RoleEnum.ADMIN
+    role_str = user.role.value if hasattr(user.role, 'value') else str(user.role)
+    is_admin = role_str == "ADMIN"
     return UserPermissionsResponse(
         user_id=user.id,
         full_name=user.full_name,
         email=user.email,
         role=user.role,
         is_admin=is_admin,
-        allowed_modules=user.allowed_modules,
+        allowed_modules=user.allowed_modules or [],
+        custom_permissions=user.custom_permissions or {},
+        can_manage_canteen=user.can_manage_canteen,
         available_modules=[ModuleDefinition(**m) for m in AVAILABLE_MODULES]
     )
 
@@ -343,6 +481,8 @@ def update_admin_user(
             user.role = r.slug
     if user_in.allowed_modules is not None:
         user.allowed_modules = user_in.allowed_modules
+    if user_in.custom_permissions is not None:
+        user.custom_permissions = user_in.custom_permissions
     if user_in.is_active is not None:
         user.is_active = user_in.is_active
 

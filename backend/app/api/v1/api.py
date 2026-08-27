@@ -12,7 +12,9 @@ from app.api.v1.endpoints import (
     admin_users,
     admin_roles,
     schulungen,
-    tickets
+    tickets,
+    canteen,
+    ai
 )
 
 api_router = APIRouter()
@@ -26,6 +28,8 @@ api_router.include_router(settings.router, prefix="/settings", tags=["System-Ein
 api_router.include_router(users.router, prefix="/users", tags=["Directorio & Usuarios"])
 api_router.include_router(calendar.router, prefix="/calendar", tags=["Unternehmenskalender"])
 api_router.include_router(documents.router, prefix="/documents", tags=["Dokumentenverwaltung & KI-Suche"])
+api_router.include_router(canteen.router, prefix="/canteen", tags=["Kantine & Speiseplan"])
+api_router.include_router(ai.router, prefix="/ai", tags=["Google Gemini KI-Dienste"])
 api_router.include_router(admin_users.router, prefix="/admin/users", tags=["SuperAdmin Benutzerverwaltung"])
 api_router.include_router(admin_roles.router, prefix="/admin/roles", tags=["SuperAdmin Rollen- & Berechtigungsverwaltung"])
 api_router.include_router(languages.admin_router, prefix="/admin/languages", tags=["SuperAdmin Sprachverwaltung"])

@@ -171,3 +171,34 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
     return user
+
+@router.patch("/{user_id}/permissions", dependencies=[Depends(require_roles([RoleEnum.ADMIN]))])
+def patch_user_permissions(
+    user_id: int,
+    permissions_in: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """SuperAdmin: Update permissions (such as manage_canteen) for a user."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
+
+    cur_perms = dict(user.custom_permissions or {})
+    if "manage_canteen" in permissions_in:
+        cur_perms["manage_canteen"] = bool(permissions_in["manage_canteen"])
+    if "custom_permissions" in permissions_in and isinstance(permissions_in["custom_permissions"], dict):
+        cur_perms.update(permissions_in["custom_permissions"])
+    if "modules" in permissions_in and isinstance(permissions_in["modules"], list):
+        user.allowed_modules = permissions_in["modules"]
+
+    user.custom_permissions = cur_perms
+    db.commit()
+    db.refresh(user)
+    return {
+        "user_id": user.id,
+        "full_name": user.full_name,
+        "custom_permissions": user.custom_permissions,
+        "can_manage_canteen": user.can_manage_canteen,
+        "allowed_modules": user.allowed_modules
+    }

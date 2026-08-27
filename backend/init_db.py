@@ -17,6 +17,8 @@ from app.models.schulung import TrainingDocument, TrainingChunk
 from app.services.seeder import seed_database
 from app.services.role_service import seed_default_roles
 from app.services.training_ai_service import seed_default_training_manuals
+from app.services.language_service import seed_default_languages
+from app.services.setting_service import seed_default_settings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("init_db")
@@ -58,6 +60,8 @@ def init():
         seed_database(db)
         seed_default_roles(db)
         seed_default_training_manuals(db, UPLOAD_ROOT)
+        seed_default_languages(db)
+        seed_default_settings(db)
         logger.info("Database seeding completed successfully.")
     except Exception as e:
         logger.error(f"Error during database seeding: {e}")
