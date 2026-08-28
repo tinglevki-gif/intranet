@@ -2,12 +2,14 @@ import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useNews } from '../../context/NewsContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { TinglevLogo } from '../common/TinglevLogo';
 import { UserAvatar } from '../common/UserAvatar';
 
 export function Sidebar({ isOpen, onClose }) {
   const { menuSections, user, menuLoading } = useAuth();
+  const { unreadCount } = useNews();
   const { t } = useLanguage();
   const location = useLocation();
 
@@ -93,7 +95,17 @@ export function Sidebar({ isOpen, onClose }) {
                             <span>{translatedLabel}</span>
                           </div>
 
-                          {translatedBadge && (
+                          {item.key === 'announcements' && unreadCount > 0 ? (
+                            <span
+                              className={`px-2 py-0.5 text-[10px] font-bold rounded-full transition-all flex items-center space-x-1 ${
+                                isActive
+                                  ? 'bg-white/20 text-white'
+                                  : 'bg-[#F05A22] text-white shadow-xs animate-pulse'
+                              }`}
+                            >
+                              <span>{unreadCount} {t('common.new', 'Neu')}</span>
+                            </span>
+                          ) : translatedBadge ? (
                             <span
                               className={`px-2 py-0.5 text-[10px] font-bold rounded-full transition-colors ${
                                 isActive
@@ -103,7 +115,7 @@ export function Sidebar({ isOpen, onClose }) {
                             >
                               {translatedBadge}
                             </span>
-                          )}
+                          ) : null}
                         </NavLink>
                       );
                     })}

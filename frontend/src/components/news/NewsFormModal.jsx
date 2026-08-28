@@ -142,6 +142,7 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
         result = await api.createNews(payload);
       }
 
+      window.dispatchEvent(new CustomEvent('news_created', { detail: result }));
       onSaved(result);
       onClose();
     } catch (err) {

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useNews } from '../context/NewsContext';
 import { useLanguage } from '../context/LanguageContext';
 import { NewsCard } from '../components/news/NewsCard';
 import { NewsDetailModal } from '../components/news/NewsDetailModal';
@@ -35,6 +36,7 @@ const CATEGORY_FILTERS = [
 export function AnnouncementsPage() {
   const { t } = useLanguage();
   const { user, hasRole } = useAuth();
+  const { markAllAsRead, refreshNews } = useNews();
   const [searchParams, setSearchParams] = useSearchParams();
   const isAdmin = hasRole('ADMIN');
 
@@ -64,6 +66,7 @@ export function AnnouncementsPage() {
       setError(null);
       const data = await api.getNews();
       setNewsList(data || []);
+      markAllAsRead();
 
       // Check if URL contains direct news ID param
       const newsIdParam = searchParams.get('id');

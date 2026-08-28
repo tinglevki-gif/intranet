@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { NewsProvider } from './context/NewsContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
@@ -56,8 +57,9 @@ export function App() {
   return (
     <LanguageProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
+        <NewsProvider>
+          <BrowserRouter>
+            <Routes>
             {/* Public Authentication Route */}
             <Route path="/login" element={<LoginPage />} />
 
@@ -260,6 +262,7 @@ export function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
+        </NewsProvider>
       </AuthProvider>
     </LanguageProvider>
   );
