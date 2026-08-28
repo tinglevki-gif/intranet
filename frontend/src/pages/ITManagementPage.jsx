@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { PerseusSecurityWidget } from '../components/security/PerseusSecurityWidget';
 import { 
   Server, 
   ShieldCheck, 
@@ -24,9 +25,9 @@ export function ITManagementPage() {
             <Server className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{t('it_management.title')}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{t('it_management.title', 'IT-Infrastruktur & Sicherheits-Dashboard')}</h1>
             <p className="text-xs sm:text-sm text-slate-500">
-              {t('it_management.subtitle')}
+              {t('it_management.subtitle', 'Live-Überwachung von Servern, Netzwerken, Backups und externer Cyber-Sicherheit.')}
             </p>
           </div>
         </div>
@@ -34,6 +35,9 @@ export function ITManagementPage() {
           IT_Admin Panel
         </span>
       </div>
+
+      {/* Perseus Security & Awareness Hub Widget */}
+      <PerseusSecurityWidget />
 
       {/* Telemetry Status Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -43,6 +43,8 @@ services:
       SECRET_KEY: ${SECRET_KEY:-tiglev-elementfabrik-super-secret-jwt-key-2026-production-change-me}
       ACCESS_TOKEN_EXPIRE_MINUTES: 1440
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      PERSEUS_API_BASE_URL: ${PERSEUS_API_BASE_URL:-https://perseus-api.prd.production.my.perseus.de}
+      PERSEUS_BEARER_TOKEN: ${PERSEUS_BEARER_TOKEN:-}
     ports:
       - "8000:8000"
     volumes:

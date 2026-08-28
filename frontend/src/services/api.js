@@ -792,6 +792,28 @@ class ApiService {
     });
   }
 
+  // Perseus Security & Awareness Hub Integration
+  getPerseusOverview(forceRefresh = false) {
+    const q = forceRefresh ? '?force_refresh=true' : '';
+    return this.request(`/security/perseus/overview${q}`);
+  }
+
+  getPerseusInfrastructure(forceRefresh = false) {
+    const q = forceRefresh ? '?force_refresh=true' : '';
+    return this.request(`/security/perseus/infrastructure${q}`);
+  }
+
+  getPerseusAwareness(forceRefresh = false) {
+    const q = forceRefresh ? '?force_refresh=true' : '';
+    return this.request(`/security/perseus/awareness${q}`);
+  }
+
+  refreshPerseus() {
+    return this.request('/security/perseus/refresh', {
+      method: 'POST',
+    });
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

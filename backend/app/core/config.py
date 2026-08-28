@@ -22,6 +22,10 @@ class Settings(BaseModel):
     # Google Gemini AI Integration
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY", None)
     
+    # Perseus Security & Awareness Integration
+    PERSEUS_API_BASE_URL: str = os.getenv("PERSEUS_API_BASE_URL", "https://perseus-api.prd.production.my.perseus.de")
+    PERSEUS_BEARER_TOKEN: Optional[str] = os.getenv("PERSEUS_BEARER_TOKEN", None)
+    
     # CORS Origins
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
