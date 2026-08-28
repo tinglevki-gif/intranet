@@ -45,17 +45,29 @@ def extract_and_chunk_training_file(file_path: str, file_type: str) -> List[Dict
         try:
             reader = PdfReader(file_path)
             for page_idx, page in enumerate(reader.pages):
-                txt = page.extract_text() or ""
-                if txt.strip():
-                    pages_text.append((page_idx + 1, txt.strip()))
+                try:
+                    txt = page.extract_text() or ""
+                    txt = txt.replace("\x00", "").strip()
+                    if txt:
+                        pages_text.append((page_idx + 1, txt))
+                except Exception as page_err:
+                    print(f"Error extracting page {page_idx + 1} from {file_path}: {page_err}")
         except Exception as e:
             print(f"Error reading PDF {file_path}: {e}")
 
-    if not pages_text and os.path.exists(file_path):
+        # If scanned PDF with no text layer
+        if not pages_text:
+            doc_name = os.path.basename(file_path)
+            pages_text.append((
+                1, 
+                f"[Gescannter Schulungsinhalt: {doc_name} enthält eingescannte Seiten ohne OCR-Textebene. Das Dokument steht zum Download und zur Ansicht bereit.]"
+            ))
+
+    elif file_type in ['txt', 'md', 'csv', 'json', 'log', 'html'] and os.path.exists(file_path):
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
-                if content.strip():
+                content = f.read().replace("\x00", "").strip()
+                if content:
                     # If file contains page markers
                     page_splits = re.split(r'(?i)<!--\s*page\s*(\d+)\s*-->|===+\s*seite\s*(\d+)\s*===+', content)
                     if len(page_splits) > 1:
@@ -69,7 +81,7 @@ def extract_and_chunk_training_file(file_path: str, file_type: str) -> List[Dict
                                 if segment.strip():
                                     pages_text.append((current_p, segment.strip()))
                     else:
-                        pages_text.append((1, content.strip()))
+                        pages_text.append((1, content))
         except Exception as e:
             print(f"Error reading text file {file_path}: {e}")
 

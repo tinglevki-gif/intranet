@@ -141,18 +141,26 @@ async def upload_training_document(
     db.flush()
 
     # 2. Extract text & create semantic chunks
-    chunks_data = extract_and_chunk_training_file(dest_path, clean_file_type)
-    for c_data in chunks_data:
-        chunk = TrainingChunk(
-            document_id=doc.id,
-            chunk_index=c_data["chunk_index"],
-            page_number=c_data["page_number"],
-            section_title=c_data.get("section_title"),
-            content=c_data["content"]
-        )
-        db.add(chunk)
+    try:
+        chunks_data = extract_and_chunk_training_file(dest_path, clean_file_type)
+        for c_data in chunks_data:
+            clean_content = (c_data.get("content") or "").replace("\x00", "").strip()
+            if not clean_content:
+                continue
+            chunk = TrainingChunk(
+                document_id=doc.id,
+                chunk_index=c_data["chunk_index"],
+                page_number=c_data["page_number"],
+                section_title=(c_data.get("section_title") or "").replace("\x00", "").strip() or None,
+                content=clean_content
+            )
+            db.add(chunk)
 
-    db.commit()
+        db.commit()
+    except Exception as chunk_err:
+        print(f"Warnung beim Indizieren der Schulungs-Chunks für {title}: {chunk_err}")
+        db.rollback()
+
     db.refresh(doc)
 
     return map_training_doc_response(doc)

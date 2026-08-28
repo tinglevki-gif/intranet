@@ -126,20 +126,27 @@ async def upload_document(
     db.refresh(doc)
 
     # Extract text and index chunks
-    pages_text = extract_text_from_file(file_path, ext)
-    chunks = chunk_text(pages_text)
+    try:
+        pages_text = extract_text_from_file(file_path, ext)
+        chunks = chunk_text(pages_text)
 
-    for c in chunks:
-        chunk_obj = DocumentChunk(
-            document_id=doc.id,
-            chunk_index=c["chunk_index"],
-            page_number=c["page_number"],
-            content=c["content"],
-            embedding_json=None
-        )
-        db.add(chunk_obj)
+        for c in chunks:
+            clean_content = (c.get("content") or "").replace("\x00", "").strip()
+            if not clean_content:
+                continue
+            chunk_obj = DocumentChunk(
+                document_id=doc.id,
+                chunk_index=c["chunk_index"],
+                page_number=c["page_number"],
+                content=clean_content,
+                embedding_json=None
+            )
+            db.add(chunk_obj)
 
-    db.commit()
+        db.commit()
+    except Exception as idx_err:
+        print(f"Warnung beim Indizieren der Dokument-Chunks für {original_name}: {idx_err}")
+        db.rollback()
 
     return DocumentResponse(
         id=doc.id,

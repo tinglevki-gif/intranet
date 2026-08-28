@@ -16,41 +16,63 @@ def extract_text_from_file(file_path: str, file_type: str) -> List[Tuple[int, st
     """
     Extracts text from file by page.
     Returns list of tuples: [(page_number, text), ...]
+    Guarantees no NUL (0x00) characters and safe handling of scanned PDFs.
     """
     pages_text = []
-    file_type = file_type.lower()
+    file_type = file_type.lower().strip(".")
 
     if file_type == 'pdf' and PdfReader and os.path.exists(file_path):
         try:
             reader = PdfReader(file_path)
             for page_idx, page in enumerate(reader.pages):
-                txt = page.extract_text() or ""
-                if txt.strip():
-                    pages_text.append((page_idx + 1, txt.strip()))
+                try:
+                    txt = page.extract_text() or ""
+                    # Sanitize NUL and control bytes
+                    txt = txt.replace("\x00", "").strip()
+                    if txt:
+                        pages_text.append((page_idx + 1, txt))
+                except Exception as page_err:
+                    print(f"Error extracting page {page_idx + 1} from {file_path}: {page_err}")
         except Exception as e:
             print(f"Error reading PDF {file_path}: {e}")
 
-    if not pages_text and os.path.exists(file_path):
-        # Fallback for plain text / markdown
+        # If PDF is a scanned image with no embedded text layer
+        if not pages_text:
+            doc_name = os.path.basename(file_path)
+            pages_text.append((
+                1, 
+                f"[Gescannter Inhalt: {doc_name} enthält eingescannte Bildseiten ohne OCR-Textebene. Das Dokument steht zum Download und zur Ansicht bereit.]"
+            ))
+
+    elif file_type in ['txt', 'md', 'csv', 'json', 'log', 'html', 'rtf'] and os.path.exists(file_path):
+        # Plain text files
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
-                if content.strip():
-                    pages_text.append((1, content.strip()))
+                content = f.read().replace("\x00", "").strip()
+                if content:
+                    pages_text.append((1, content))
         except Exception as e:
             print(f"Error reading text file {file_path}: {e}")
+    
+    elif not pages_text and os.path.exists(file_path):
+        # Generic fallback
+        doc_name = os.path.basename(file_path)
+        pages_text.append((1, f"[Dokument: {doc_name} (Format .{file_type})]"))
 
     return pages_text
 
 def chunk_text(pages_text: List[Tuple[int, str]], chunk_size: int = 600, overlap: int = 100) -> List[Dict[str, Any]]:
     """
     Splits page text into overlapping semantic chunks for indexing.
+    Sanitizes all chunk content to ensure database safety.
     """
     chunks = []
     chunk_index = 0
 
     for page_num, text in pages_text:
-        cleaned = re.sub(r'\s+', ' ', text).strip()
+        # Sanitize any remaining NUL or invalid unicode bytes
+        sanitized_text = text.replace("\x00", "")
+        cleaned = re.sub(r'\s+', ' ', sanitized_text).strip()
         if not cleaned:
             continue
 
@@ -58,23 +80,26 @@ def chunk_text(pages_text: List[Tuple[int, str]], chunk_size: int = 600, overlap
         current_chunk = ""
 
         for p in paragraphs:
-            if len(current_chunk) + len(p) <= chunk_size:
-                current_chunk += (" " if current_chunk else "") + p
+            p_clean = p.replace("\x00", "").strip()
+            if not p_clean:
+                continue
+            if len(current_chunk) + len(p_clean) <= chunk_size:
+                current_chunk += (" " if current_chunk else "") + p_clean
             else:
                 if current_chunk.strip():
                     chunks.append({
                         "chunk_index": chunk_index,
                         "page_number": page_num,
-                        "content": current_chunk.strip()
+                        "content": current_chunk.strip().replace("\x00", "")
                     })
                     chunk_index += 1
-                current_chunk = p
+                current_chunk = p_clean
 
         if current_chunk.strip():
             chunks.append({
                 "chunk_index": chunk_index,
                 "page_number": page_num,
-                "content": current_chunk.strip()
+                "content": current_chunk.strip().replace("\x00", "")
             })
             chunk_index += 1
 
