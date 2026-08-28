@@ -42,6 +42,7 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
   const [summary, setSummary] = useState(newsToEdit?.summary || '');
   const [content, setContent] = useState(newsToEdit?.content || '');
   const [coverImage, setCoverImage] = useState(newsToEdit?.cover_image || '');
+  const [showUrlInput, setShowUrlInput] = useState(Boolean(newsToEdit?.cover_image && (newsToEdit.cover_image.startsWith('http://') || newsToEdit.cover_image.startsWith('https://'))));
   
   const [activeTab, setActiveTab] = useState('editor'); // 'editor' | 'preview'
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -194,7 +195,7 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
         )}
 
         {/* Scrollable Form Body */}
-        <form id="news-form" onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 space-y-6">
+        <form id="news-form" onSubmit={handleSubmit} noValidate className="p-6 overflow-y-auto flex-1 space-y-6">
           {/* 1. Title */}
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -269,12 +270,23 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
 
           {/* 4. Cover Image Upload & Preview */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-              {t('news.field_cover_image', 'Titelbild / Header-Grafik')}
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                {t('news.field_cover_image', 'Titelbild / Header-Grafik')}
+              </label>
+              {!coverUrl && (
+                <button
+                  type="button"
+                  onClick={() => setShowUrlInput(!showUrlInput)}
+                  className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                >
+                  {showUrlInput ? '✕ Upload verwenden' : '🔗 URL eingeben'}
+                </button>
+              )}
+            </div>
 
             {coverUrl ? (
-              <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 h-44 group">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 h-48 group shadow-inner">
                 <img
                   src={coverUrl}
                   alt="Titelbild Vorschau"
@@ -284,20 +296,37 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 bg-white text-slate-900 rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors flex items-center space-x-1"
+                    className="px-3.5 py-2 bg-white text-slate-900 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all shadow-md flex items-center space-x-1.5"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>Bild austauschen</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setCoverImage('')}
-                    className="px-3 py-1.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition-colors flex items-center space-x-1"
+                    onClick={() => {
+                      setCoverImage('');
+                      setShowUrlInput(false);
+                    }}
+                    className="px-3.5 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition-all shadow-md flex items-center space-x-1.5"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Entfernen</span>
                   </button>
                 </div>
+              </div>
+            ) : showUrlInput ? (
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                <input
+                  type="text"
+                  value={coverImage}
+                  onChange={(e) => setCoverImage(e.target.value)}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
+                  autoFocus
+                />
+                <p className="text-[11px] text-slate-400">
+                  Fügen Sie einen direkten Weblink zu einem JPG, PNG oder WEBP Bild ein.
+                </p>
               </div>
             ) : (
               <div
@@ -345,17 +374,6 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
                 }
               }}
             />
-
-            {/* Alternative Direct URL Input */}
-            <div className="mt-2 flex items-center space-x-2">
-              <input
-                type="text"
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="Oder Bild-URL / Pfad einfügen (z. B. https://images.unsplash.com/...)"
-                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
-              />
-            </div>
           </div>
 
           {/* 5. Main Content Editor with Markdown Tools & Tabs */}
