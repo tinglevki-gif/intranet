@@ -30,8 +30,26 @@ export function PhoneDirectoryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedDept, setSelectedDept] = useState('ALL');
-  const [viewMode, setViewMode] = useState('GRID'); // 'GRID' or 'TABLE'
   const [toastMessage, setToastMessage] = useState(null);
+
+  // View Mode with localStorage persistence (Default: 'TABLE')
+  const [viewMode, setViewModeState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('tinglev_phone_directory_view_mode');
+      return saved === 'GRID' ? 'GRID' : 'TABLE';
+    } catch {
+      return 'TABLE';
+    }
+  });
+
+  const setViewMode = (mode) => {
+    setViewModeState(mode);
+    try {
+      localStorage.setItem('tinglev_phone_directory_view_mode', mode);
+    } catch (e) {
+      console.error('Error saving view mode:', e);
+    }
+  };
 
   // Sorting state
   const [sortBy, setSortBy] = useState('name'); // 'name' | 'phone' | 'department' | 'position' | 'location'
