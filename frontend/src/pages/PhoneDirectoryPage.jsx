@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { UserAvatar } from '../components/common/UserAvatar';
@@ -16,7 +16,12 @@ import {
   Users, 
   Building,
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  SlidersHorizontal,
+  Briefcase
 } from 'lucide-react';
 
 export function PhoneDirectoryPage() {
@@ -27,6 +32,10 @@ export function PhoneDirectoryPage() {
   const [selectedDept, setSelectedDept] = useState('ALL');
   const [viewMode, setViewMode] = useState('GRID'); // 'GRID' or 'TABLE'
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Sorting state
+  const [sortBy, setSortBy] = useState('name'); // 'name' | 'phone' | 'department' | 'position' | 'location'
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' | 'desc'
 
   const departments = [
     'ALL',
@@ -40,6 +49,14 @@ export function PhoneDirectoryPage() {
     'Produktion \\ Planung',
     'Abwicklung',
     'IT \\ SuperAdmin'
+  ];
+
+  const sortOptions = [
+    { key: 'name', label: 'Mitarbeiter Name', icon: Users },
+    { key: 'phone', label: 'Durchwahl / Telefon', icon: Phone },
+    { key: 'department', label: 'Abteilung', icon: Building },
+    { key: 'position', label: 'Position / Rolle', icon: Briefcase },
+    { key: 'location', label: 'Standort', icon: MapPin },
   ];
 
   useEffect(() => {
@@ -59,6 +76,53 @@ export function PhoneDirectoryPage() {
     return () => clearTimeout(timer);
   }, [search, selectedDept]);
 
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+  };
+
+  // Dynamically sort directory based on active sort criteria
+  const sortedDirectory = useMemo(() => {
+    return [...directory].sort((a, b) => {
+      let valA = '';
+      let valB = '';
+
+      switch (sortBy) {
+        case 'name':
+          valA = a.full_name || '';
+          valB = b.full_name || '';
+          break;
+        case 'phone':
+        case 'extension':
+          valA = a.extension || a.phone || '';
+          valB = b.extension || b.phone || '';
+          break;
+        case 'department':
+          valA = a.department || '';
+          valB = b.department || '';
+          break;
+        case 'position':
+          valA = a.position || '';
+          valB = b.position || '';
+          break;
+        case 'location':
+          valA = a.location || '';
+          valB = b.location || '';
+          break;
+        default:
+          valA = a.full_name || '';
+          valB = b.full_name || '';
+      }
+
+      const cmp = valA.localeCompare(valB, 'de', { numeric: true, sensitivity: 'base' });
+      return sortOrder === 'asc' ? cmp : -cmp;
+    });
+  }, [directory, sortBy, sortOrder]);
+
   const handleCall = (name, phone) => {
     setToastMessage(`Wähle ${name} (${phone})...`);
     setTimeout(() => setToastMessage(null), 3000);
@@ -66,7 +130,7 @@ export function PhoneDirectoryPage() {
 
   const handleCopy = (text, label) => {
     navigator.clipboard?.writeText?.(text);
-    setToastMessage(`${label} ${t('phone_directory.copied')}: ${text}`);
+    setToastMessage(`${label} kopiert: ${text}`);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
@@ -79,71 +143,134 @@ export function PhoneDirectoryPage() {
             <PhoneCall className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{t('phone_directory.title')}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {t('phone_directory.title', 'Telefon- & Durchwahlverzeichnis')}
+            </h1>
             <p className="text-xs sm:text-sm text-slate-500">
-              {t('phone_directory.subtitle')}
+              {t('phone_directory.subtitle', 'Direktdurchwahlen, Standorte und Kontaktdaten aller Mitarbeiter.')}
             </p>
           </div>
         </div>
 
         {/* View Mode Toggle & Counter */}
         <div className="flex items-center space-x-3">
-          <span className="text-xs font-semibold text-slate-400">
-            {directory.length} {t('directory.employees_count', 'Mitarbeiter')}
+          <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl">
+            <strong className="text-slate-900">{sortedDirectory.length}</strong> {t('directory.employees_count', 'Mitarbeiter')}
           </span>
           <div className="flex items-center bg-slate-100 p-1 rounded-xl">
             <button
               onClick={() => setViewMode('GRID')}
               className={`p-1.5 rounded-lg transition-colors flex items-center space-x-1 text-xs font-semibold ${
-                viewMode === 'GRID' ? 'bg-white text-indigo-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'GRID' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
               }`}
-              title={t('phone_directory.view_cards')}
+              title="Kartenansicht"
             >
               <LayoutGrid className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('phone_directory.view_cards')}</span>
+              <span className="hidden sm:inline">Karten</span>
             </button>
             <button
               onClick={() => setViewMode('TABLE')}
               className={`p-1.5 rounded-lg transition-colors flex items-center space-x-1 text-xs font-semibold ${
-                viewMode === 'TABLE' ? 'bg-white text-indigo-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                viewMode === 'TABLE' ? 'bg-white text-blue-600 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
               }`}
-              title={t('phone_directory.view_table')}
+              title="Tabellenansicht"
             >
               <List className="w-4 h-4" />
-              <span className="hidden sm:inline">{t('phone_directory.view_table')}</span>
+              <span className="hidden sm:inline">Tabelle</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Search & Department Filters */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-card space-y-4">
-        <div className="relative w-full">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('phone_directory.search_placeholder')}
-            className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-          />
+      {/* Search & Sorting & Department Filters Toolbar */}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-card space-y-4">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+          {/* Global Search Input */}
+          <div className="relative flex-1 min-w-[280px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Nach Name, Durchwahl, Position, Abteilung oder Standort suchen..."
+              className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+          </div>
+
+          {/* Interactive Sorting Controls Bar */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 flex items-center space-x-1 shrink-0">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600" />
+              <span>Sortieren:</span>
+            </span>
+
+            <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
+              {sortOptions.map((opt) => {
+                const isActive = sortBy === opt.key;
+                const IconComp = opt.icon;
+
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => handleSort(opt.key)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
+                      isActive
+                        ? 'bg-white text-blue-600 shadow-xs font-bold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
+                    }`}
+                  >
+                    <IconComp className="w-3.5 h-3.5" />
+                    <span>{opt.label}</span>
+                    {isActive && (
+                      <span className="text-[11px] ml-0.5">
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Direction Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
+              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors text-xs font-bold flex items-center space-x-1"
+              title={sortOrder === 'asc' ? 'Aufsteigend sortiert (Klick für Absteigend)' : 'Absteigend sortiert (Klick für Aufsteigend)'}
+            >
+              {sortOrder === 'asc' ? (
+                <>
+                  <ArrowUp className="w-4 h-4 text-blue-600" />
+                  <span className="text-[11px] hidden sm:inline">A-Z / 0-9</span>
+                </>
+              ) : (
+                <>
+                  <ArrowDown className="w-4 h-4 text-blue-600" />
+                  <span className="text-[11px] hidden sm:inline">Z-A / 9-0</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Department filter pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-          {departments.map((dept) => (
-            <button
-              key={dept}
-              onClick={() => setSelectedDept(dept)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                selectedDept === dept
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                  : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/70'
-              }`}
-            >
-              {dept === 'ALL' ? t('phone_directory.all_departments') : dept}
-            </button>
-          ))}
+        <div className="pt-2 border-t border-slate-100">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+            {departments.map((dept) => (
+              <button
+                key={dept}
+                onClick={() => setSelectedDept(dept)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  selectedDept === dept
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-slate-100/80 text-slate-600 hover:bg-slate-200/70'
+                }`}
+              >
+                {dept === 'ALL' ? 'Alle Abteilungen' : dept}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -158,16 +285,16 @@ export function PhoneDirectoryPage() {
       {loading ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-slate-400">{t('directory.loading')}</p>
+          <p className="text-xs text-slate-400">Telefonverzeichnis wird geladen...</p>
         </div>
-      ) : directory.length === 0 ? (
+      ) : sortedDirectory.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 text-slate-400 text-sm">
-          {t('directory.empty')}
+          Keine Mitarbeiter für die ausgewählten Such- und Filterkriterien gefunden.
         </div>
       ) : viewMode === 'GRID' ? (
         /* GRID VIEW OF CONTACT CARDS */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {directory.map((user) => (
+          {sortedDirectory.map((user) => (
             <div
               key={user.id}
               className="bg-white rounded-3xl p-6 border border-slate-100 shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between group"
@@ -205,9 +332,9 @@ export function PhoneDirectoryPage() {
                 {/* Contact Meta Details */}
                 <div className="space-y-2 text-xs text-slate-600 border-t border-slate-100/80 pt-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">{t('phone_directory.ext')}:</span>
+                    <span className="text-slate-400">Durchwahl:</span>
                     <button
-                      onClick={() => handleCopy(user.phone, t('phone_directory.ext'))}
+                      onClick={() => handleCopy(user.phone, 'Durchwahl')}
                       className="font-mono font-bold text-slate-800 hover:text-blue-600 transition-colors"
                       title="Kopieren"
                     >
@@ -217,9 +344,9 @@ export function PhoneDirectoryPage() {
 
                   {user.mobile && (
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">{t('phone_directory.mobile')}:</span>
+                      <span className="text-slate-400">Mobil:</span>
                       <button
-                        onClick={() => handleCopy(user.mobile, t('phone_directory.mobile'))}
+                        onClick={() => handleCopy(user.mobile, 'Mobil')}
                         className="font-mono text-slate-700 hover:text-blue-600 transition-colors"
                       >
                         {user.mobile}
@@ -228,13 +355,13 @@ export function PhoneDirectoryPage() {
                   )}
 
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400">{t('phone_directory.location')}:</span>
+                    <span className="text-slate-400">Standort:</span>
                     <span className="text-slate-600 truncate max-w-[130px]">{user.location}</span>
                   </div>
 
                   {user.supervisor_name && (
                     <div className="flex items-center justify-between">
-                      <span className="text-slate-400">{t('phone_directory.supervisor')}:</span>
+                      <span className="text-slate-400">Vorgesetzte(r):</span>
                       <span className="text-slate-600 truncate max-w-[130px] font-medium">{user.supervisor_name}</span>
                     </div>
                   )}
@@ -248,7 +375,7 @@ export function PhoneDirectoryPage() {
                   className="flex-1 flex items-center justify-center space-x-1.5 py-2 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl text-xs font-semibold transition-all shadow-2xs"
                 >
                   <Phone className="w-3.5 h-3.5" />
-                  <span>{t('phone_directory.call')}</span>
+                  <span>Anrufen</span>
                 </button>
 
                 <a
@@ -263,22 +390,75 @@ export function PhoneDirectoryPage() {
           ))}
         </div>
       ) : (
-        /* COMPACT TABLE VIEW */
+        /* COMPACT TABLE VIEW WITH CLICKABLE SORT HEADERS */
         <div className="bg-white rounded-3xl border border-slate-100 shadow-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <thead className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider select-none">
                 <tr>
-                  <th className="px-6 py-4">Mitarbeiter</th>
-                  <th className="px-6 py-4">Durchwahl</th>
+                  <th 
+                    onClick={() => handleSort('name')}
+                    className="px-6 py-4 cursor-pointer hover:bg-slate-100/80 transition-colors"
+                  >
+                    <div className="flex items-center space-x-1.5">
+                      <span className={sortBy === 'name' ? 'text-blue-600 font-extrabold' : ''}>Mitarbeiter</span>
+                      {sortBy === 'name' ? (
+                        sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-blue-600" /> : <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+                      )}
+                    </div>
+                  </th>
+
+                  <th 
+                    onClick={() => handleSort('phone')}
+                    className="px-6 py-4 cursor-pointer hover:bg-slate-100/80 transition-colors"
+                  >
+                    <div className="flex items-center space-x-1.5">
+                      <span className={sortBy === 'phone' ? 'text-blue-600 font-extrabold' : ''}>Durchwahl</span>
+                      {sortBy === 'phone' ? (
+                        sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-blue-600" /> : <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+                      )}
+                    </div>
+                  </th>
+
                   <th className="px-6 py-4">Mobil</th>
-                  <th className="px-6 py-4">Abteilung</th>
-                  <th className="px-6 py-4">Standort</th>
+
+                  <th 
+                    onClick={() => handleSort('department')}
+                    className="px-6 py-4 cursor-pointer hover:bg-slate-100/80 transition-colors"
+                  >
+                    <div className="flex items-center space-x-1.5">
+                      <span className={sortBy === 'department' ? 'text-blue-600 font-extrabold' : ''}>Abteilung</span>
+                      {sortBy === 'department' ? (
+                        sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-blue-600" /> : <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+                      )}
+                    </div>
+                  </th>
+
+                  <th 
+                    onClick={() => handleSort('location')}
+                    className="px-6 py-4 cursor-pointer hover:bg-slate-100/80 transition-colors"
+                  >
+                    <div className="flex items-center space-x-1.5">
+                      <span className={sortBy === 'location' ? 'text-blue-600 font-extrabold' : ''}>Standort</span>
+                      {sortBy === 'location' ? (
+                        sortOrder === 'asc' ? <ArrowUp className="w-3.5 h-3.5 text-blue-600" /> : <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 text-slate-300" />
+                      )}
+                    </div>
+                  </th>
+
                   <th className="px-6 py-4 text-right">Aktionen</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {directory.map((user) => (
+                {sortedDirectory.map((user) => (
                   <tr key={user.id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
@@ -327,7 +507,7 @@ export function PhoneDirectoryPage() {
                         <button
                           onClick={() => handleCall(user.full_name, user.phone)}
                           className="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
-                          title={t('phone_directory.call')}
+                          title="Anrufen"
                         >
                           <Phone className="w-4 h-4" />
                         </button>
