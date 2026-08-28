@@ -19,8 +19,8 @@ from app.services.auth_service import get_current_user, require_roles
 
 router = APIRouter()
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-UPLOAD_ROOT = os.path.join(BASE_DIR, "uploads")
+BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+UPLOAD_ROOT = os.path.join(BACKEND_DIR, "uploads")
 NEWS_UPLOAD_DIR = os.path.join(UPLOAD_ROOT, "news")
 os.makedirs(NEWS_UPLOAD_DIR, exist_ok=True)
 

@@ -349,10 +349,10 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
             {/* Alternative Direct URL Input */}
             <div className="mt-2 flex items-center space-x-2">
               <input
-                type="url"
+                type="text"
                 value={coverImage}
                 onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="Oder Bild-URL einfügen (z. B. https://images.unsplash.com/...)"
+                placeholder="Oder Bild-URL / Pfad einfügen (z. B. https://images.unsplash.com/...)"
                 className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all"
               />
             </div>
