@@ -123,7 +123,7 @@ DEFAULT_MENUS = [
         "section": "Hauptbereich",
         "order": 2,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
-        "badge": "3 Neu",
+        "badge": None,
     },
     {
         "key": "phone-directory",
@@ -366,10 +366,11 @@ def migrate_menu_items_to_german(db: Session):
                 item.label = src["label"]
                 updated = True
 
-            # Migrate badges
-            if item.badge in ["3 Nuevos", "3 Neue"]:
-                item.badge = "3 Neu"
-                updated = True
+            # Clear fake static counter badges for announcements
+            if item.key == "announcements" or item.badge in ["3 Nuevos", "3 Neue", "3 Neu"]:
+                if item.badge is not None:
+                    item.badge = None
+                    updated = True
             elif item.badge == "Pendientes":
                 item.badge = "Ausstehend"
                 updated = True
