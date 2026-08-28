@@ -17,14 +17,14 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
     if not user or not verify_password(user_credentials.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Correo electrónico o contraseña incorrectos",
+            detail="Ungültige E-Mail-Adresse oder falsches Passwort",
             headers={"WWW-Authenticate": "Bearer"},
         )
         
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="La cuenta de usuario se encuentra inactiva",
+            detail="Das Benutzerkonto ist derzeit deaktiviert",
         )
         
     access_token = create_access_token(subject=user.id)
@@ -43,4 +43,4 @@ def get_me(current_user: User = Depends(get_current_user)):
 def reseed_data(db: Session = Depends(get_db)):
     """Convenience endpoint to ensure demo data and users exist."""
     seed_database(db)
-    return {"message": "Base de datos verificada y poblada exitosamente."}
+    return {"message": "Datenbank erfolgreich überprüft und synchronisiert."}

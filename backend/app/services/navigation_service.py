@@ -1,6 +1,7 @@
 from typing import List, Optional, Any
 from sqlalchemy.orm import Session
 from app.models.menu import MenuItem
+from app.models.role import Role
 from app.models.user import User, RoleEnum
 from app.schemas.navigation import NavigationResponse, NavigationSection, MenuItemResponse
 
@@ -106,30 +107,30 @@ DEFAULT_MENUS = [
     # 1. Hauptbereich (Alle Rollen)
     {
         "key": "dashboard",
-        "label": "Dashboard Principal",
+        "label": "Haupt-Dashboard",
         "path": "/",
         "icon": "LayoutDashboard",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 1,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
     },
     {
         "key": "announcements",
-        "label": "Comunicados & Noticias",
+        "label": "Mitteilungen & News",
         "path": "/announcements",
         "icon": "Megaphone",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 2,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
-        "badge": "3 Nuevos",
+        "badge": "3 Neu",
     },
     {
         "key": "phone-directory",
         "label": "Telefonverzeichnis",
         "path": "/phone-directory",
         "icon": "PhoneCall",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 3,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
@@ -139,17 +140,17 @@ DEFAULT_MENUS = [
         "label": "Organigramm",
         "path": "/org-chart",
         "icon": "Network",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 4,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "Hierarchie",
     },
     {
         "key": "directory",
-        "label": "Directorio de Equipo",
+        "label": "Teamverzeichnis",
         "path": "/directory",
         "icon": "Users",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 5,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
@@ -159,7 +160,7 @@ DEFAULT_MENUS = [
         "label": "Kantine (Speiseplan)",
         "path": "/kantine",
         "icon": "UtensilsCrossed",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 6,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "Menü",
@@ -169,57 +170,57 @@ DEFAULT_MENUS = [
         "label": "GPS (Fahrzeugortung)",
         "path": "/gps",
         "icon": "Navigation",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 7,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "Live",
     },
     {
         "key": "vertrieb",
-        "label": "Vertrieb (Sales-Dashboard)",
+        "label": "Vertrieb & Sales",
         "path": "/vertrieb",
         "icon": "TrendingUp",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 8,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
     },
     {
         "key": "technik",
-        "label": "Technik (Geräte & Support)",
+        "label": "Technik & Geräte",
         "path": "/technik",
         "icon": "Cpu",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 9,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
     },
     {
         "key": "abwicklung",
-        "label": "Abwicklung (Auftragsprozesse)",
+        "label": "Auftragsabwicklung",
         "path": "/abwicklung",
         "icon": "ClipboardCheck",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 10,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "Prozess",
     },
     {
         "key": "planung",
-        "label": "Planung (Ressourcen & Projekte)",
+        "label": "Ressourcen & Planung",
         "path": "/planung",
         "icon": "CalendarClock",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 11,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
     },
     {
         "key": "schulungen",
-        "label": "Schulungen & KI-Chatbot",
+        "label": "Schulungen & KI",
         "path": "/schulungen",
         "icon": "GraduationCap",
-        "section": "Principal",
+        "section": "Hauptbereich",
         "order": 12,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "KI Bot",
@@ -228,21 +229,21 @@ DEFAULT_MENUS = [
     # 2. Arbeitsbereich / Workplace (Alle Rollen)
     {
         "key": "documents",
-        "label": "Gestor Documental",
+        "label": "Dokumentenablage",
         "path": "/documents",
         "icon": "FolderOpen",
-        "section": "Espacio de Trabajo",
-        "order": 12,
+        "section": "Arbeitsbereich",
+        "order": 13,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
     },
     {
         "key": "calendar",
-        "label": "Calendario Corporativo",
+        "label": "Unternehmenskalender",
         "path": "/calendar",
         "icon": "Calendar",
-        "section": "Espacio de Trabajo",
-        "order": 13,
+        "section": "Arbeitsbereich",
+        "order": 14,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
         "is_active": False,
@@ -251,21 +252,21 @@ DEFAULT_MENUS = [
     # 3. Personal & HR (HR_MANAGER & ADMIN)
     {
         "key": "hr-requests",
-        "label": "Solicitudes & Vacaciones",
+        "label": "Anträge & Urlaub",
         "path": "/hr/requests",
         "icon": "Clock",
-        "section": "Gestión & RRHH",
-        "order": 14,
+        "section": "Personal & HR",
+        "order": 15,
         "allowed_roles": ["ADMIN", "HR_MANAGER"],
-        "badge": "Pendientes",
+        "badge": "Ausstehend",
     },
     {
         "key": "performance",
-        "label": "Evaluaciones & Clima",
+        "label": "Feedback & Klima",
         "path": "/hr/performance",
         "icon": "Award",
-        "section": "Gestión & RRHH",
-        "order": 15,
+        "section": "Personal & HR",
+        "order": 16,
         "allowed_roles": ["ADMIN", "HR_MANAGER"],
         "badge": None,
     },
@@ -277,7 +278,7 @@ DEFAULT_MENUS = [
         "path": "/it/management",
         "icon": "Server",
         "section": "IT & Systeme",
-        "order": 16,
+        "order": 17,
         "allowed_roles": ["ADMIN", "IT_ADMIN"],
         "badge": "IT Admin",
     },
@@ -287,7 +288,7 @@ DEFAULT_MENUS = [
         "path": "/tickets",
         "icon": "Headphones",
         "section": "IT & Systeme",
-        "order": 17,
+        "order": 18,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "Helpdesk",
     },
@@ -295,11 +296,11 @@ DEFAULT_MENUS = [
     # 5. Administration (SuperAdmin / ADMIN)
     {
         "key": "admin-users",
-        "label": "Gestión de Usuarios",
+        "label": "Benutzerverwaltung",
         "path": "/admin/users",
         "icon": "UserCog",
-        "section": "Administración",
-        "order": 17,
+        "section": "Administration",
+        "order": 19,
         "allowed_roles": ["ADMIN"],
         "badge": "Admin",
     },
@@ -308,22 +309,73 @@ DEFAULT_MENUS = [
         "label": "Rollen & Berechtigungen",
         "path": "/admin/roles",
         "icon": "ShieldCheck",
-        "section": "Administración",
-        "order": 18,
+        "section": "Administration",
+        "order": 20,
         "allowed_roles": ["ADMIN"],
         "badge": "RBAC",
     },
     {
         "key": "admin-settings",
-        "label": "Configuración Intranet",
+        "label": "Intranet-Einstellungen",
         "path": "/admin/settings",
         "icon": "Sliders",
-        "section": "Administración",
-        "order": 19,
+        "section": "Administration",
+        "order": 21,
         "allowed_roles": ["ADMIN"],
         "badge": None,
     }
 ]
+
+SECTION_MIGRATION_MAP = {
+    "Principal": "Hauptbereich",
+    "Espacio de Trabajo": "Arbeitsbereich",
+    "Gestión & RRHH": "Personal & HR",
+    "Gesti\u00f3n & RRHH": "Personal & HR",
+    "Administración": "Administration",
+    "Administraci\u00f3n": "Administration",
+}
+
+def migrate_menu_items_to_german(db: Session):
+    """
+    Safely migrates legacy Spanish menu labels, sections, and badges to German in database.
+    Preserves custom ordering and active status.
+    """
+    default_dict = {item["key"]: item for item in DEFAULT_MENUS}
+    existing_items = db.query(MenuItem).all()
+    updated = False
+
+    for item in existing_items:
+        if item.key in default_dict:
+            src = default_dict[item.key]
+            # If section is in Spanish migration map, update to German
+            if item.section in SECTION_MIGRATION_MAP:
+                item.section = SECTION_MIGRATION_MAP[item.section]
+                updated = True
+            elif not item.section:
+                item.section = src["section"]
+                updated = True
+
+            # If label has legacy Spanish text, update to German
+            spanish_labels = {
+                "Dashboard Principal", "Comunicados & Noticias", "Directorio de Equipo",
+                "Gestor Documental", "Calendario Corporativo", "Solicitudes & Vacaciones",
+                "Evaluaciones & Clima", "Gestión de Usuarios", "Gesti\u00f3n de Usuarios",
+                "Configuración Intranet", "Configuraci\u00f3n Intranet"
+            }
+            if item.label in spanish_labels:
+                item.label = src["label"]
+                updated = True
+
+            # Migrate badges
+            if item.badge in ["3 Nuevos", "3 Neue"]:
+                item.badge = "3 Neu"
+                updated = True
+            elif item.badge == "Pendientes":
+                item.badge = "Ausstehend"
+                updated = True
+
+    if updated:
+        db.commit()
 
 def get_navigation_for_role(db: Session, user_role: Any, current_user: Optional[User] = None) -> NavigationResponse:
     """

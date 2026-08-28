@@ -16,7 +16,7 @@ def get_current_user(
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="No se ha proporcionado token de autenticación",
+            detail="Kein Authentifizierungs-Token übermittelt",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -24,7 +24,7 @@ def get_current_user(
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido o expirado",
+            detail="Ungültiges oder abgelaufenes Token",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -32,7 +32,7 @@ def get_current_user(
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Credenciales de token no válidas",
+            detail="Ungültige Token-Anmeldedaten",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -40,13 +40,13 @@ def get_current_user(
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado",
+            detail="Benutzer nicht gefunden",
         )
     
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Usuario inactivo",
+            detail="Benutzerkonto ist deaktiviert",
         )
         
     return user
@@ -59,7 +59,7 @@ def require_roles(allowed_roles: List[Any]):
         if user_role_val not in allowed_values and user_role_val != "ADMIN":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permiso denegado. Se requiere uno de los siguientes roles: {allowed_values}",
+                detail=f"Zugriff verweigert. Erforderliche Rollen: {allowed_values}",
             )
         return current_user
     return role_checker

@@ -54,6 +54,8 @@ def ensure_schema_migrations():
         except Exception as e:
             logger.warning(f"Schema migration note: {e}")
 
+from app.services.navigation_service import migrate_menu_items_to_german
+
 def init():
     logger.info("Creating database tables...")
     Base.metadata.create_all(bind=engine)
@@ -65,6 +67,7 @@ def init():
     db = SessionLocal()
     try:
         seed_database(db)
+        migrate_menu_items_to_german(db)
         seed_default_roles(db)
         seed_default_training_manuals(db, UPLOAD_ROOT)
         seed_default_languages(db)

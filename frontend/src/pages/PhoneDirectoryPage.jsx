@@ -88,7 +88,7 @@ export function PhoneDirectoryPage() {
         {/* View Mode Toggle & Counter */}
         <div className="flex items-center space-x-3">
           <span className="text-xs font-semibold text-slate-400">
-            {directory.length} {t('nav_sections.Espacio de Trabajo')}
+            {directory.length} {t('directory.employees_count', 'Mitarbeiter')}
           </span>
           <div className="flex items-center bg-slate-100 p-1 rounded-xl">
             <button

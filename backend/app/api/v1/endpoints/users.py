@@ -141,7 +141,7 @@ def get_user_by_id(
     """Get single user profile by ID."""
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
-        raise HTTPException(status_code=404, detail="Colaborador no encontrado")
+        raise HTTPException(status_code=404, detail="Mitarbeiter nicht gefunden")
     return user
 
 @router.post("", response_model=UserResponse, dependencies=[Depends(require_roles([RoleEnum.ADMIN]))])
@@ -149,7 +149,7 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
     """Admin-only: Create new corporate employee."""
     existing = db.query(User).filter(User.email == user_in.email.lower()).first()
     if existing:
-        raise HTTPException(status_code=400, detail="El correo electrónico ya se encuentra registrado")
+        raise HTTPException(status_code=400, detail="Diese E-Mail-Adresse ist bereits registriert")
         
     user = User(
         email=user_in.email.lower().strip(),

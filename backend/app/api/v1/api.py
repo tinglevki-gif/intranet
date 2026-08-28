@@ -19,13 +19,13 @@ from app.api.v1.endpoints import (
 
 api_router = APIRouter()
 
-api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
-api_router.include_router(navigation.router, prefix="/navigation", tags=["Navegación Dinámica"])
-api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard Corporativo"])
+api_router.include_router(auth.router, prefix="/auth", tags=["Authentifizierung & Anmeldung"])
+api_router.include_router(navigation.router, prefix="/navigation", tags=["Dynamische Navigation & Menüs"])
+api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Unternehmens-Dashboard"])
 api_router.include_router(news.router, prefix="/news", tags=["Unternehmensnews & Mitteilungen"])
 api_router.include_router(languages.router, prefix="/languages", tags=["Sprachverwaltung (i18n)"])
 api_router.include_router(settings.router, prefix="/settings", tags=["System-Einstellungen & Integrationen"])
-api_router.include_router(users.router, prefix="/users", tags=["Directorio & Usuarios"])
+api_router.include_router(users.router, prefix="/users", tags=["Mitarbeiterverzeichnis & Benutzer"])
 api_router.include_router(calendar.router, prefix="/calendar", tags=["Unternehmenskalender"])
 api_router.include_router(documents.router, prefix="/documents", tags=["Dokumentenverwaltung & KI-Suche"])
 api_router.include_router(canteen.router, prefix="/canteen", tags=["Kantine & Speiseplan"])

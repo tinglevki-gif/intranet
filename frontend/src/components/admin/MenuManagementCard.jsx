@@ -305,11 +305,11 @@ export function MenuManagementCard() {
                           <div className="space-y-0.5 min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-bold text-slate-900 truncate">
-                                {item.label}
+                                {t(`nav_items.${item.key}`, item.label)}
                               </span>
                               {item.badge && (
                                 <span className="px-1.5 py-0.2 bg-purple-50 text-purple-700 text-[10px] font-bold rounded">
-                                  {item.badge}
+                                  {t(`nav_badges.${item.badge}`, item.badge)}
                                 </span>
                               )}
                               {!item.is_active && (
