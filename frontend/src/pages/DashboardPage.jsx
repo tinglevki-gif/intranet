@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { HeroBanner } from '../components/dashboard/HeroBanner';
 import { ModuleQuickCards } from '../components/dashboard/ModuleQuickCards';
@@ -11,6 +12,7 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 
 export function DashboardPage() {
   const { t } = useLanguage();
+  const { hasModulePermission } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,6 +63,8 @@ export function DashboardPage() {
     );
   }
 
+  const showCalendar = hasModulePermission('calendar');
+
   return (
     <div className="space-y-8 pb-12">
       {/* 1. Personalized Corporate Hero Banner */}
@@ -73,8 +77,8 @@ export function DashboardPage() {
       <MetricsGrid stats={data?.stats} />
 
       {/* 4. Main Grid: Announcements & Quick Launcher vs Events Agenda */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className={`grid grid-cols-1 ${showCalendar ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} gap-8`}>
+        <div className={`${showCalendar ? 'lg:col-span-2' : 'w-full'} space-y-8`}>
           <AnnouncementsFeed 
             announcements={data?.announcements} 
             onRefresh={fetchDashboard} 
@@ -82,9 +86,11 @@ export function DashboardPage() {
           <QuickLauncher tools={data?.quick_tools} />
         </div>
 
-        <div className="space-y-8">
-          <EventsWidget events={data?.upcoming_events} />
-        </div>
+        {showCalendar && (
+          <div className="space-y-8">
+            <EventsWidget events={data?.upcoming_events} />
+          </div>
+        )}
       </div>
     </div>
   );

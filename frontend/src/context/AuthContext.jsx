@@ -96,14 +96,33 @@ export function AuthProvider({ children }) {
 
   const hasModulePermission = (moduleKey) => {
     if (!user) return false;
+
+    // 1. Global Module Active Check: if deactivated in Intranet-Einstellungen, hide everywhere for everyone
+    if (menuSections && menuSections.length > 0) {
+      const allActiveItems = menuSections.flatMap((s) => s.items || []);
+      const isPresentInActiveMenu = allActiveItems.some(
+        (i) =>
+          i.key === moduleKey ||
+          i.path === `/${moduleKey}` ||
+          (moduleKey === 'tickets' && (i.key === 'it-helpdesk' || i.path?.includes('tickets') || i.path?.includes('helpdesk'))) ||
+          (moduleKey === 'hr-requests' && (i.key === 'hr-requests' || i.key === 'hr_requests' || i.path?.includes('requests'))) ||
+          (moduleKey === 'it-management' && (i.key === 'it-management' || i.path?.includes('management')))
+      );
+
+      if (moduleKey !== 'dashboard' && !isPresentInActiveMenu) {
+        return false;
+      }
+    }
+
+    // 2. SuperAdmin has access to all currently active modules
     if (user.role === 'ADMIN') return true;
 
-    // 1. Granular user module override matrix
+    // 3. Granular user module override matrix
     if (user.allowed_modules && Array.isArray(user.allowed_modules)) {
       return user.allowed_modules.includes(moduleKey);
     }
 
-    // 2. Default role-based boundaries
+    // 4. Default role-based boundaries
     if (['admin-users', 'admin-roles', 'admin-settings'].includes(moduleKey)) {
       return user.role === 'ADMIN';
     }

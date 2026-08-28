@@ -1,15 +1,33 @@
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export function MetricsGrid({ stats }) {
   const { t } = useLanguage();
+  const { hasModulePermission } = useAuth();
   if (!stats || stats.length === 0) return null;
 
   const renderIcon = (iconName, className = 'w-6 h-6') => {
     const IconComponent = LucideIcons[iconName] || LucideIcons.Activity;
     return <IconComponent className={className} />;
   };
+
+  const isStatAllowed = (stat) => {
+    switch (stat.id) {
+      case 'stat-vacations':
+        return hasModulePermission('hr-requests');
+      case 'stat-tickets':
+        return hasModulePermission('tickets');
+      case 'stat-events':
+        return hasModulePermission('calendar');
+      default:
+        return true;
+    }
+  };
+
+  const allowedStats = stats.filter(isStatAllowed);
+  if (allowedStats.length === 0) return null;
 
   const colorVariants = [
     { bg: 'bg-[#eef8fd]', border: 'border-[#aee0f6]', text: 'text-[#009FE3]', iconBg: 'bg-[#009FE3]' },
@@ -47,8 +65,8 @@ export function MetricsGrid({ stats }) {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-      {stats.map((stat, idx) => {
+    <div className={`grid grid-cols-1 sm:grid-cols-2 ${allowedStats.length >= 4 ? 'lg:grid-cols-4' : allowedStats.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-4 sm:gap-6`}>
+      {allowedStats.map((stat, idx) => {
         const theme = colorVariants[idx % colorVariants.length];
         const statKey = stat.id ? stat.id.replace('-', '_') : `stat_${idx}`;
         const title = t(`metrics.${statKey}_title`, stat.title);
