@@ -27,7 +27,6 @@ export function NewsDetailModal({
   if (!news) return null;
 
   const coverUrl = getNewsCoverUrl(news.cover_image);
-  const avatarUrl = getAvatarUrl(news.author_avatar);
   const categoryStyle = getCategoryBadgeStyle(news.category);
   const dateStr = formatDate(news.created_at || Date.now(), { 
     weekday: 'long', 
