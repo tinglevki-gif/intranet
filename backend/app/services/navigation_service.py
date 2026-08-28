@@ -8,6 +8,34 @@ from app.schemas.navigation import NavigationResponse, NavigationSection, MenuIt
 # System modules definitions for Granular Permissions Matrix
 AVAILABLE_MODULES = [
     {
+        "key": "announcements",
+        "label": "Mitteilungen & News",
+        "category": "Hauptbereich",
+        "icon": "Megaphone",
+        "description": "Unternehmensbekanntmachungen, News-Feed und Eilmeldungen."
+    },
+    {
+        "key": "phone-directory",
+        "label": "Telefonverzeichnis",
+        "category": "Hauptbereich",
+        "icon": "PhoneCall",
+        "description": "Durchwahlen, Mobilnummern und Kontaktschnellaktionen."
+    },
+    {
+        "key": "org-chart",
+        "label": "Organigramm",
+        "category": "Hauptbereich",
+        "icon": "Network",
+        "description": "Interaktive Unternehmenshierarchie und Baumstruktur."
+    },
+    {
+        "key": "directory",
+        "label": "Teamverzeichnis",
+        "category": "Hauptbereich",
+        "icon": "Users",
+        "description": "Mitarbeiterübersicht und Abteilungsfilter."
+    },
+    {
         "key": "kantine",
         "label": "Kantine & Speiseplan",
         "category": "Hauptbereich",
@@ -50,6 +78,13 @@ AVAILABLE_MODULES = [
         "description": "Kapazitätsauslastung der Fertigungslinien und Schichtpläne."
     },
     {
+        "key": "schulungen",
+        "label": "Schulungen & Handbücher",
+        "category": "Hauptbereich",
+        "icon": "GraduationCap",
+        "description": "Benutzerhandbücher, Videoanleitungen und interaktiver KI-Support-Chatbot."
+    },
+    {
         "key": "documents",
         "label": "Dokumentenablage & KI",
         "category": "Arbeitsbereich",
@@ -64,32 +99,39 @@ AVAILABLE_MODULES = [
         "description": "Terminverwaltung, Feiertage und iCal-Kalendersynchronisation."
     },
     {
-        "key": "phone-directory",
-        "label": "Telefonverzeichnis",
-        "category": "Hauptbereich",
-        "icon": "PhoneCall",
-        "description": "Durchwahlen, Mobilnummern und Kontaktschnellaktionen."
+        "key": "tickets",
+        "label": "IT-Helpdesk & Tickets",
+        "category": "IT & Systeme",
+        "icon": "Headphones",
+        "description": "Störungsmeldungen, Supportanfragen und Ticketbearbeitung."
     },
     {
-        "key": "org-chart",
-        "label": "Organigramm",
-        "category": "Hauptbereich",
-        "icon": "Network",
-        "description": "Interaktive Unternehmenshierarchie und Baumstruktur."
+        "key": "hr-requests",
+        "label": "Urlaubs- & Abwesenheitsverwaltung",
+        "category": "Personal & HR",
+        "icon": "Clock",
+        "description": "Urlaubsanträge, Zeitausgleich und Krankmeldungen."
     },
     {
-        "key": "directory",
-        "label": "Teamverzeichnis",
-        "category": "Hauptbereich",
-        "icon": "Users",
-        "description": "Mitarbeiterübersicht und Abteilungsfilter."
+        "key": "performance",
+        "label": "Mitarbeitergespräche & Performance",
+        "category": "Personal & HR",
+        "icon": "Award",
+        "description": "Zielvereinbarungen (OKRs) und Mitarbeiter-Feedback."
     },
     {
-        "key": "schulungen",
-        "label": "Schulungen & Handbücher",
-        "category": "Hauptbereich",
-        "icon": "GraduationCap",
-        "description": "Benutzerhandbücher, Videoanleitungen und interaktiver KI-Support-Chatbot."
+        "key": "it-management",
+        "label": "IT-Infrastruktur & Sicherheit",
+        "category": "IT & Systeme",
+        "icon": "Server",
+        "description": "Serverstatus, 2FA-Überwachung und Sicherheitsmanagement."
+    },
+    {
+        "key": "admin-users",
+        "label": "Benutzerverwaltung",
+        "category": "Administration",
+        "icon": "UserCheck",
+        "description": "Mitarbeiterkonten verwalten, Passwörter zurücksetzen und Berechtigungen vergeben."
     },
     {
         "key": "admin-roles",
@@ -97,6 +139,13 @@ AVAILABLE_MODULES = [
         "category": "Administration",
         "icon": "ShieldCheck",
         "description": "Rollen definieren, RBAC-Matrix anpassen und Berechtigungsstufen steuern."
+    },
+    {
+        "key": "admin-settings",
+        "label": "Intranet-Einstellungen",
+        "category": "Administration",
+        "icon": "Settings",
+        "description": "Systemkonfiguration, Navigation und OneDrive-Integration."
     }
 ]
 

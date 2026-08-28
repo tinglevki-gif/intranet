@@ -1,28 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import * as LucideIcons from 'lucide-react';
 import { 
   X, 
   ShieldCheck, 
   ShieldAlert, 
-  Lock, 
-  Unlock, 
   Save, 
   CheckCircle2, 
-  AlertCircle,
-  Sparkles,
-  RefreshCw,
-  UtensilsCrossed,
-  Navigation,
-  TrendingUp,
-  Cpu,
-  ClipboardCheck,
-  CalendarClock,
-  FolderOpen,
-  Calendar,
-  PhoneCall,
-  Network,
-  Users,
-  Check,
-  SlidersHorizontal
+  AlertCircle, 
+  Sparkles, 
+  RefreshCw, 
+  Check, 
+  SlidersHorizontal 
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
@@ -38,23 +26,10 @@ export function PermissionsModal({ isOpen, onClose, user, onSaveSuccess }) {
   const [permissionData, setPermissionData] = useState(null);
   const [selectedModules, setSelectedModules] = useState([]);
 
-  // Icon mapping helper
+  // Dynamic icon mapping helper
   const renderModuleIcon = (iconName) => {
-    switch (iconName) {
-      case 'UtensilsCrossed': return <UtensilsCrossed className="w-5 h-5" />;
-      case 'Navigation': return <Navigation className="w-5 h-5" />;
-      case 'TrendingUp': return <TrendingUp className="w-5 h-5" />;
-      case 'Cpu': return <Cpu className="w-5 h-5" />;
-      case 'ClipboardCheck': return <ClipboardCheck className="w-5 h-5" />;
-      case 'CalendarClock': return <CalendarClock className="w-5 h-5" />;
-      case 'FolderOpen': return <FolderOpen className="w-5 h-5" />;
-      case 'Calendar': return <Calendar className="w-5 h-5" />;
-      case 'PhoneCall': return <PhoneCall className="w-5 h-5" />;
-      case 'Network': return <Network className="w-5 h-5" />;
-      case 'Users': return <Users className="w-5 h-5" />;
-      case 'GraduationCap': return <GraduationCap className="w-5 h-5" />;
-      default: return <Sparkles className="w-5 h-5" />;
-    }
+    const IconComponent = LucideIcons[iconName] || LucideIcons.Sparkles;
+    return <IconComponent className="w-5 h-5" />;
   };
 
   useEffect(() => {

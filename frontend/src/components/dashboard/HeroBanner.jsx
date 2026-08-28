@@ -6,7 +6,7 @@ import { RoleBadge } from '../common/Badge';
 import { Sparkles, Calendar, Clock, ArrowRight, MessageSquarePlus } from 'lucide-react';
 
 export function HeroBanner() {
-  const { user } = useAuth();
+  const { user, hasModulePermission } = useAuth();
   const { t, formatDate, formatTime } = useLanguage();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -67,22 +67,26 @@ export function HeroBanner() {
             {t('hero.welcome_text_2', 'Hier finden Sie alle zentralen Arbeitsabläufe, Neuigkeiten und Team-Ressourcen.')}
           </p>
 
-          {/* Tinglev Action CTA Buttons (inspired by the screenshot "Jetzt Anfragen" + "Mehr erfahren") */}
+          {/* Tinglev Action CTA Buttons */}
           <div className="pt-2 flex flex-wrap items-center gap-3">
-            <Link
-              to="/tickets"
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#F05A22] hover:bg-[#e0460f] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#F05A22]/30 transition-all hover:scale-102 active:scale-98"
-            >
-              <MessageSquarePlus className="w-4 h-4" />
-              <span>{t('hero.cta_primary', 'Ticket / Anfrage erstellen')}</span>
-            </Link>
-            <Link
-              to="/announcements"
-              className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#009FE3] hover:bg-[#008DD2] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#009FE3]/25 transition-all hover:scale-102 active:scale-98"
-            >
-              <span>{t('hero.cta_secondary', 'Mehr erfahren')}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {hasModulePermission('tickets') && (
+              <Link
+                to="/tickets"
+                className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#F05A22] hover:bg-[#e0460f] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#F05A22]/30 transition-all hover:scale-102 active:scale-98"
+              >
+                <MessageSquarePlus className="w-4 h-4" />
+                <span>{t('hero.cta_primary', 'Ticket / Anfrage erstellen')}</span>
+              </Link>
+            )}
+            {hasModulePermission('announcements') && (
+              <Link
+                to="/announcements"
+                className="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-[#009FE3] hover:bg-[#008DD2] text-white text-xs sm:text-sm font-bold shadow-md shadow-[#009FE3]/25 transition-all hover:scale-102 active:scale-98"
+              >
+                <span>{t('hero.cta_secondary', 'Mehr erfahren')}</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
         </div>
 

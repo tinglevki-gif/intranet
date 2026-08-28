@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import * as LucideIcons from 'lucide-react';
 import { LayoutGrid, ExternalLink, Check } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export function QuickLauncher({ tools }) {
   const { t } = useLanguage();
+  const { hasModulePermission } = useAuth();
   const [toastMessage, setToastMessage] = useState(null);
 
   const renderIcon = (iconName, className = 'w-5 h-5') => {
@@ -16,6 +18,31 @@ export function QuickLauncher({ tools }) {
     setToastMessage(`${t('tools.accessing')} "${translatedTitle}"...`);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  // Check tool permissions against system modules
+  const isToolAllowed = (tool) => {
+    switch (tool.id) {
+      case 'tool-payroll':
+      case 'tool-vacations':
+        return hasModulePermission('hr-requests');
+      case 'tool-jira':
+        return hasModulePermission('technik') || hasModulePermission('abwicklung');
+      case 'tool-cloud-drive':
+        return hasModulePermission('documents');
+      case 'tool-desk-booking':
+        return hasModulePermission('calendar');
+      case 'tool-it-helpdesk':
+        return hasModulePermission('tickets');
+      default:
+        return true;
+    }
+  };
+
+  const allowedTools = (tools || []).filter(isToolAllowed);
+
+  if (allowedTools.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card">
@@ -40,7 +67,7 @@ export function QuickLauncher({ tools }) {
 
       {/* Grid of Tools */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {(tools || []).map((tool) => {
+        {allowedTools.map((tool) => {
           const toolKey = tool.id ? tool.id.replace('tool-', '') : '';
           const title = t(`tools.${toolKey}_title`, tool.title);
           const category = t(`tools.${toolKey}_cat`, tool.category);

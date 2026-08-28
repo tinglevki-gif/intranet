@@ -97,9 +97,23 @@ export function AuthProvider({ children }) {
   const hasModulePermission = (moduleKey) => {
     if (!user) return false;
     if (user.role === 'ADMIN') return true;
+
+    // 1. Granular user module override matrix
     if (user.allowed_modules && Array.isArray(user.allowed_modules)) {
       return user.allowed_modules.includes(moduleKey);
     }
+
+    // 2. Default role-based boundaries
+    if (['admin-users', 'admin-roles', 'admin-settings'].includes(moduleKey)) {
+      return user.role === 'ADMIN';
+    }
+    if (['hr-requests', 'performance'].includes(moduleKey)) {
+      return ['ADMIN', 'HR_MANAGER'].includes(user.role);
+    }
+    if (['it-management'].includes(moduleKey)) {
+      return ['ADMIN', 'IT_ADMIN'].includes(user.role);
+    }
+
     return true;
   };
 

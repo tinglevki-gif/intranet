@@ -74,9 +74,30 @@ export function App() {
             >
               {/* 1. Hauptbereich / Main Hub */}
               <Route index element={<DashboardPage />} />
-              <Route path="announcements" element={<AnnouncementsPage />} />
-              <Route path="news" element={<AnnouncementsPage />} />
-              <Route path="mitteilungszentrale" element={<AnnouncementsPage />} />
+              <Route
+                path="announcements"
+                element={
+                  <ProtectedRoute requiredModule="announcements">
+                    <AnnouncementsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="news"
+                element={
+                  <ProtectedRoute requiredModule="announcements">
+                    <AnnouncementsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="mitteilungszentrale"
+                element={
+                  <ProtectedRoute requiredModule="announcements">
+                    <AnnouncementsPage />
+                  </ProtectedRoute>
+                }
+              />
 
               <Route
                 path="phone-directory"
@@ -219,9 +240,23 @@ export function App() {
               />
 
               {/* 4. IT & Systeme */}
-              <Route path="tickets" element={<TicketsPage />} />
+              <Route
+                path="tickets"
+                element={
+                  <ProtectedRoute requiredModule="tickets">
+                    <TicketsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="it-helpdesk" element={<Navigate to="/tickets" replace />} />
-              <Route path="it/helpdesk" element={<TicketsPage />} />
+              <Route
+                path="it/helpdesk"
+                element={
+                  <ProtectedRoute requiredModule="tickets">
+                    <TicketsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="it/management"
                 element={
