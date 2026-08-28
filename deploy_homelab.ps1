@@ -37,8 +37,8 @@ Write-Host "[2/3] Conectando a admin-server@192.168.1.29 y actualizando ~/intran
 $RemoteCommands = @"
 cd ~/intranet-server/ && \
 git pull origin main && \
-sudo docker compose up -d --build && \
-sudo docker compose ps
+docker compose up -d --build && \
+docker compose ps
 "@
 
 try {
