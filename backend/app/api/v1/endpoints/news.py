@@ -32,13 +32,21 @@ ALLOWED_IMAGE_TYPES = {
     "image/svg+xml": ".svg"
 }
 
-def format_news_response(post: Announcement) -> NewsPostResponse:
+def format_news_response(post: Announcement, db: Session = None) -> NewsPostResponse:
     # Approximate read time based on ~180-200 words/min
     word_count = len((post.content or "").split())
     read_time = max(1, math.ceil(word_count / 180))
 
     author_avatar = post.author.avatar_url if post.author else None
     author_dept = post.author.department if post.author else "Unternehmenskommunikation"
+    author_name = post.author_name or (post.author.full_name if post.author else "Geschäftsleitung")
+
+    # If post has a specific author_name, attempt lookup in database to get the matching profile avatar
+    if db and post.author_name:
+        matched_user = db.query(User).filter(User.full_name == post.author_name).first()
+        if matched_user:
+            author_avatar = matched_user.avatar_url or author_avatar
+            author_dept = matched_user.department or author_dept
 
     return NewsPostResponse(
         id=post.id,
@@ -49,7 +57,7 @@ def format_news_response(post: Announcement) -> NewsPostResponse:
         is_pinned=bool(post.is_pinned),
         cover_image=post.cover_image,
         author_id=post.author_id,
-        author_name=post.author_name or (post.author.full_name if post.author else "Geschäftsleitung"),
+        author_name=author_name,
         author_avatar=author_avatar,
         author_department=author_dept,
         views_count=post.views_count or 0,
@@ -113,7 +121,7 @@ def list_news(
         desc(Announcement.created_at)
     ).offset(offset).limit(limit).all()
 
-    return [format_news_response(p) for p in posts]
+    return [format_news_response(p, db) for p in posts]
 
 @router.get("/{news_id}", response_model=NewsPostResponse, tags=["Unternehmensnews & Mitteilungen"])
 def get_news_detail(
@@ -136,7 +144,7 @@ def get_news_detail(
     db.commit()
     db.refresh(post)
 
-    return format_news_response(post)
+    return format_news_response(post, db)
 
 @router.post("", response_model=NewsPostResponse, status_code=status.HTTP_201_CREATED, tags=["Unternehmensnews & Mitteilungen"])
 def create_news(
@@ -175,7 +183,7 @@ def create_news(
     db.commit()
     db.refresh(new_post)
 
-    return format_news_response(new_post)
+    return format_news_response(new_post, db)
 
 @router.put("/{news_id}", response_model=NewsPostResponse, tags=["Unternehmensnews & Mitteilungen"])
 @router.patch("/{news_id}", response_model=NewsPostResponse, tags=["Unternehmensnews & Mitteilungen"])
@@ -222,7 +230,7 @@ def update_news(
     db.commit()
     db.refresh(post)
 
-    return format_news_response(post)
+    return format_news_response(post, db)
 
 @router.delete("/{news_id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Unternehmensnews & Mitteilungen"])
 def delete_news(

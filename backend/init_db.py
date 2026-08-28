@@ -55,7 +55,7 @@ def ensure_schema_migrations():
             logger.warning(f"Schema migration note: {e}")
 
 from app.services.navigation_service import migrate_menu_items_to_german
-from app.services.seeder import seed_default_user_avatars
+from app.services.seeder import seed_default_user_avatars, sync_announcements_authors
 
 def init():
     logger.info("Creating database tables...")
@@ -70,6 +70,7 @@ def init():
         seed_database(db)
         migrate_menu_items_to_german(db)
         seed_default_user_avatars(db)
+        sync_announcements_authors(db)
         seed_default_roles(db)
         seed_default_training_manuals(db, UPLOAD_ROOT)
         seed_default_languages(db)

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, User, Pin, Clock, Eye, Share2, Check, Edit2, Trash2 } from 'lucide-react';
+import { X, Calendar, Pin, Clock, Eye, Share2, Check, Edit2, Trash2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { getNewsCoverUrl, getAvatarUrl } from '../../services/api';
+import { getNewsCoverUrl } from '../../services/api';
 import { getCategoryBadgeStyle } from '../common/Badge';
+import { UserAvatar } from '../common/UserAvatar';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
 export function NewsDetailModal({ 
@@ -136,17 +137,13 @@ export function NewsDetailModal({
           {/* Author & Date Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 py-3.5 border-y border-slate-100 text-xs text-slate-500">
             <div className="flex items-center space-x-3">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={news.author_name}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-indigo-50"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                  {news.author_name ? news.author_name.charAt(0) : 'U'}
-                </div>
-              )}
+              <UserAvatar
+                src={news.author_avatar}
+                name={news.author_name}
+                size="md"
+                rounded="rounded-full"
+                className="ring-2 ring-indigo-50 shrink-0"
+              />
               <div>
                 <p className="font-bold text-slate-900 text-sm">{news.author_name}</p>
                 <p className="text-slate-400">{news.author_department || 'Tiglev Elementfabrik'}</p>

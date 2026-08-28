@@ -88,7 +88,7 @@ def seed_database(db: Session):
                 "role": RoleEnum.ADMIN.value if hasattr(RoleEnum.ADMIN, 'value') else "ADMIN",
                 "department": "IT \\ SuperAdmin",
                 "position": "IT-Leiter & SuperAdmin (HUSE)",
-                "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+                "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250&auto=format&fit=crop&q=80",
                 "phone": "+49 33439 86-245",
                 "mobile": "0162 / 25 66 144",
                 "location": "Werk Tinglev",
@@ -888,7 +888,7 @@ DEFAULT_USER_AVATARS = {
     'Jenny Rudolph': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=250&auto=format&fit=crop&q=80',
     'Torsten Anton': 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=250&auto=format&fit=crop&q=80',
     'Robert Kuhaupt': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=250&auto=format&fit=crop&q=80',
-    'Humbert Senf': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250&auto=format&fit=crop&q=80',
+    'Humbert Senf': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250&auto=format&fit=crop&q=80',
 }
 
 def seed_default_user_avatars(db: Session):
@@ -898,9 +898,36 @@ def seed_default_user_avatars(db: Session):
     updated = False
     for name, url in DEFAULT_USER_AVATARS.items():
         user = db.query(User).filter(User.full_name == name).first()
-        if user and not user.avatar_url:
-            user.avatar_url = url
-            updated = True
+        if user:
+            if not user.avatar_url or (name == 'Humbert Senf' and '1534528741775' in (user.avatar_url or '')):
+                user.avatar_url = url
+                updated = True
     if updated:
         db.commit()
         logger.info("Seeder: Standard-Benutzeravatare synchronisiert.")
+
+def sync_announcements_authors(db: Session):
+    """
+    Ensures existing announcements are linked to their respective distinct corporate authors.
+    """
+    updated = False
+    author_assignments = [
+        ("%Willkommen%", "Anja Knoll"),
+        ("%IT-Sicherheit%", "Robert Kuhaupt"),
+        ("%Urlaubsplanung%", "Petra Petersen"),
+        ("%Fertigungshalle%", "Matthias Grade"),
+        ("%Frühlingsevent%", "Susanne Merten"),
+    ]
+
+    for title_pattern, author_name in author_assignments:
+        post = db.query(Announcement).filter(Announcement.title.ilike(title_pattern)).first()
+        if post:
+            author_user = db.query(User).filter(User.full_name == author_name).first()
+            if author_user and (post.author_name != author_name or post.author_id != author_user.id):
+                post.author_name = author_name
+                post.author_id = author_user.id
+                updated = True
+
+    if updated:
+        db.commit()
+        logger.info("Seeder: Autoren der Mitteilungszentrale erfolgreich synchronisiert.")

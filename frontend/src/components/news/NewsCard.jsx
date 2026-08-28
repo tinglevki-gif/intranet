@@ -1,8 +1,9 @@
 import React from 'react';
-import { Pin, Clock, Eye, MoreVertical, Edit2, Trash2, ArrowRight, User } from 'lucide-react';
+import { Pin, Clock, Eye, MoreVertical, Edit2, Trash2, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { getNewsCoverUrl, getAvatarUrl } from '../../services/api';
+import { getNewsCoverUrl } from '../../services/api';
 import { getCategoryBadgeStyle } from '../common/Badge';
+import { UserAvatar } from '../common/UserAvatar';
 
 export function NewsCard({ 
   news, 
@@ -120,17 +121,13 @@ export function NewsCard({
         {/* Author Footer */}
         <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center space-x-2.5 min-w-0">
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={news.author_name}
-                className="w-7 h-7 rounded-full object-cover ring-2 ring-indigo-50 shrink-0"
-              />
-            ) : (
-              <div className="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                <User className="w-3.5 h-3.5" />
-              </div>
-            )}
+            <UserAvatar
+              src={news.author_avatar}
+              name={news.author_name}
+              size="xs"
+              rounded="rounded-full"
+              className="ring-2 ring-indigo-50 shrink-0"
+            />
             <div className="min-w-0">
               <p className="font-bold text-slate-800 truncate leading-tight">{news.author_name}</p>
               <p className="text-[11px] text-slate-400 truncate">{dateStr}</p>
