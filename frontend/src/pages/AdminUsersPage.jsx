@@ -23,9 +23,10 @@ import {
   FileCode,
   ChevronDown
 } from 'lucide-react';
-import { api, getAvatarUrl } from '../services/api';
+import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { UserAvatar } from '../components/common/UserAvatar';
 import { UserModal } from '../components/admin/UserModal';
 import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
 import { PermissionsModal } from '../components/admin/PermissionsModal';
@@ -508,13 +509,13 @@ export function AdminUsersPage() {
                       {/* User & Email */}
                       <td className="py-3.5 px-5">
                         <div className="flex items-center space-x-3">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-xs overflow-hidden">
-                            {userItem.avatar_url ? (
-                              <img src={getAvatarUrl(userItem.avatar_url)} alt={userItem.full_name} className="w-full h-full rounded-full object-cover" />
-                            ) : (
-                              userItem.full_name.charAt(0)
-                            )}
-                          </div>
+                          <UserAvatar
+                            src={userItem.avatar_url}
+                            name={userItem.full_name}
+                            size="sm"
+                            className="shrink-0 shadow-xs"
+                            rounded="rounded-full"
+                          />
                           <div>
                             <div className="flex items-center space-x-1.5">
                               <p className="font-bold text-slate-900 leading-tight">{userItem.full_name}</p>

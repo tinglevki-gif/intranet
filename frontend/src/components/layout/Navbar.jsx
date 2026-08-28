@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { RoleBadge } from '../common/Badge';
 import { WeatherWidget } from './WeatherWidget';
-import { getAvatarUrl } from '../../services/api';
+import { UserAvatar } from '../common/UserAvatar';
 
 export function Navbar({ onToggleSidebar }) {
   const { user, logout } = useAuth();
@@ -123,10 +123,12 @@ export function Navbar({ onToggleSidebar }) {
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center space-x-2.5 p-1.5 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none"
           >
-            <img
-              src={getAvatarUrl(user?.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-              alt={user?.full_name}
-              className="w-9 h-9 rounded-xl object-cover ring-2 ring-[#009FE3]/30"
+            <UserAvatar
+              src={user?.avatar_url}
+              name={user?.full_name}
+              size="sm"
+              className="ring-2 ring-[#009FE3]/30 shrink-0"
+              rounded="rounded-xl"
             />
             <div className="hidden sm:block text-left">
               <p className="text-xs font-bold text-slate-800 leading-tight">{user?.full_name}</p>

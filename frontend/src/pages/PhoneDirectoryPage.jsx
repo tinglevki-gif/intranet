@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { api, getAvatarUrl } from '../services/api';
+import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { UserAvatar } from '../components/common/UserAvatar';
 import { 
   PhoneCall, 
   Search, 
@@ -184,10 +185,12 @@ export function PhoneDirectoryPage() {
 
                 {/* Avatar & User Details */}
                 <div className="flex items-center space-x-3.5 mb-4">
-                  <img
-                    src={getAvatarUrl(user.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                    alt={user.full_name}
-                    className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-100 shadow-xs shrink-0"
+                  <UserAvatar
+                    src={user.avatar_url}
+                    name={user.full_name}
+                    size="lg"
+                    className="ring-2 ring-slate-100 shadow-xs shrink-0"
+                    rounded="rounded-2xl"
                   />
                   <div className="min-w-0">
                     <h3 className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
@@ -279,10 +282,12 @@ export function PhoneDirectoryPage() {
                   <tr key={user.id} className="hover:bg-slate-50/60 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <img
-                          src={getAvatarUrl(user.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-                          alt={user.full_name}
-                          className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100"
+                        <UserAvatar
+                          src={user.avatar_url}
+                          name={user.full_name}
+                          size="md"
+                          className="ring-2 ring-slate-100"
+                          rounded="rounded-full"
                         />
                         <div>
                           <p className="font-bold text-slate-900 text-sm">{user.full_name}</p>

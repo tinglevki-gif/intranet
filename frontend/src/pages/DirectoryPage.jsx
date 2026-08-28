@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { RoleBadge } from '../components/common/Badge';
+import { UserAvatar } from '../components/common/UserAvatar';
 import { Users, Search, Mail, Phone, MapPin, Building } from 'lucide-react';
 
 export function DirectoryPage() {
@@ -110,10 +111,12 @@ export function DirectoryPage() {
             >
               <div>
                 <div className="flex items-start justify-between">
-                  <img
+                  <UserAvatar
                     src={user.avatar_url}
-                    alt={user.full_name}
-                    className="w-14 h-14 rounded-2xl object-cover ring-4 ring-slate-50 shadow-sm"
+                    name={user.full_name}
+                    size="xl"
+                    className="ring-4 ring-slate-50 shadow-sm"
+                    rounded="rounded-2xl"
                   />
                   <RoleBadge role={user.role} customRoleName={user.custom_role_name} />
                 </div>

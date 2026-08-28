@@ -87,6 +87,7 @@ os.makedirs(CANTEEN_DIR, exist_ok=True)
 Base.metadata.create_all(bind=engine)
 
 from app.services.navigation_service import migrate_menu_items_to_german
+from app.services.seeder import seed_default_user_avatars
 
 # Seed initial default demo data (strictly idempotent & write-protected)
 db = SessionLocal()
@@ -94,6 +95,7 @@ try:
     logger.info("Prüfe Datenbank-Initialisierung und Standardkonfigurationen beim Serverstart...")
     seed_database(db)
     migrate_menu_items_to_german(db)
+    seed_default_user_avatars(db)
     seed_default_roles(db)
     seed_default_training_manuals(db, UPLOAD_ROOT)
     seed_default_languages(db)

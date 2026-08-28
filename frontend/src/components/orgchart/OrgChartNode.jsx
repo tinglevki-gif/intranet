@@ -12,7 +12,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { getAvatarUrl } from '../../services/api';
+import { UserAvatar } from '../common/UserAvatar';
 
 export function OrgChartNode({ 
   node, 
@@ -119,10 +119,12 @@ export function OrgChartNode({
         {/* Profile Details */}
         <div className="flex items-start space-x-3.5">
           <div className="relative">
-            <img
-              src={getAvatarUrl(node.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-              alt={node.full_name}
-              className="w-13 h-13 rounded-2xl object-cover ring-2 ring-slate-100 shadow-sm shrink-0"
+            <UserAvatar
+              src={node.avatar_url}
+              name={node.full_name}
+              size="lg"
+              className="ring-2 ring-slate-100 shadow-sm shrink-0"
+              rounded="rounded-2xl"
             />
             {node.role === 'ADMIN' && (
               <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-xs">

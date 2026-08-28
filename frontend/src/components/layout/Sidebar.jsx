@@ -4,7 +4,7 @@ import * as LucideIcons from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { TinglevLogo } from '../common/TinglevLogo';
-import { getAvatarUrl } from '../../services/api';
+import { UserAvatar } from '../common/UserAvatar';
 
 export function Sidebar({ isOpen, onClose }) {
   const { menuSections, user, menuLoading } = useAuth();
@@ -117,10 +117,12 @@ export function Sidebar({ isOpen, onClose }) {
         {/* Quick User summary in Sidebar footer */}
         <div className="p-4 border-t border-[#002B49]/80 bg-[#001424]/40">
           <div className="flex items-center space-x-3 p-2 rounded-xl bg-[#002B49]/50 border border-[#003E6B]/60">
-            <img
-              src={getAvatarUrl(user?.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'}
-              alt={user?.full_name}
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-[#009FE3]/50"
+            <UserAvatar
+              src={user?.avatar_url}
+              name={user?.full_name}
+              size="md"
+              className="ring-2 ring-[#009FE3]/50 shrink-0"
+              rounded="rounded-full"
             />
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white truncate">{user?.full_name}</p>
