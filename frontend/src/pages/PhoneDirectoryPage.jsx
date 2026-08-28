@@ -182,76 +182,18 @@ export function PhoneDirectoryPage() {
         </div>
       </div>
 
-      {/* Search & Sorting & Department Filters Toolbar */}
+      {/* Search & Department Filters Toolbar */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-card space-y-4">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-          {/* Global Search Input */}
-          <div className="relative flex-1 min-w-[280px]">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Nach Name, Durchwahl, Position, Abteilung oder Standort suchen..."
-              className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-            />
-          </div>
-
-          {/* Interactive Sorting Controls Bar */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 flex items-center space-x-1 shrink-0">
-              <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600" />
-              <span>Sortieren:</span>
-            </span>
-
-            <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
-              {sortOptions.map((opt) => {
-                const isActive = sortBy === opt.key;
-                const IconComp = opt.icon;
-
-                return (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    onClick={() => handleSort(opt.key)}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                      isActive
-                        ? 'bg-white text-blue-600 shadow-xs font-bold'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-                    }`}
-                  >
-                    <IconComp className="w-3.5 h-3.5" />
-                    <span>{opt.label}</span>
-                    {isActive && (
-                      <span className="text-[11px] ml-0.5">
-                        {sortOrder === 'asc' ? '↑' : '↓'}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Direction Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
-              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors text-xs font-bold flex items-center space-x-1"
-              title={sortOrder === 'asc' ? 'Aufsteigend sortiert (Klick für Absteigend)' : 'Absteigend sortiert (Klick für Aufsteigend)'}
-            >
-              {sortOrder === 'asc' ? (
-                <>
-                  <ArrowUp className="w-4 h-4 text-blue-600" />
-                  <span className="text-[11px] hidden sm:inline">A-Z / 0-9</span>
-                </>
-              ) : (
-                <>
-                  <ArrowDown className="w-4 h-4 text-blue-600" />
-                  <span className="text-[11px] hidden sm:inline">Z-A / 9-0</span>
-                </>
-              )}
-            </button>
-          </div>
+        {/* Global Search Input */}
+        <div className="relative w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Nach Name, Durchwahl, Position, Abteilung oder Standort suchen..."
+            className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm bg-slate-50 hover:bg-slate-100/70 focus:bg-white rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          />
         </div>
 
         {/* Department filter pills */}
