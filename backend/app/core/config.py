@@ -1,10 +1,15 @@
 import os
+import sys
 from typing import List, Optional
 from pydantic import BaseModel
 
-# Absolute path to backend directory
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT_SQLITE_PATH = os.path.join(BASE_DIR, "intranet.db").replace("\\", "/")
+# Absolute path to backend directory (supports PyInstaller frozen mode)
+if getattr(sys, 'frozen', False):
+    EXE_DIR = os.path.dirname(sys.executable)
+    DEFAULT_SQLITE_PATH = os.path.join(EXE_DIR, "intranet.db").replace("\\", "/")
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DEFAULT_SQLITE_PATH = os.path.join(BASE_DIR, "intranet.db").replace("\\", "/")
 
 class Settings(BaseModel):
     PROJECT_NAME: str = "Tiglev Elementfabrik Intranet"

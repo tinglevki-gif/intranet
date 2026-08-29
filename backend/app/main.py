@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +12,12 @@ from sqlalchemy import text
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("main")
+
+# Create all database tables on startup
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    logger.warning(f"Base.metadata.create_all note: {e}")
 
 # Ensure schema migrations for newly added columns across PostgreSQL and SQLite
 with engine.connect() as conn:
@@ -95,9 +102,17 @@ from app.services.training_ai_service import seed_default_training_manuals
 from app.services.language_service import seed_default_languages
 from app.services.setting_service import seed_default_settings
 
-# Upload Directories Setup
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-UPLOAD_ROOT = os.path.join(BASE_DIR, "uploads")
+# Upload Directories & Paths Setup (supports PyInstaller frozen mode)
+if getattr(sys, 'frozen', False):
+    EXE_DIR = os.path.dirname(sys.executable)
+    BUNDLE_DIR = getattr(sys, '_MEIPASS', EXE_DIR)
+    BASE_DIR = EXE_DIR
+    UPLOAD_ROOT = os.path.join(EXE_DIR, "uploads")
+else:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    BUNDLE_DIR = BASE_DIR
+    UPLOAD_ROOT = os.path.join(BASE_DIR, "uploads")
+
 AVATAR_DIR = os.path.join(UPLOAD_ROOT, "avatars")
 DOCS_DIR = os.path.join(UPLOAD_ROOT, "documents")
 SCHULUNGEN_DIR = os.path.join(UPLOAD_ROOT, "schulungen")
@@ -162,11 +177,16 @@ app.include_router(api_router, prefix="/api")
 from fastapi.responses import FileResponse
 
 # Production Frontend SPA Serving
-FRONTEND_DIST = os.path.join(BASE_DIR, "frontend_dist")
-if not os.path.exists(FRONTEND_DIST):
-    alt_dist = os.path.join(os.path.dirname(BASE_DIR), "frontend", "dist")
-    if os.path.exists(alt_dist):
-        FRONTEND_DIST = alt_dist
+if getattr(sys, 'frozen', False):
+    FRONTEND_DIST = os.path.join(BUNDLE_DIR, "frontend_dist")
+    if not os.path.exists(FRONTEND_DIST):
+        FRONTEND_DIST = os.path.join(EXE_DIR, "frontend_dist")
+else:
+    FRONTEND_DIST = os.path.join(BASE_DIR, "frontend_dist")
+    if not os.path.exists(FRONTEND_DIST):
+        alt_dist = os.path.join(os.path.dirname(BASE_DIR), "frontend", "dist")
+        if os.path.exists(alt_dist):
+            FRONTEND_DIST = alt_dist
 
 if os.path.exists(FRONTEND_DIST) and os.path.isfile(os.path.join(FRONTEND_DIST, "index.html")):
     assets_dir = os.path.join(FRONTEND_DIST, "assets")
