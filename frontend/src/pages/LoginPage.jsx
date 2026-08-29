@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useBranding } from '../context/BrandingContext';
 import { TinglevMark } from '../components/common/TinglevLogo';
 import { 
   Lock, 
@@ -18,6 +19,7 @@ export function LoginPage() {
 
   const { login } = useAuth();
   const { t } = useLanguage();
+  const { companyName, companySuffix, companyTagline, companyLogoUrl } = useBranding();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -46,16 +48,20 @@ export function LoginPage() {
 
       <div className="sm:mx-auto sm:w-full sm:max-w-lg relative z-10 text-center">
         {/* Logo */}
-        <div className="inline-flex items-center justify-center w-18 h-18 p-3 rounded-3xl bg-gradient-to-br from-[#00243F] to-[#001E36] border border-[#003E6B]/80 shadow-2xl shadow-[#001424]/60 mb-4 relative group">
-          <TinglevMark className="w-10 h-10 transform group-hover:scale-105 transition-transform" color="#009FE3" />
+        <div className="inline-flex items-center justify-center w-20 h-20 p-3 rounded-3xl bg-gradient-to-br from-[#00243F] to-[#001E36] border border-[#003E6B]/80 shadow-2xl shadow-[#001424]/60 mb-4 relative group overflow-hidden">
+          {companyLogoUrl ? (
+            <img src={companyLogoUrl} alt={companyName} className="w-12 h-12 object-contain rounded-xl" />
+          ) : (
+            <TinglevMark className="w-10 h-10 transform group-hover:scale-105 transition-transform" color="#009FE3" />
+          )}
           <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#F05A22] rounded-full border-2 border-[#001424]"></span>
         </div>
         <div className="w-12 h-1 bg-[#F05A22] rounded-full mx-auto mb-3"></div>
         <h2 className="text-3xl font-extrabold text-white tracking-tight font-heading">
-          {t('login.tag', 'TINGLEV ELEMENTFABRIK')}
+          {companyName} {companySuffix}
         </h2>
         <p className="mt-2 text-sm text-slate-300">
-          {t('login.subtitle', 'Zentrales Portal für Unternehmenszusammenarbeit & Workflows')}
+          {companyTagline || t('login.subtitle', 'Zentrales Portal für Unternehmenszusammenarbeit & Workflows')}
         </p>
       </div>
 

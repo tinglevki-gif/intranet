@@ -24,3 +24,14 @@ class PublicSettingResponse(BaseModel):
     key: str
     value: str
     label: str
+
+class BrandingResponse(BaseModel):
+    company_name: str
+    company_suffix: str
+    company_tagline: str
+    company_logo_url: str
+
+class BrandingUpdate(BaseModel):
+    company_name: str = Field(..., min_length=1, max_length=100)
+    company_suffix: str = Field(..., max_length=100)
+    company_tagline: str = Field(..., max_length=100)

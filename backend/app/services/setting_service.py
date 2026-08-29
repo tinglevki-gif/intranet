@@ -19,6 +19,42 @@ DEFAULT_SETTINGS = [
         "category": "integrations",
         "description": "Direkte Verknüpfung zum zentralen OneDrive-Ordner für CAD-Zeichnungen, BIM-Modelle und statische Berechnungen.",
         "is_public": True
+    },
+    {
+        "key": "company_name",
+        "value": "TINGLEV",
+        "default_value": "TINGLEV",
+        "label": "Unternehmensname",
+        "category": "branding",
+        "description": "Hauptname des Unternehmens (z. B. TINGLEV).",
+        "is_public": True
+    },
+    {
+        "key": "company_suffix",
+        "value": "ELEMENTFABRIK",
+        "default_value": "ELEMENTFABRIK",
+        "label": "Unternehmenszusatz / Suffix",
+        "category": "branding",
+        "description": "Zusatzbezeichnung des Unternehmens (z. B. ELEMENTFABRIK).",
+        "is_public": True
+    },
+    {
+        "key": "company_tagline",
+        "value": "PORTAL INTRANET",
+        "default_value": "PORTAL INTRANET",
+        "label": "Untertitel / Tagline",
+        "category": "branding",
+        "description": "Untertitel unter dem Firmennamen in der Seitenleiste und auf der Anmeldeseite.",
+        "is_public": True
+    },
+    {
+        "key": "company_logo_url",
+        "value": "",
+        "default_value": "",
+        "label": "Firmenlogo-URL",
+        "category": "branding",
+        "description": "URL zum hochgeladenen benutzerdefinierten Firmenlogo.",
+        "is_public": True
     }
 ]
 

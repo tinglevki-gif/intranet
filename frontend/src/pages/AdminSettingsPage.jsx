@@ -6,6 +6,7 @@ import { RoleBadge } from '../components/common/Badge';
 import { LanguageManagementCard } from '../components/admin/LanguageManagementCard';
 import { OneDriveConfigCard } from '../components/admin/OneDriveConfigCard';
 import { MenuManagementCard } from '../components/admin/MenuManagementCard';
+import { BrandingManagementCard } from '../components/admin/BrandingManagementCard';
 
 export function AdminSettingsPage() {
   const { user, refreshMenu } = useAuth();
@@ -47,7 +48,10 @@ export function AdminSettingsPage() {
         <RoleBadge role={user?.role} customRoleName={user?.custom_role_name} />
       </div>
 
-      {/* 1. SuperAdmin Menu & Navigation Management Card (Reorder, Toggle Active, Global Impact) */}
+      {/* 1. SuperAdmin Company Branding & Logo Customizer */}
+      <BrandingManagementCard />
+
+      {/* 2. SuperAdmin Menu & Navigation Management Card (Reorder, Toggle Active, Global Impact) */}
       <MenuManagementCard />
 
       {/* 2. Dynamic System Languages (i18n) Management Card */}

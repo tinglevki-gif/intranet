@@ -118,12 +118,14 @@ DOCS_DIR = os.path.join(UPLOAD_ROOT, "documents")
 SCHULUNGEN_DIR = os.path.join(UPLOAD_ROOT, "schulungen")
 NEWS_DIR = os.path.join(UPLOAD_ROOT, "news")
 CANTEEN_DIR = os.path.join(UPLOAD_ROOT, "canteen")
+COMPANY_DIR = os.path.join(UPLOAD_ROOT, "company")
 
 os.makedirs(AVATAR_DIR, exist_ok=True)
 os.makedirs(DOCS_DIR, exist_ok=True)
 os.makedirs(SCHULUNGEN_DIR, exist_ok=True)
 os.makedirs(NEWS_DIR, exist_ok=True)
 os.makedirs(CANTEEN_DIR, exist_ok=True)
+os.makedirs(COMPANY_DIR, exist_ok=True)
 
 # Create all database tables on startup
 Base.metadata.create_all(bind=engine)

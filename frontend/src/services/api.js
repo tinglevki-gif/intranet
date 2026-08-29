@@ -257,6 +257,49 @@ class ApiService {
     });
   }
 
+  // Company Branding & Custom Logo
+  getBranding() {
+    return this.request('/settings/branding');
+  }
+
+  updateBranding(companyName, companySuffix, companyTagline) {
+    return this.request('/admin/settings/branding', {
+      method: 'PUT',
+      body: JSON.stringify({
+        company_name: companyName,
+        company_suffix: companySuffix,
+        company_tagline: companyTagline,
+      }),
+    });
+  }
+
+  async uploadCompanyLogo(file) {
+    const token = this.getToken();
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/admin/settings/branding/logo`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Logo Upload fehlgeschlagen' }));
+      throw new Error(errorData.detail || 'Fehler beim Hochladen des Logos');
+    }
+    return await response.json();
+  }
+
+  resetBranding() {
+    return this.request('/admin/settings/branding/reset', {
+      method: 'POST',
+    });
+  }
+
   getQuickTools() {
     return this.request('/dashboard/quick-tools');
   }

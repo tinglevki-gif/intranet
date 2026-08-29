@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NewsProvider } from './context/NewsContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { BrandingProvider } from './context/BrandingContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 
@@ -56,9 +57,10 @@ function PlaceholderModule({ title, description, badge }) {
 export function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <NewsProvider>
-          <BrowserRouter>
+      <BrandingProvider>
+        <AuthProvider>
+          <NewsProvider>
+            <BrowserRouter>
             <Routes>
             {/* Public Authentication Route */}
             <Route path="/login" element={<LoginPage />} />
@@ -299,6 +301,7 @@ export function App() {
         </BrowserRouter>
         </NewsProvider>
       </AuthProvider>
+      </BrandingProvider>
     </LanguageProvider>
   );
 }

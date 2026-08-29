@@ -39,4 +39,11 @@ Thumbs.db
 .idea/
 *.log
 publish21/
+backend/dist/
+backend/build/
+instalador_final/
+*.spec
+*.exe
+*.iss
+
 
