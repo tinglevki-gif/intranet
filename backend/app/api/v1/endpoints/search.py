@@ -183,10 +183,11 @@ SYSTEM_TOOLS = [
 class EmployeeSearchResult(BaseModel):
     id: int
     name: str
-    job_title: Optional[str] = None
+    position: Optional[str] = None
     department: Optional[str] = None
     email: str
     phone: Optional[str] = None
+    mobile: Optional[str] = None
     avatar_url: Optional[str] = None
     role: str
     url: str
@@ -245,23 +246,26 @@ def global_search(
     # 1. Search Employees / Mitarbeiter
     matching_users = db.query(User).filter(
         or_(
+            User.full_name.ilike(search_pattern),
             User.first_name.ilike(search_pattern),
             User.last_name.ilike(search_pattern),
             User.email.ilike(search_pattern),
             User.department.ilike(search_pattern),
-            User.job_title.ilike(search_pattern),
-            User.phone.ilike(search_pattern)
+            User.position.ilike(search_pattern),
+            User.phone.ilike(search_pattern),
+            User.mobile.ilike(search_pattern)
         )
     ).order_by(User.last_name.asc()).limit(limit).all()
 
     employees = [
         EmployeeSearchResult(
             id=u.id,
-            name=f"{u.first_name} {u.last_name}".strip(),
-            job_title=u.job_title,
+            name=u.full_name or f"{u.first_name or ''} {u.last_name or ''}".strip(),
+            position=u.position,
             department=u.department,
             email=u.email,
             phone=u.phone,
+            mobile=u.mobile,
             avatar_url=u.avatar_url,
             role=u.role.value if hasattr(u.role, 'value') else str(u.role),
             url="/phone-directory"
