@@ -49,8 +49,11 @@ export function DocumentsPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState(null);
 
-  // Upload State (SuperAdmin only)
+  // Upload & Live OCR Progress State (SuperAdmin only)
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadPhase, setUploadPhase] = useState('');
+  const [uploadingFileName, setUploadingFileName] = useState('');
   const [uploadCategory, setUploadCategory] = useState('GENERAL');
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
@@ -105,7 +108,7 @@ export function DocumentsPage() {
     }
   };
 
-  // Handle File Upload (SuperAdmin only)
+  // Handle File Upload with Live OCR Progress Counter
   const handleFileUpload = async (file) => {
     if (!file) return;
     if (!isSuperAdmin) {
@@ -114,15 +117,53 @@ export function DocumentsPage() {
     }
 
     setIsUploading(true);
+    setUploadProgress(10);
+    setUploadingFileName(file.name);
+    setUploadPhase('1/4 • Datei wird hochgeladen und validiert...');
+
+    // Progress simulation while OCR & backend processing is in-flight
+    let currentPct = 10;
+    const progressInterval = setInterval(() => {
+      currentPct += Math.floor(Math.random() * 6) + 3;
+      if (currentPct > 92) {
+        currentPct = 92;
+      }
+      setUploadProgress(currentPct);
+
+      if (currentPct < 30) {
+        setUploadPhase('1/4 • Datei wird hochgeladen und validiert...');
+      } else if (currentPct < 60) {
+        setUploadPhase('2/4 • PDF-Seitenrasterisierung (250 DPI) & Bildanalyse...');
+      } else if (currentPct < 82) {
+        setUploadPhase('3/4 • Tesseract OCR-Texterkennung (Deutsch & Englisch)...');
+      } else {
+        setUploadPhase('4/4 • KI-Klassifizierung & Strukturierte Metadaten-Extraktion...');
+      }
+    }, 320);
+
     try {
       const res = await api.uploadDocument(file, uploadCategory);
-      setToastMessage(`${t('documents.upload_success_toast')}: ${res.original_name}`);
-      setTimeout(() => setToastMessage(null), 4000);
-      loadDocuments();
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      setUploadPhase('✨ 100% • Fertiggestellt! Dokument katalogisiert und indiziert.');
+      
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress(0);
+        setUploadPhase('');
+        setUploadingFileName('');
+        setToastMessage(`${t('documents.upload_success_toast')}: ${res.original_name}`);
+        setTimeout(() => setToastMessage(null), 4000);
+        loadDocuments();
+      }, 700);
     } catch (err) {
+      clearInterval(progressInterval);
+      setIsUploading(false);
+      setUploadProgress(0);
+      setUploadPhase('');
+      setUploadingFileName('');
       alert(err.message || t('documents.upload_error_toast'));
     } finally {
-      setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -376,72 +417,144 @@ export function DocumentsPage() {
               : 'border-slate-200 hover:border-amber-400'
           }`}
         >
-          <div className="flex flex-col items-center text-center space-y-4 max-w-xl mx-auto">
-            <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-xs">
-              <Upload className="w-7 h-7" />
-            </div>
+          <div className="max-w-xl mx-auto w-full">
+            {isUploading ? (
+              /* LIVE OCR PROGRESS TRACKER CARD */
+              <div className="bg-gradient-to-br from-indigo-50/90 via-purple-50/60 to-amber-50/70 rounded-3xl p-6 sm:p-8 border border-indigo-200/80 shadow-lg text-center space-y-5 animate-fade-in relative overflow-hidden">
+                {/* Laser scanning beam animation */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-pulse"></div>
 
-            <div>
-              <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1.5">
-                <ShieldCheck className="w-3 h-3" />
-                <span>SuperAdmin Upload</span>
+                <div className="flex flex-col items-center justify-center space-y-3">
+                  <div className="relative">
+                    <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                      <Scan className="w-8 h-8 animate-pulse" />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-black shadow-xs">
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white text-indigo-700 border border-indigo-200/80 text-[11px] font-extrabold uppercase tracking-wider shadow-xs">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></div>
+                      <span>Echtzeit-Dokumentenanalyse & OCR</span>
+                    </div>
+                    <p className="text-sm font-bold text-slate-900 truncate max-w-sm mx-auto mt-1 font-mono">
+                      {uploadingFileName || 'Dokument wird verarbeitet...'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Progress Bar & Percentage */}
+                <div className="space-y-2 max-w-md mx-auto">
+                  <div className="flex items-center justify-between text-xs font-semibold px-1">
+                    <span className="text-slate-600 font-medium">{uploadPhase}</span>
+                    <span className="font-mono text-base font-extrabold text-indigo-600">
+                      {uploadProgress}%
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-white/90 rounded-full h-4 p-1 overflow-hidden border border-indigo-200/80 shadow-inner">
+                    <div 
+                      className="h-full rounded-full bg-gradient-to-r from-amber-500 via-indigo-600 to-cyan-500 transition-all duration-300 ease-out shadow-xs relative"
+                      style={{ width: `${uploadProgress}%` }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4 Pipeline Step Indicators */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-indigo-100 text-[10px]">
+                  <div className={`p-2 rounded-xl flex items-center space-x-1.5 font-bold transition-all ${
+                    uploadProgress >= 20 ? 'bg-emerald-100 text-emerald-800' : 'bg-white/80 text-slate-500'
+                  }`}>
+                    {uploadProgress >= 20 ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <div className="w-2 h-2 rounded-full bg-slate-300 shrink-0"></div>}
+                    <span className="truncate">1. Upload & Check</span>
+                  </div>
+
+                  <div className={`p-2 rounded-xl flex items-center space-x-1.5 font-bold transition-all ${
+                    uploadProgress >= 50 ? 'bg-emerald-100 text-emerald-800' : uploadProgress >= 20 ? 'bg-indigo-100 text-indigo-800 animate-pulse' : 'bg-white/80 text-slate-500'
+                  }`}>
+                    {uploadProgress >= 50 ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <div className="w-2 h-2 rounded-full bg-slate-300 shrink-0"></div>}
+                    <span className="truncate">2. Raster (250 DPI)</span>
+                  </div>
+
+                  <div className={`p-2 rounded-xl flex items-center space-x-1.5 font-bold transition-all ${
+                    uploadProgress >= 80 ? 'bg-emerald-100 text-emerald-800' : uploadProgress >= 50 ? 'bg-indigo-100 text-indigo-800 animate-pulse' : 'bg-white/80 text-slate-500'
+                  }`}>
+                    {uploadProgress >= 80 ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <div className="w-2 h-2 rounded-full bg-slate-300 shrink-0"></div>}
+                    <span className="truncate">3. Tesseract OCR</span>
+                  </div>
+
+                  <div className={`p-2 rounded-xl flex items-center space-x-1.5 font-bold transition-all ${
+                    uploadProgress >= 100 ? 'bg-emerald-100 text-emerald-800' : uploadProgress >= 80 ? 'bg-indigo-100 text-indigo-800 animate-pulse' : 'bg-white/80 text-slate-500'
+                  }`}>
+                    {uploadProgress >= 100 ? <Check className="w-3 h-3 text-emerald-600 shrink-0" /> : <div className="w-2 h-2 rounded-full bg-slate-300 shrink-0"></div>}
+                    <span className="truncate">4. KI-Klassifizierung</span>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-base font-bold text-slate-900">
-                {t('documents.upload_drag_title')}
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                {t('documents.upload_drag_subtitle')}
-              </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Unterstützte Formate: PDF (digital & gescannt), Scans & Fotos (PNG, JPG, TIFF, WEBP), DOCX, TXT, CSV, XLSX
-              </p>
-            </div>
+            ) : (
+              /* STANDARD UPLOAD DROPZONE */
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-xs">
+                  <Upload className="w-7 h-7" />
+                </div>
 
-            {/* Category Selector */}
-            <div className="flex items-center space-x-2 text-xs">
-              <span className="text-slate-500 font-semibold">{t('documents.upload_category_label')}:</span>
-              <select
-                value={uploadCategory}
-                onChange={(e) => setUploadCategory(e.target.value)}
-                className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-              >
-                <option value="GENERAL">Automatisch erkennen (KI / OCR)</option>
-                <option value="HR">{t('documents.cat_HR')}</option>
-                <option value="IT_POLICIES">{t('documents.cat_IT_POLICIES')}</option>
-                <option value="FINANCE">{t('documents.cat_FINANCE')}</option>
-                <option value="BRAND">{t('documents.cat_BRAND')}</option>
-              </select>
-            </div>
+                <div>
+                  <div className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-1.5">
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>SuperAdmin Upload</span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {t('documents.upload_drag_title')}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    {t('documents.upload_drag_subtitle')}
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Unterstützte Formate: PDF (digital & gescannt), Scans & Fotos (PNG, JPG, TIFF, WEBP), DOCX, TXT, CSV, XLSX
+                  </p>
+                </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.png,.jpg,.jpeg,.tiff,.tif,.webp"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleFileUpload(e.target.files[0]);
-                }
-              }}
-              className="hidden"
-            />
+                {/* Category Selector */}
+                <div className="flex items-center space-x-2 text-xs">
+                  <span className="text-slate-500 font-semibold">{t('documents.upload_category_label')}:</span>
+                  <select
+                    value={uploadCategory}
+                    onChange={(e) => setUploadCategory(e.target.value)}
+                    className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+                  >
+                    <option value="GENERAL">Automatisch erkennen (KI / OCR)</option>
+                    <option value="HR">{t('documents.cat_HR')}</option>
+                    <option value="IT_POLICIES">{t('documents.cat_IT_POLICIES')}</option>
+                    <option value="FINANCE">{t('documents.cat_FINANCE')}</option>
+                    <option value="BRAND">{t('documents.cat_BRAND')}</option>
+                  </select>
+                </div>
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-500/20 transition-all flex items-center space-x-2 disabled:opacity-50"
-            >
-              {isUploading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>OCR-Textextraktion & KI-Analyse läuft...</span>
-                </>
-              ) : (
-                <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,.txt,.md,.csv,.xlsx,.png,.jpg,.jpeg,.tiff,.tif,.webp"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                  }}
+                  className="hidden"
+                />
+
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-xl text-xs font-bold shadow-md shadow-amber-500/20 transition-all flex items-center space-x-2"
+                >
                   <Upload className="w-4 h-4" />
                   <span>{t('documents.upload_btn')}</span>
-                </>
-              )}
-            </button>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
