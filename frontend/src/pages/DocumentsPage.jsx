@@ -743,11 +743,11 @@ export function DocumentsPage() {
       </div>
 
       {/* ========================================================= */}
-      {/* 4. METADATA & OCR DETAIL INSPECTION MODAL */}
+      {/* 4. METADATA & OCR DETAIL INSPECTION MODAL WITH PAGE 1 PREVIEW */}
       {/* ========================================================= */}
       {selectedDocModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-3xl max-w-5xl w-full border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
             {/* Modal Header */}
             <div className="px-6 py-5 bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -759,7 +759,7 @@ export function DocumentsPage() {
                     {selectedDocModal.original_name}
                   </h3>
                   <p className="text-xs text-purple-200/80">
-                    Dokumentenanalyse & Strukturierte Metadaten
+                    Dokumentenvorschau (Seite 1) & Strukturierte Metadaten-Analyse
                   </p>
                 </div>
               </div>
@@ -772,140 +772,208 @@ export function DocumentsPage() {
               </button>
             </div>
 
-            {/* Modal Body */}
+            {/* Modal Body: 2-Column Grid (Left: Preview, Right: Analysis) */}
             <div className="p-6 overflow-y-auto space-y-6">
-              {/* Classification & OCR Overview */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Erkannter Typ</span>
-                  <p className="text-xs font-bold text-slate-800 mt-1">
-                    {selectedDocModal.doc_type || 'Allgemein'}
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* LEFT COLUMN (5 Cols): Live First-Page Visual Preview */}
+                <div className="lg:col-span-5 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-900">
+                    <span className="flex items-center space-x-1.5">
+                      <Eye className="w-4 h-4 text-indigo-600" />
+                      <span>Dokumentenvorschau (Seite 1)</span>
+                    </span>
+                    <a
+                      href={api.getDownloadUrl(selectedDocModal.id)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-indigo-600 hover:text-indigo-700 flex items-center space-x-1 font-semibold"
+                    >
+                      <span>Vollbild</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
 
-                <div className="p-3.5 bg-purple-50/70 rounded-2xl border border-purple-100">
-                  <span className="text-[10px] uppercase font-bold text-purple-600">OCR-Status</span>
-                  <p className="text-xs font-bold text-purple-900 mt-1 flex items-center space-x-1">
-                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                    <span>{selectedDocModal.ocr_applied ? `Aktiv (${Math.round(selectedDocModal.ocr_confidence || 90)}%)` : 'Digitaler Text'}</span>
-                  </p>
-                </div>
+                  {/* Thumbnail Frame */}
+                  <div className="relative group bg-slate-900/5 rounded-2xl p-2 border border-slate-200 flex items-center justify-center min-h-[360px] max-h-[460px] overflow-hidden shadow-inner">
+                    <img
+                      src={api.getPreviewUrl(selectedDocModal.id)}
+                      alt={selectedDocModal.original_name}
+                      className="w-full h-auto max-h-[440px] object-contain rounded-xl shadow-md border border-slate-200/80 bg-white transition-transform group-hover:scale-[1.02] duration-200"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = 'none';
+                        const fallbackEl = document.getElementById(`preview-fallback-${selectedDocModal.id}`);
+                        if (fallbackEl) fallbackEl.style.display = 'flex';
+                      }}
+                    />
 
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Kategorie</span>
-                  <p className="text-xs font-bold text-slate-800 mt-1">
-                    {selectedDocModal.category}
-                  </p>
-                </div>
-
-                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Dateigröße</span>
-                  <p className="text-xs font-bold text-slate-800 mt-1 font-mono">
-                    {formatFileSize(selectedDocModal.file_size)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Extracted Structured Entities */}
-              {(() => {
-                let meta = null;
-                try {
-                  if (selectedDocModal.extracted_metadata) {
-                    meta = JSON.parse(selectedDocModal.extracted_metadata);
-                  }
-                } catch (e) {
-                  meta = null;
-                }
-
-                return (
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center space-x-1.5">
-                      <Tag className="w-3.5 h-3.5 text-indigo-600" />
-                      <span>Extrahierte Metadaten & Entitäten</span>
-                    </h4>
-
-                    <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/60 space-y-3 text-xs">
-                      {meta?.dates_found && meta.dates_found.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="w-4 h-4 text-blue-500 shrink-0" />
-                          <span className="text-slate-500 font-medium">Erkannte Datumsangaben:</span>
-                          <div className="flex flex-wrap gap-1">
-                            {meta.dates_found.map((d, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md font-mono text-[11px] font-semibold">
-                                {d}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {meta?.amounts_found && meta.amounts_found.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="w-4 h-4 text-emerald-500 shrink-0" />
-                          <span className="text-slate-500 font-medium">Geldbeträge / Summen:</span>
-                          <div className="flex flex-wrap gap-1">
-                            {meta.amounts_found.map((a, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md font-mono text-[11px] font-bold">
-                                {a}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {meta?.invoice_numbers && meta.invoice_numbers.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <FileCode className="w-4 h-4 text-amber-500 shrink-0" />
-                          <span className="text-slate-500 font-medium">Rechnungs- / Belegnummern:</span>
-                          <div className="flex flex-wrap gap-1">
-                            {meta.invoice_numbers.map((n, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-md font-mono text-[11px] font-bold">
-                                {n}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {meta?.iban_found && meta.iban_found.length > 0 && (
-                        <div className="flex items-center space-x-2">
-                          <ShieldCheck className="w-4 h-4 text-purple-500 shrink-0" />
-                          <span className="text-slate-500 font-medium">Erkannte IBAN:</span>
-                          <div className="flex flex-wrap gap-1">
-                            {meta.iban_found.map((ib, i) => (
-                              <span key={i} className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-md font-mono text-[11px]">
-                                {ib}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {selectedDocModal.folder_path && (
-                        <div className="flex items-center space-x-2 pt-2 border-t border-slate-200/50">
-                          <Folder className="w-4 h-4 text-indigo-500 shrink-0" />
-                          <span className="text-slate-500 font-medium">Automatischer Zielordner:</span>
-                          <span className="font-mono text-slate-800 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">
-                            uploads/documents/{selectedDocModal.folder_path}
-                          </span>
-                        </div>
-                      )}
+                    {/* Fallback if preview image not loadable */}
+                    <div 
+                      id={`preview-fallback-${selectedDocModal.id}`}
+                      className="hidden flex-col items-center justify-center space-y-3 p-8 text-center"
+                    >
+                      <FileText className="w-16 h-16 text-slate-400" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-700">{selectedDocModal.original_name}</p>
+                        <p className="text-[10px] text-slate-400 font-mono mt-0.5">{selectedDocModal.file_type.toUpperCase()} Dokument</p>
+                      </div>
+                      <a
+                        href={api.getDownloadUrl(selectedDocModal.id)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow-xs hover:bg-indigo-500 transition-colors"
+                      >
+                        Dokument öffnen
+                      </a>
                     </div>
                   </div>
-                );
-              })()}
 
-              {/* Executive Summary */}
-              {selectedDocModal.summary && (
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Automatische Zusammenfassung
-                  </h4>
-                  <div className="p-4 bg-amber-50/50 border border-amber-200/60 rounded-2xl text-xs text-slate-700 leading-relaxed">
-                    {selectedDocModal.summary}
+                  {/* Visual Status Under Preview */}
+                  <div className="flex items-center justify-between text-[11px] px-1 text-slate-500">
+                    <span className="font-mono">{selectedDocModal.file_type.toUpperCase()} • {formatFileSize(selectedDocModal.file_size)}</span>
+                    <span className="text-emerald-700 font-semibold flex items-center space-x-1">
+                      <Check className="w-3 h-3 text-emerald-600" />
+                      <span>Seite 1 gerendert</span>
+                    </span>
                   </div>
                 </div>
-              )}
+
+                {/* RIGHT COLUMN (7 Cols): Metadata, Classification & Entities */}
+                <div className="lg:col-span-7 space-y-5">
+                  {/* Classification & OCR Overview Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                      <span className="text-[9px] uppercase font-bold text-slate-400">Erkannter Typ</span>
+                      <p className="text-xs font-bold text-slate-800 mt-0.5 truncate">
+                        {selectedDocModal.doc_type || 'Allgemein'}
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-purple-50/70 rounded-2xl border border-purple-100">
+                      <span className="text-[9px] uppercase font-bold text-purple-600">OCR-Status</span>
+                      <p className="text-xs font-bold text-purple-900 mt-0.5 flex items-center space-x-1">
+                        <Sparkles className="w-3 h-3 text-purple-600 shrink-0" />
+                        <span className="truncate">{selectedDocModal.ocr_applied ? `Aktiv (${Math.round(selectedDocModal.ocr_confidence || 90)}%)` : 'Digitaler Text'}</span>
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                      <span className="text-[9px] uppercase font-bold text-slate-400">Kategorie</span>
+                      <p className="text-xs font-bold text-slate-800 mt-0.5">
+                        {selectedDocModal.category}
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                      <span className="text-[9px] uppercase font-bold text-slate-400">Dateigröße</span>
+                      <p className="text-xs font-bold text-slate-800 mt-0.5 font-mono">
+                        {formatFileSize(selectedDocModal.file_size)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Extracted Structured Entities */}
+                  {(() => {
+                    let meta = null;
+                    try {
+                      if (selectedDocModal.extracted_metadata) {
+                        meta = JSON.parse(selectedDocModal.extracted_metadata);
+                      }
+                    } catch (e) {
+                      meta = null;
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center space-x-1.5">
+                          <Tag className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Extrahierte Metadaten & Entitäten</span>
+                        </h4>
+
+                        <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/60 space-y-3 text-xs">
+                          {meta?.dates_found && meta.dates_found.length > 0 && (
+                            <div className="flex items-center space-x-2">
+                              <Calendar className="w-4 h-4 text-blue-500 shrink-0" />
+                              <span className="text-slate-500 font-medium">Erkannte Datumsangaben:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {meta.dates_found.map((d, i) => (
+                                  <span key={i} className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md font-mono text-[11px] font-semibold">
+                                    {d}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {meta?.amounts_found && meta.amounts_found.length > 0 && (
+                            <div className="flex items-center space-x-2">
+                              <DollarSign className="w-4 h-4 text-emerald-500 shrink-0" />
+                              <span className="text-slate-500 font-medium">Geldbeträge / Summen:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {meta.amounts_found.map((a, i) => (
+                                  <span key={i} className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md font-mono text-[11px] font-bold">
+                                    {a}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {meta?.invoice_numbers && meta.invoice_numbers.length > 0 && (
+                            <div className="flex items-center space-x-2">
+                              <FileCode className="w-4 h-4 text-amber-500 shrink-0" />
+                              <span className="text-slate-500 font-medium">Rechnungs- / Belegnummern:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {meta.invoice_numbers.map((n, i) => (
+                                  <span key={i} className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-md font-mono text-[11px] font-bold">
+                                    {n}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {meta?.iban_found && meta.iban_found.length > 0 && (
+                            <div className="flex items-center space-x-2">
+                              <ShieldCheck className="w-4 h-4 text-purple-500 shrink-0" />
+                              <span className="text-slate-500 font-medium">Erkannte IBAN:</span>
+                              <div className="flex flex-wrap gap-1">
+                                {meta.iban_found.map((ib, i) => (
+                                  <span key={i} className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-md font-mono text-[11px]">
+                                    {ib}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {selectedDocModal.folder_path && (
+                            <div className="flex items-center space-x-2 pt-2 border-t border-slate-200/50">
+                              <Folder className="w-4 h-4 text-indigo-500 shrink-0" />
+                              <span className="text-slate-500 font-medium">Automatischer Zielordner:</span>
+                              <span className="font-mono text-slate-800 font-bold bg-white px-2 py-0.5 rounded border border-slate-200">
+                                uploads/documents/{selectedDocModal.folder_path}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Executive Summary */}
+                  {selectedDocModal.summary && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                        Automatische Zusammenfassung
+                      </h4>
+                      <div className="p-3.5 bg-amber-50/50 border border-amber-200/60 rounded-2xl text-xs text-slate-700 leading-relaxed">
+                        {selectedDocModal.summary}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Modal Footer Actions */}

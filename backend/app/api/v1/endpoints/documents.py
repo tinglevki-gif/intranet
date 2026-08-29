@@ -17,12 +17,15 @@ router = APIRouter()
 
 BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 UPLOAD_DIR = os.path.join(BACKEND_DIR, "uploads", "documents")
+PREVIEWS_DIR = os.path.join(UPLOAD_DIR, ".previews")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(PREVIEWS_DIR, exist_ok=True)
 
 import json
 from app.services.ocr_service import (
     extract_structured_entities,
-    organize_document_storage
+    organize_document_storage,
+    generate_document_preview_page1
 )
 
 @router.get("", response_model=List[DocumentResponse])
@@ -299,6 +302,44 @@ def download_document(
         path=doc.file_path,
         filename=doc.original_name,
         media_type="application/octet-stream"
+    )
+
+@router.get("/{document_id}/preview")
+def preview_document_page1(
+    document_id: int,
+    token: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+):
+    """
+    Renders and serves a high-resolution PNG preview of the first page of the document.
+    Works seamlessly for PDFs, scanned documents, and images.
+    """
+    if not token:
+        raise HTTPException(status_code=401, detail="Vorschau erfordert ein gültiges Authentifizierungs-Token")
+
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Ungültiges oder abgelaufenes Vorschau-Token")
+
+    doc = db.query(Document).filter(Document.id == document_id).first()
+    if not doc or not os.path.exists(doc.file_path):
+        raise HTTPException(status_code=404, detail="Dokumentdatei auf dem Server nicht gefunden")
+
+    preview_path = generate_document_preview_page1(doc.file_path, doc.file_type, PREVIEWS_DIR)
+    if preview_path and os.path.exists(preview_path):
+        ext = preview_path.split(".")[-1].lower()
+        media_type = f"image/{ext}" if ext in ["png", "jpeg", "jpg", "webp"] else "image/png"
+        return FileResponse(
+            path=preview_path,
+            filename=f"preview_{doc.original_name}.png",
+            media_type=media_type
+        )
+
+    # Fallback to direct file response
+    return FileResponse(
+        path=doc.file_path,
+        filename=doc.original_name,
+        media_type="application/pdf" if doc.file_type == "pdf" else "application/octet-stream"
     )
 
 @router.post("/search-ai", response_model=AISearchResponse)

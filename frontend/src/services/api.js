@@ -631,6 +631,11 @@ class ApiService {
     return `${API_BASE_URL}/documents/${documentId}/download?token=${encodeURIComponent(token || '')}`;
   }
 
+  getPreviewUrl(documentId) {
+    const token = this.getToken();
+    return `${API_BASE_URL}/documents/${documentId}/preview?token=${encodeURIComponent(token || '')}`;
+  }
+
   searchDocumentsAI(query, top_k = 4, category = null) {
     return this.request('/documents/search-ai', {
       method: 'POST',

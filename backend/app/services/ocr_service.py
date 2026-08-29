@@ -207,3 +207,40 @@ def organize_document_storage(
 
     relative_folder = f"{category_folder}/"
     return dest_file_path, relative_folder
+
+
+def generate_document_preview_page1(file_path: str, file_type: str, cache_dir: str) -> Optional[str]:
+    """
+    Renders and caches the first page of a document as a high-quality PNG image for instant modal preview.
+    - If image (PNG, JPG, etc.): returns original image path.
+    - If PDF: uses pdf2image to rasterize page 1 into a crisp PNG (dpi=160).
+    Returns absolute path to the preview image, or None.
+    """
+    file_type = file_type.lower().strip(".")
+    if not os.path.exists(file_path):
+        return None
+
+    # If already an image
+    if file_type in ['png', 'jpg', 'jpeg', 'webp', 'bmp']:
+        return file_path
+
+    # If PDF
+    if file_type == 'pdf' and pdf2image:
+        os.makedirs(cache_dir, exist_ok=True)
+        base_name = os.path.basename(file_path)
+        clean_name = base_name.replace(' ', '_').split('.')[0]
+        preview_filename = f"preview_{clean_name}_p1.png"
+        preview_path = os.path.join(cache_dir, preview_filename)
+
+        if os.path.exists(preview_path) and os.path.getsize(preview_path) > 0:
+            return preview_path
+
+        try:
+            images = pdf2image.convert_from_path(file_path, dpi=160, first_page=1, last_page=1)
+            if images and len(images) > 0:
+                images[0].save(preview_path, format="PNG", optimize=True)
+                return preview_path
+        except Exception as e:
+            logger.warning(f"Could not render PDF preview page 1 for {file_path}: {e}")
+
+    return None
