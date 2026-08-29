@@ -24,6 +24,14 @@ with engine.connect() as conn:
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_id INTEGER DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_name VARCHAR DEFAULT 'Geschäftsleitung';"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT 0;"))
+            
+            # Documents OCR & Classification migrations
+            conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS ocr_applied BOOLEAN DEFAULT FALSE;"))
+            conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS ocr_confidence FLOAT DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS doc_type VARCHAR DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS extracted_metadata TEXT DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS detected_language VARCHAR DEFAULT 'deu';"))
+            conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS folder_path VARCHAR DEFAULT NULL;"))
             conn.commit()
             logger.info("PostgreSQL schema migrations verified.")
         elif dialect == "sqlite":
@@ -51,6 +59,25 @@ with engine.connect() as conn:
                 if "is_pinned" not in cols_ann:
                     conn.execute(text("ALTER TABLE announcements ADD COLUMN is_pinned BOOLEAN DEFAULT 0;"))
                 conn.commit()
+
+            # Documents OCR migrations
+            res_doc = conn.execute(text("PRAGMA table_info(documents)"))
+            cols_doc = [r[1] for r in res_doc.fetchall()]
+            if cols_doc:
+                if "ocr_applied" not in cols_doc:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN ocr_applied BOOLEAN DEFAULT 0;"))
+                if "ocr_confidence" not in cols_doc:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN ocr_confidence FLOAT DEFAULT NULL;"))
+                if "doc_type" not in cols_doc:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN doc_type VARCHAR DEFAULT NULL;"))
+                if "extracted_metadata" not in cols_doc:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN extracted_metadata TEXT DEFAULT NULL;"))
+                if "detected_language" not in cols_doc:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN detected_language VARCHAR DEFAULT 'deu';"))
+                if "folder_path" not in cols_doc:
+                    conn.execute(text("ALTER TABLE documents ADD COLUMN folder_path VARCHAR DEFAULT NULL;"))
+                conn.commit()
+
             logger.info("SQLite schema migrations verified.")
     except Exception as e:
         logger.warning(f"Schema migration note: {e}")

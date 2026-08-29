@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, Enum, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, Enum, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
@@ -19,11 +19,19 @@ class Document(Base):
     filename = Column(String, nullable=False, unique=True)
     original_name = Column(String, nullable=False)
     file_path = Column(String, nullable=False)
-    file_type = Column(String, nullable=False)  # pdf, docx, txt, md
+    file_type = Column(String, nullable=False)  # pdf, png, jpg, docx, txt, md
     file_size = Column(Integer, nullable=False)  # in bytes
     category = Column(Enum(DocumentCategory), default=DocumentCategory.GENERAL, nullable=False)
     allowed_department = Column(String, nullable=True)
     summary = Column(Text, nullable=True)
+
+    # Automatic OCR & Document Classification
+    ocr_applied = Column(Boolean, default=False, nullable=False)
+    ocr_confidence = Column(Float, nullable=True)
+    doc_type = Column(String, nullable=True)          # e.g., Rechnung, Vertrag, Richtlinie, Beleg
+    extracted_metadata = Column(Text, nullable=True)   # JSON string with structured entities (date, amount, ref, company)
+    detected_language = Column(String, default="deu")  # deu, eng
+    folder_path = Column(String, nullable=True)        # categorized relative folder e.g. HR/ or FINANCE/
 
     uploaded_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     uploaded_by = relationship("User", foreign_keys=[uploaded_by_id])

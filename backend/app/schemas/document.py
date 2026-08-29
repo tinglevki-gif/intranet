@@ -8,6 +8,8 @@ class DocumentBase(BaseModel):
     category: DocumentCategory = DocumentCategory.GENERAL
     allowed_department: Optional[str] = None
     summary: Optional[str] = None
+    doc_type: Optional[str] = None
+    folder_path: Optional[str] = None
 
 class DocumentResponse(DocumentBase):
     id: int
@@ -16,6 +18,10 @@ class DocumentResponse(DocumentBase):
     file_size: int
     uploaded_by_id: Optional[int] = None
     uploader_name: Optional[str] = None
+    ocr_applied: bool = False
+    ocr_confidence: Optional[float] = None
+    extracted_metadata: Optional[str] = None
+    detected_language: Optional[str] = "deu"
     created_at: datetime
     updated_at: Optional[datetime] = None
 

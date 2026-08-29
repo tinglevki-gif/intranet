@@ -2,7 +2,7 @@ import os
 import re
 import math
 import json
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 from sqlalchemy.orm import Session
 from app.models.document import Document, DocumentChunk
 
@@ -12,40 +12,71 @@ try:
 except ImportError:
     PdfReader = None
 
-def extract_text_from_file(file_path: str, file_type: str) -> List[Tuple[int, str]]:
+from app.services.ocr_service import (
+    is_ocr_available, 
+    extract_ocr_from_image, 
+    extract_ocr_from_pdf,
+    extract_structured_entities
+)
+
+def extract_text_from_file(file_path: str, file_type: str) -> Tuple[List[Tuple[int, str]], bool, Optional[float]]:
     """
-    Extracts text from file by page.
-    Returns list of tuples: [(page_number, text), ...]
-    Guarantees no NUL (0x00) characters and safe handling of scanned PDFs.
+    Extracts text from file by page with automatic OCR fallback for scanned PDFs and direct OCR for images.
+    Returns: (pages_text_list, ocr_applied, average_confidence)
     """
     pages_text = []
     file_type = file_type.lower().strip(".")
+    ocr_applied = False
+    ocr_confidence = None
 
-    if file_type == 'pdf' and PdfReader and os.path.exists(file_path):
-        try:
-            reader = PdfReader(file_path)
-            for page_idx, page in enumerate(reader.pages):
-                try:
-                    txt = page.extract_text() or ""
-                    # Sanitize NUL and control bytes
-                    txt = txt.replace("\x00", "").strip()
-                    if txt:
-                        pages_text.append((page_idx + 1, txt))
-                except Exception as page_err:
-                    print(f"Error extracting page {page_idx + 1} from {file_path}: {page_err}")
-        except Exception as e:
-            print(f"Error reading PDF {file_path}: {e}")
+    # 1. Direct Image Files (PNG, JPG, TIFF, WEBP, BMP)
+    if file_type in ['png', 'jpg', 'jpeg', 'tiff', 'tif', 'webp', 'bmp'] and os.path.exists(file_path):
+        ocr_text, conf = extract_ocr_from_image(file_path)
+        if ocr_text:
+            pages_text.append((1, ocr_text))
+            ocr_applied = True
+            ocr_confidence = conf
+        else:
+            pages_text.append((1, f"[Bilddokument: {os.path.basename(file_path)}]"))
 
-        # If PDF is a scanned image with no embedded text layer
+    # 2. PDF Files (Native Extraction with automatic OCR fallback)
+    elif file_type == 'pdf' and os.path.exists(file_path):
+        if PdfReader:
+            try:
+                reader = PdfReader(file_path)
+                for page_idx, page in enumerate(reader.pages):
+                    try:
+                        txt = page.extract_text() or ""
+                        txt = txt.replace("\x00", "").strip()
+                        if txt:
+                            pages_text.append((page_idx + 1, txt))
+                    except Exception as page_err:
+                        print(f"Error extracting page {page_idx + 1} from {file_path}: {page_err}")
+            except Exception as e:
+                print(f"Error reading PDF {file_path}: {e}")
+
+        # Total characters extracted natively
+        total_native_chars = sum(len(txt) for _, txt in pages_text)
+
+        # If scanned PDF (less than 40 chars total extracted natively), trigger OCR pipeline
+        if total_native_chars < 40 and is_ocr_available():
+            ocr_results = extract_ocr_from_pdf(file_path)
+            if ocr_results:
+                pages_text = [(p_num, p_txt) for p_num, p_txt, _ in ocr_results]
+                all_confs = [c for _, _, c in ocr_results if c > 0]
+                ocr_confidence = round(sum(all_confs) / len(all_confs), 1) if all_confs else 90.0
+                ocr_applied = True
+
+        # If still no text could be extracted
         if not pages_text:
             doc_name = os.path.basename(file_path)
             pages_text.append((
                 1, 
-                f"[Gescannter Inhalt: {doc_name} enthält eingescannte Bildseiten ohne OCR-Textebene. Das Dokument steht zum Download und zur Ansicht bereit.]"
+                f"[Gescannter Inhalt: {doc_name} enthält eingescannte Bildseiten. Das Dokument steht zum Download und zur Ansicht bereit.]"
             ))
 
+    # 3. Plain Text / Markdown / CSV files
     elif file_type in ['txt', 'md', 'csv', 'json', 'log', 'html', 'rtf'] and os.path.exists(file_path):
-        # Plain text files
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                 content = f.read().replace("\x00", "").strip()
@@ -54,12 +85,12 @@ def extract_text_from_file(file_path: str, file_type: str) -> List[Tuple[int, st
         except Exception as e:
             print(f"Error reading text file {file_path}: {e}")
     
+    # 4. Fallback for any other file
     elif not pages_text and os.path.exists(file_path):
-        # Generic fallback
         doc_name = os.path.basename(file_path)
         pages_text.append((1, f"[Dokument: {doc_name} (Format .{file_type})]"))
 
-    return pages_text
+    return pages_text, ocr_applied, ocr_confidence
 
 def chunk_text(pages_text: List[Tuple[int, str]], chunk_size: int = 600, overlap: int = 100) -> List[Dict[str, Any]]:
     """
