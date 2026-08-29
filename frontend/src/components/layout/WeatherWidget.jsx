@@ -30,14 +30,21 @@ export function WeatherWidget() {
       const saved = localStorage.getItem(WEATHER_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && parsed.name && parsed.lat !== undefined && parsed.lon !== undefined) {
+        if (
+          parsed && 
+          parsed.name && 
+          !parsed.name.toLowerCase().includes('tinglev') && 
+          !parsed.name.toLowerCase().includes('tiglev') &&
+          parsed.lat !== undefined && 
+          parsed.lon !== undefined
+        ) {
           return parsed;
         }
       }
     } catch (err) {
       console.warn('Could not read saved weather location:', err);
     }
-    return COMPANY_LOCATIONS[0]; // Default to Tinglev HQ
+    return COMPANY_LOCATIONS[0]; // Default to Altlandsberg HQ
   });
 
   const [weatherData, setWeatherData] = useState(null);
@@ -205,7 +212,7 @@ export function WeatherWidget() {
                     {selectedLocation.displayName || selectedLocation.name}
                   </h4>
                   <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-600">
-                    {selectedLocation.isHQ ? `${t('weather.hq')} • Tiglev` : selectedLocation.country || 'Standort'}
+                    {selectedLocation.isHQ ? `${t('weather.hq')} • Altlandsberg` : selectedLocation.country || 'Standort'}
                   </span>
                 </div>
               </div>

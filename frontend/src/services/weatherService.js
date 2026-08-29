@@ -1,7 +1,7 @@
 export const COMPANY_LOCATIONS = [
-  { id: 'tiglev', name: 'Tinglev', country: 'DK', flag: '🇩🇰', lat: 54.933, lon: 9.250, isHQ: true },
-  { id: 'muc', name: 'München', country: 'DE', flag: '🇩🇪', lat: 48.137, lon: 11.576, isHQ: false },
+  { id: 'altlandsberg', name: 'Altlandsberg', country: 'DE', flag: '🇩🇪', lat: 52.5644, lon: 13.7278, isHQ: true },
   { id: 'ber', name: 'Berlin', country: 'DE', flag: '🇩🇪', lat: 52.520, lon: 13.405, isHQ: false },
+  { id: 'muc', name: 'München', country: 'DE', flag: '🇩🇪', lat: 48.137, lon: 11.576, isHQ: false },
   { id: 'fra', name: 'Frankfurt', country: 'DE', flag: '🇩🇪', lat: 50.110, lon: 8.682, isHQ: false },
   { id: 'lon', name: 'London', country: 'GB', flag: '🇬🇧', lat: 51.507, lon: -0.128, isHQ: false },
   { id: 'waw', name: 'Warschau', country: 'PL', flag: '🇵🇱', lat: 52.229, lon: 21.012, isHQ: false },
@@ -81,7 +81,7 @@ export async function searchGeocodingLocations(query) {
         flag: flag,
         lat: item.latitude,
         lon: item.longitude,
-        isHQ: item.name.toLowerCase().includes('tinglev') || item.name.toLowerCase().includes('tiglev'),
+        isHQ: item.name.toLowerCase().includes('altlandsberg'),
       };
     });
   } catch (err) {
