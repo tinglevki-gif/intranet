@@ -61,8 +61,8 @@ def admin_toggle_menu_item_active(
         raise HTTPException(status_code=404, detail="Menüpunkt nicht gefunden.")
 
     # Prevent deactivating essential system dashboard if needed
-    if item.key == "dashboard" and toggle_in and toggle_in.is_active is False:
-        raise HTTPException(status_code=400, detail="Das Haupt-Dashboard darf nicht global deaktiviert werden.")
+    if item.key == "dashboard" and ((toggle_in and toggle_in.is_active is False) or (toggle_in is None and item.is_active)):
+        raise HTTPException(status_code=400, detail="Das Dashboard darf nicht global deaktiviert werden.")
 
     if toggle_in is not None:
         item.is_active = toggle_in.is_active

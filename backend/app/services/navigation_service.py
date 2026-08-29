@@ -156,7 +156,7 @@ DEFAULT_MENUS = [
     # 1. Hauptbereich (Alle Rollen)
     {
         "key": "dashboard",
-        "label": "Haupt-Dashboard",
+        "label": "Dashboard",
         "path": "/",
         "icon": "LayoutDashboard",
         "section": "Hauptbereich",

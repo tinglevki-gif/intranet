@@ -33,7 +33,7 @@ export const translations = {
     },
 
     nav_items: {
-      'dashboard': 'Haupt-Dashboard',
+      'dashboard': 'Dashboard',
       'announcements': 'Mitteilungen & News',
       'phone-directory': 'Telefonverzeichnis',
       'org-chart': 'Organigramm',
