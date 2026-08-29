@@ -14,6 +14,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { RoleBadge } from '../common/Badge';
 import { WeatherWidget } from './WeatherWidget';
 import { UserAvatar } from '../common/UserAvatar';
+import { GlobalSearchBar } from './GlobalSearchBar';
 
 const NOTIFICATIONS_STORAGE_KEY = 'intranet_read_notif_ids';
 
@@ -96,18 +97,8 @@ export function Navbar({ onToggleSidebar }) {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Global Search Input */}
-        <div className="relative w-full max-w-md hidden sm:block">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder={t('navbar.search_placeholder')}
-            className="w-full pl-10 pr-12 py-2 text-xs md:text-sm bg-slate-100/80 hover:bg-slate-100 focus:bg-white text-slate-900 placeholder-slate-400 rounded-xl border border-transparent focus:border-[#009FE3] focus:ring-2 focus:ring-[#009FE3]/20 transition-all outline-none"
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-0.5 pointer-events-none">
-            <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-400 bg-white border border-slate-200 rounded shadow-2xs">⌘K</kbd>
-          </div>
-        </div>
+        {/* Global Multi-Entity Unified Search Bar */}
+        <GlobalSearchBar />
       </div>
 
       {/* Right side: Weather Widget, Status, Notifications, User Menu */}

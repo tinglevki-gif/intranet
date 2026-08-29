@@ -300,6 +300,14 @@ class ApiService {
     });
   }
 
+  // Global Unified Intranet Search (Employees, Documents, Tools, News)
+  globalSearch(query, limit = 6) {
+    if (!query || !query.trim()) {
+      return Promise.resolve({ query: '', total_count: 0, employees: [], documents: [], tools: [], news: [] });
+    }
+    return this.request(`/search?q=${encodeURIComponent(query.trim())}&limit=${limit}`);
+  }
+
   getQuickTools() {
     return this.request('/dashboard/quick-tools');
   }

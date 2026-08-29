@@ -1,18 +1,17 @@
 # Homelab Deployment Rule for Tiglev Elementfabrik Intranet
 
-Whenever changes, features, or fixes are implemented and verified for the Tiglev Elementfabrik intranet, automatically deploy them directly to the homelab server following these specifications:
+Whenever changes, features, or fixes are implemented, build and deploy them exclusively and directly to the **Homelab Server**:
 
-## 🖥️ Server Details
+## 🖥️ Server Details & URLs
 - **Host**: `192.168.1.29`
 - **User**: `admin-server` (`admin-server@192.168.1.29`)
 - **Project Path on Server**: `~/intranet-server/`
+- **Application URL**: `http://192.168.1.29`
 
 ## ⚙️ Deployment Instructions
-1. **Commit & Push**: Push latest code changes to `origin/main` (`github.com/tinglevki-gif/intranet.git`).
-2. **Execute Deployment on Server**:
-   ```bash
-   ssh admin-server@192.168.1.29 "cd ~/intranet-server/ && git pull origin main && sudo docker compose up -d --build"
-   ```
-3. **CRITICAL Database Safety Rule**:
-   - **NEVER** use `-v` or `--volumes` when restarting or taking down containers (e.g. `docker compose down -v` is strictly forbidden).
-   - Preserves all persistent data in PostgreSQL, uploaded documents, avatars, and configuration.
+1. Automatically deploy changes using `powershell -ExecutionPolicy Bypass -File .\deploy_homelab.ps1 -CommitMessage "..."`.
+2. Do not refer to `localhost` or alternative environments in responses—all user verification and links must point directly to the live Homelab instance at `http://192.168.1.29`.
+
+## 🛡️ Database Safety Rule
+- **NEVER** use `-v` or `--volumes` when taking down or restarting containers on the Homelab server (e.g. `docker compose down -v` is strictly forbidden).
+- Preserves all persistent data in PostgreSQL, uploaded documents, avatars, and configuration.
