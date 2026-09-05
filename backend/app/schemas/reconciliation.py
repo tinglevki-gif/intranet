@@ -1,18 +1,18 @@
-from datetime import datetime, date
+import datetime as dt
 from typing import Optional, List, Any, Dict
 from pydantic import BaseModel, Field
 
 class TripReconciliationRequest(BaseModel):
     plate: str = Field(..., min_length=2, max_length=50, description="Amtliches Kennzeichen des Lkw (z. B. MOL-TE 101)")
     delivery_note_number: str = Field(..., min_length=2, max_length=100, description="Lieferschein-Nummer (z. B. LS-2026-8842)")
-    date: date = Field(..., description="Datum der Anlieferungsfahrt (YYYY-MM-DD)")
+    date: dt.date = Field(..., description="Datum der Anlieferungsfahrt (YYYY-MM-DD)")
     site_geofence_id: int = Field(..., description="ID des Zielbaustellen-Geofence")
     free_unloading_minutes: int = Field(default=60, ge=0, le=480, description="Vereinbarte kostenlose Entladezeit in Minuten (Standard: 60)")
     hourly_demurrage_rate: float = Field(default=95.0, ge=0.0, description="Stundensatz für Standgeld in Euro (Standard: 95.00 €/Std.)")
     notes: Optional[str] = Field(None, max_length=1000, description="Optionale Bemerkungen zum Entladevorgang / Kranprotokoll")
 
 class GpsAuditTrailItem(BaseModel):
-    timestamp: datetime = Field(..., description="Exakter GPS-Zeitstempel")
+    timestamp: dt.datetime = Field(..., description="Exakter GPS-Zeitstempel")
     event_type: str = Field(..., description="Ereignistyp (FACTORY_EXIT, SITE_ENTER, DWELL_CHECKPOINT, SITE_EXIT)")
     location_name: str = Field(..., description="Ortsbezeichnung / Geofence-Name")
     latitude: float = Field(..., description="Geografische Breite")
@@ -25,14 +25,14 @@ class TripReconciliationResponse(BaseModel):
     report_number: str = Field(..., description="Eindeutige Prüfbericht-Nummer (z. B. SGN-2026-0905-101)")
     delivery_note_number: str = Field(..., description="Lieferschein-Nummer")
     plate: str = Field(..., description="Kennzeichen")
-    trip_date: date = Field(..., description="Datum")
+    trip_date: dt.date = Field(..., description="Datum")
     site_geofence_id: int
     site_name: str = Field(..., description="Name der Zielbaustelle")
     factory_geofence_id: Optional[int] = None
     factory_name: Optional[str] = None
-    factory_departure_time: Optional[datetime] = None
-    site_arrival_time: Optional[datetime] = None
-    site_departure_time: Optional[datetime] = None
+    factory_departure_time: Optional[dt.datetime] = None
+    site_arrival_time: Optional[dt.datetime] = None
+    site_departure_time: Optional[dt.datetime] = None
     stay_duration_minutes: int = Field(..., description="Gesamte Standzeit an der Baustelle in Minuten")
     free_unloading_minutes: int = Field(default=60, description="Freistandzeit in Minuten")
     billable_delay_minutes: int = Field(..., description="Abrechenbare Standgeldzeit in Minuten")
@@ -43,7 +43,7 @@ class TripReconciliationResponse(BaseModel):
     compliance_text: Optional[str] = None
     notes: Optional[str] = None
     created_by_name: Optional[str] = None
-    created_at: Optional[datetime] = None
+    created_at: Optional[dt.datetime] = None
     audit_trail: List[GpsAuditTrailItem] = Field(default_factory=list)
 
     class Config:
