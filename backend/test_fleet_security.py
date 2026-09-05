@@ -72,8 +72,8 @@ def run_tests():
             factory_geo = Geofence(
                 name="Werk Altlandsberg (Zentrale)",
                 type=GeofenceType.FACTORY,
-                latitude=52.5272,
-                longitude=13.8052,
+                latitude=52.5584,
+                longitude=13.7656,
                 radius_meters=600,
                 is_active=True
             )

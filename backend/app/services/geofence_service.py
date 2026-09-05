@@ -14,8 +14,8 @@ DEFAULT_GEOFENCES = [
     {
         "name": "Werk Altlandsberg (Zentrale)",
         "type": GeofenceType.FACTORY,
-        "latitude": 52.5272,
-        "longitude": 13.8052,
+        "latitude": 52.5584,
+        "longitude": 13.7656,
         "radius_meters": 600,
         "is_active": True,
         "description": "Hauptwerk & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
@@ -93,8 +93,8 @@ def seed_default_geofences(db: Session) -> None:
     for f_geo in factory_geos:
         f_geo.name = "Werk Altlandsberg (Zentrale)"
         f_geo.description = "Hauptwerk & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
-        f_geo.latitude = 52.5272
-        f_geo.longitude = 13.8052
+        f_geo.latitude = 52.5584
+        f_geo.longitude = 13.7656
     db.commit()
 
 class GeofenceMonitorService:

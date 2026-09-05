@@ -39,8 +39,8 @@ class EtaCalculationService:
             logger.warning("Fahrzeug mit ID '%s' für Tracking-Token '%s' nicht gefunden.", share.vehicle_id, share.token)
             return None
 
-        current_lat = float(target_vehicle.get("lat", 52.5272))
-        current_lon = float(target_vehicle.get("lon", 13.8052))
+        current_lat = float(target_vehicle.get("lat", 52.5584))
+        current_lon = float(target_vehicle.get("lon", 13.7656))
         speed = float(target_vehicle.get("speed", 0.0) or 0.0)
         is_moving = speed > 0.0
         plate = str(target_vehicle.get("plate", "LKW"))

@@ -132,7 +132,7 @@ export function PublicTrackingPage() {
     const map = L.map(mapContainerRef.current, {
       zoomControl: true,
       attributionControl: false
-    }).setView([52.5272, 13.8052], 11);
+    }).setView([52.5584, 13.7656], 11);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,

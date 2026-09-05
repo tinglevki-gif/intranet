@@ -19,8 +19,8 @@ logger = logging.getLogger("dispatch_service")
 
 # Default Factory Location (Tinglev Elementfabrik GmbH - Werk Altlandsberg (Zentrale))
 FACTORY_COORDS = {
-    "lat": 52.5272,
-    "lon": 13.8052,
+    "lat": 52.5584,
+    "lon": 13.7656,
     "name": "Werk Altlandsberg (Zentrale)",
     "address": "Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
 }
@@ -28,7 +28,7 @@ FACTORY_COORDS = {
 # Known Postcodes & Location Database for fast resolution in Berlin/Brandenburg
 POSTAL_CODE_GEO_CACHE: Dict[str, Tuple[float, float, str]] = {
     # Berlin & Brandenburg Hubs
-    "15345": (52.5272, 13.8052, "Altlandsberg / Bruchmühle (Werk Tinglev)"),
+    "15345": (52.5584, 13.7656, "Altlandsberg / Bruchmühle (Werk Tinglev)"),
     "10115": (52.5310, 13.3680, "Berlin Europacity / Hbf"),
     "10117": (52.5170, 13.3888, "Berlin Mitte / Friedrichstraße"),
     "10557": (52.5250, 13.3690, "Berlin Moabit / Lehrter Str."),

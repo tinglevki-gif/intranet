@@ -36,8 +36,8 @@ def test_dispatch_classification():
             factory = Geofence(
                 name="Werk Altlandsberg (Zentrale)",
                 type="FACTORY",
-                latitude=52.5272,
-                longitude=13.8052,
+                latitude=52.5584,
+                longitude=13.7656,
                 radius_meters=600,
                 is_active=True
             )
@@ -177,7 +177,7 @@ def test_telemetry_enrichment_and_summary():
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "total_vehicles": 3,
             "vehicles": [
-                {"id": 801, "plate": "MOL-TE 801", "lat": 52.5272, "lon": 13.8052, "speed": 0, "brand": "MAN TGX 26.510"},
+                {"id": 801, "plate": "MOL-TE 801", "lat": 52.5584, "lon": 13.7656, "speed": 0, "brand": "MAN TGX 26.510"},
                 {"id": 802, "plate": "MOL-TE 802", "lat": 52.3500, "lon": 13.9000, "speed": 0, "brand": "Mercedes Actros 1845"},
                 {"id": 803, "plate": "MOL-TE 803", "lat": 52.5200, "lon": 13.6000, "speed": 60, "brand": "Volvo FH 500"}
             ]

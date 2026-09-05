@@ -37,7 +37,7 @@ class TestGeofencingAndStays(unittest.TestCase):
         self.assertLess(dist, 2600.0)
 
         # Identical point distance should be 0.0
-        self.assertEqual(calculate_haversine_distance(52.5272, 13.8052, 52.5272, 13.8052), 0.0)
+        self.assertEqual(calculate_haversine_distance(52.5584, 13.7656, 52.5584, 13.7656), 0.0)
 
     def test_geofence_seeding(self):
         seed_default_geofences(self.db)

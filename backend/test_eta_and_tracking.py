@@ -6,8 +6,8 @@ from app.services.eta_service import EtaCalculationService, eta_calculation_serv
 from app.services.geofence_service import calculate_haversine_distance
 
 def test_haversine_and_road_distance():
-    # Factory Altlandsberg (52.5272, 13.8052) to Berlin Potsdamer Platz (52.5096, 13.3759)
-    factory_lat, factory_lon = 52.5272, 13.8052
+    # Factory Altlandsberg (52.5584, 13.7656) to Berlin Potsdamer Platz (52.5096, 13.3759)
+    factory_lat, factory_lon = 52.5584, 13.7656
     dest_lat, dest_lon = 52.5096, 13.3759
 
     crow_dist_m = calculate_haversine_distance(factory_lat, factory_lon, dest_lat, dest_lon)

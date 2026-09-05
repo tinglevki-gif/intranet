@@ -54,8 +54,8 @@ import { useLanguage } from '../context/LanguageContext';
 
 // Company HQ Coordinates (Tinglev Elementfabrik GmbH - Werk Altlandsberg (Zentrale))
 const TINGLEV_HQ = {
-  lat: 52.5272,
-  lon: 13.8052,
+  lat: 52.5584,
+  lon: 13.7656,
   name: 'Werk Altlandsberg (Zentrale)',
   address: 'Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle'
 };
@@ -249,8 +249,8 @@ export function GpsPage() {
   const [geofenceForm, setGeofenceForm] = useState({
     name: '',
     type: 'FACTORY',
-    latitude: 52.5272,
-    longitude: 13.8052,
+    latitude: 52.5584,
+    longitude: 13.7656,
     radius_meters: 500,
     is_active: true,
     description: ''
