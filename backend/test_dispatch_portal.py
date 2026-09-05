@@ -205,9 +205,13 @@ def test_nearest_vehicle_search():
             limit=5,
             only_available=False
         )
-        res_plz = dispatch_service.find_nearest_vehicles(db, req_plz)
+        res_plz_raw = dispatch_service.find_nearest_vehicles(db, req_plz)
+        res_plz = NearestVehicleResponse(**res_plz_raw)
         assert res_plz.query_location is not None, "Query location could not be resolved"
-        print(f"  [OK] PLZ '10115 Berlin' aufgelöst: {res_plz.query_location.formatted_address} ({res_plz.query_location.latitude}, {res_plz.query_location.longitude})")
+        loc_name = res_plz.query_location.get("name") or res_plz.query_location.get("formatted_address")
+        loc_lat = res_plz.query_location.get("latitude")
+        loc_lon = res_plz.query_location.get("longitude")
+        print(f"  [OK] PLZ '10115 Berlin' aufgelöst: {loc_name} ({loc_lat}, {loc_lon})")
         print(f"       Gefundene Fahrzeuge im 150km-Radius: {res_plz.total_found}")
         
         for i, veh in enumerate(res_plz.vehicles[:3], 1):
@@ -224,7 +228,8 @@ def test_nearest_vehicle_search():
                 limit=3,
                 only_available=True
             )
-            res_geo = dispatch_service.find_nearest_vehicles(db, req_geo)
+            res_geo_raw = dispatch_service.find_nearest_vehicles(db, req_geo)
+            res_geo = NearestVehicleResponse(**res_geo_raw)
             print(f"  [OK] Geofence Suche '{factory.name}': {res_geo.total_found} verfügbare Lkw gefunden.")
     finally:
         db.close()

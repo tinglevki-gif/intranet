@@ -284,11 +284,18 @@ class DispatchClassificationService:
 
         raw_telemetry["vehicles"] = enriched_vehicles
         raw_telemetry["dispatch_summary"] = {
+            "loading_factory": loading_factory_count,
+            "outbound_transit": outbound_transit_count,
+            "unloading_site": unloading_site_count,
+            "inbound_return": inbound_return_count,
+            "standby_idle": standby_idle_count,
             "loading_factory_count": loading_factory_count,
             "outbound_transit_count": outbound_transit_count,
             "unloading_site_count": unloading_site_count,
             "inbound_return_count": inbound_return_count,
-            "standby_idle_count": standby_idle_count
+            "standby_idle_count": standby_idle_count,
+            "available_count": loading_factory_count + inbound_return_count + standby_idle_count,
+            "total": len(vehicles)
         }
 
         return raw_telemetry
