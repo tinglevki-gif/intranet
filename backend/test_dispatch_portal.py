@@ -18,7 +18,7 @@ from app.core.database import SessionLocal
 from app.models.role import Role
 from app.models.user import User
 from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
-from app.models.tracking_share import DeliveryTrackingShare
+from app.models.delivery_tracking import DeliveryTrackingShare
 from app.models.maintenance import MaintenanceInterval, MaintenanceLog, VehicleMeta
 from app.models.reconciliation import TripReconciliation
 from app.services.dispatch_service import dispatch_service, DispatchClassificationService
