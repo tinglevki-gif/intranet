@@ -44,6 +44,9 @@ class TripReconciliationService:
 
         # 3. Zeitfenster für den Tag definieren
         target_date = req.date
+        if isinstance(target_date, str):
+            target_date = date.fromisoformat(target_date)
+
         start_of_day = datetime(target_date.year, target_date.month, target_date.day, 0, 0, 0)
         end_of_day = datetime(target_date.year, target_date.month, target_date.day, 23, 59, 59)
 
@@ -253,7 +256,7 @@ class TripReconciliationService:
             "report_number": report_obj.report_number,
             "delivery_note_number": report_obj.delivery_note_number,
             "plate": report_obj.plate,
-            "trip_date": report_obj.trip_date,
+            "trip_date": str(report_obj.trip_date),
             "site_geofence_id": site.id,
             "site_name": site.name,
             "factory_geofence_id": factory.id if factory else None,
@@ -369,7 +372,7 @@ class TripReconciliationService:
                 "report_number": r.report_number,
                 "delivery_note_number": r.delivery_note_number,
                 "plate": r.plate,
-                "trip_date": r.trip_date,
+                "trip_date": str(r.trip_date),
                 "site_geofence_id": r.site_geofence_id,
                 "site_name": site_name,
                 "factory_geofence_id": r.factory_geofence_id,

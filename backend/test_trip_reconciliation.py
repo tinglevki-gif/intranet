@@ -41,7 +41,7 @@ def run_tests():
         test_req_exceeded = TripReconciliationRequest(
             plate="MOL-TE 101",
             delivery_note_number="LS-2026-9901",
-            date=today,
+            date=str(today),
             site_geofence_id=berlin_site.id,
             free_unloading_minutes=60,
             hourly_demurrage_rate=95.0,
@@ -73,7 +73,7 @@ def run_tests():
         test_req_ok = TripReconciliationRequest(
             plate="MOL-TE 105",
             delivery_note_number="LS-2026-9902",
-            date=today,
+            date=str(today),
             site_geofence_id=berlin_site.id,
             free_unloading_minutes=60,
             hourly_demurrage_rate=95.0,
