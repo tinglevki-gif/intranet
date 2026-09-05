@@ -191,7 +191,7 @@ export const translations = {
       refreshing: 'Wird aktualisiert...',
       search_placeholder: 'Kennzeichen, Typ oder Standort suchen...',
       map_view: 'Kartenansicht (OpenStreetMap)',
-      center_hq: 'Werk Tinglev zentrieren',
+      center_hq: 'Werk Altlandsberg (Zentrale) zentrieren',
       fit_all: 'Gesamtflotte einpassen',
       no_vehicles_found: 'Keine Fahrzeuge gefunden, die den Kriterien entsprechen.',
       telemetry_online: 'Navkonzept Live-Telemetrie verbunden',

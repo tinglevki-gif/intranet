@@ -22,12 +22,12 @@ import {
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 
-// Company HQ Coordinates (Tinglev Elementfabrik Werk Tinglev)
+// Company HQ Coordinates (Tinglev Elementfabrik GmbH - Zentrale & Werk Altlandsberg-Bruchmühle)
 const TINGLEV_HQ = {
-  lat: 54.9333,
-  lon: 9.2500,
-  name: 'Werk Tinglev (Zentrale)',
-  address: 'Bjerndrupvej 27, 6360 Tinglev'
+  lat: 52.5272,
+  lon: 13.8052,
+  name: 'Tinglev Elementfabrik GmbH (Zentrale & Werk)',
+  address: 'Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle'
 };
 
 // Create custom SVG HTML Icon for Leaflet
@@ -458,10 +458,10 @@ export function GpsPage() {
               <button
                 onClick={handleCenterHQ}
                 className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
-                title="Auf Werk Tinglev zentrieren"
+                title="Auf Werk Altlandsberg-Bruchmühle (Zentrale) zentrieren"
               >
                 <Building2 className="w-3.5 h-3.5 text-amber-600" />
-                <span>Werk Tinglev</span>
+                <span>Werk Altlandsberg</span>
               </button>
 
               <button
@@ -491,7 +491,7 @@ export function GpsPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="w-3 h-3 rounded-full bg-orange-500 inline-block ring-2 ring-orange-300"></span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">Werk Tinglev (Zentrale)</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">Werk Altlandsberg (Zentrale)</span>
               </div>
             </div>
           </div>
