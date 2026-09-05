@@ -17,11 +17,12 @@ from app.services.navkonzept_service import navkonzept_fleet_service
 
 logger = logging.getLogger("dispatch_service")
 
-# Default Factory Location (Tinglev Elementfabrik GmbH - Werk Altlandsberg)
+# Default Factory Location (Tinglev Elementfabrik GmbH - Werk Altlandsberg (Zentrale))
 FACTORY_COORDS = {
     "lat": 52.5272,
     "lon": 13.8052,
-    "name": "Werk Altlandsberg-Bruchmühle (Zentrale & Fertigung)"
+    "name": "Werk Altlandsberg (Zentrale)",
+    "address": "Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
 }
 
 # Known Postcodes & Location Database for fast resolution in Berlin/Brandenburg

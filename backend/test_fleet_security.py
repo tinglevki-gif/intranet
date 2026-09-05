@@ -70,7 +70,7 @@ def run_tests():
         factory_geo = db.query(Geofence).filter(Geofence.type == GeofenceType.FACTORY).first()
         if not factory_geo:
             factory_geo = Geofence(
-                name="Werk Altlandsberg-Bruchmühle (Zentrale)",
+                name="Werk Altlandsberg (Zentrale)",
                 type=GeofenceType.FACTORY,
                 latitude=52.5272,
                 longitude=13.8052,

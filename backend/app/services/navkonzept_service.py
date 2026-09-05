@@ -8,7 +8,7 @@ from app.core.config import settings
 
 logger = logging.getLogger("navkonzept_service")
 
-# Realistic fallback fleet dataset (Tinglev Elementfabrik GmbH - Werk Altlandsberg-Bruchmühle & Region Berlin/Brandenburg)
+# Realistic fallback fleet dataset (Tinglev Elementfabrik GmbH - Werk Altlandsberg (Zentrale) & Region Berlin/Brandenburg)
 FALLBACK_FLEET_VEHICLES = [
     {
         "id": 101,
@@ -28,7 +28,7 @@ FALLBACK_FLEET_VEHICLES = [
         "brand": "Mercedes-Benz Actros 2548 (Innenlader)",
         "lat": 52.5272,
         "lon": 13.8052,
-        "location": "Werk Altlandsberg-Bruchmühle (Ladezone 3)",
+        "location": "Werk Altlandsberg (Zentrale) - Ladezone 3 (Am Gewerbepark 8A)",
         "speed": 0.0,
         "mileage": 142180,
         "timestamp": None,

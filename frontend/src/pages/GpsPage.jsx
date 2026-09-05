@@ -52,11 +52,11 @@ import {
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 
-// Company HQ Coordinates (Tinglev Elementfabrik GmbH - Zentrale & Werk Altlandsberg-Bruchmühle)
+// Company HQ Coordinates (Tinglev Elementfabrik GmbH - Werk Altlandsberg (Zentrale))
 const TINGLEV_HQ = {
   lat: 52.5272,
   lon: 13.8052,
-  name: 'Tinglev Elementfabrik GmbH (Zentrale & Werk)',
+  name: 'Werk Altlandsberg (Zentrale)',
   address: 'Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle'
 };
 
@@ -1574,7 +1574,7 @@ export function GpsPage() {
                   <button
                     onClick={handleCenterHQ}
                     className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors"
-                    title="Auf Werk Altlandsberg-Bruchmühle (Zentrale) zentrieren"
+                    title="Auf Werk Altlandsberg (Zentrale) zentrieren"
                   >
                     <Building2 className="w-3.5 h-3.5 text-amber-600" />
                     <span>Werk Altlandsberg</span>
@@ -4128,7 +4128,7 @@ export function GpsPage() {
                   Prüfbericht zur Standgeldabrechnung (§ 412 HGB / VBGL)
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Tinglev Elementfabrik GmbH • Zentrale & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg
+                  Tinglev Elementfabrik GmbH • Werk Altlandsberg (Zentrale): Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle
                 </p>
               </div>
 

@@ -12,13 +12,13 @@ logger = logging.getLogger("geofence_service")
 # Default corporate geofences for Tinglev Elementfabrik GmbH
 DEFAULT_GEOFENCES = [
     {
-        "name": "Werk Altlandsberg-Bruchmühle (Zentrale & Fertigung)",
+        "name": "Werk Altlandsberg (Zentrale)",
         "type": GeofenceType.FACTORY,
         "latitude": 52.5272,
         "longitude": 13.8052,
         "radius_meters": 600,
         "is_active": True,
-        "description": "Hauptwerk, Fertigteilproduktion & Verladezone (Am Gewerbepark 8A)"
+        "description": "Hauptwerk & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
     },
     {
         "name": "Großbaustelle Berlin Europacity / Hbf",
@@ -67,7 +67,7 @@ def calculate_haversine_distance(lat1: float, lon1: float, lat2: float, lon2: fl
 
 def seed_default_geofences(db: Session) -> None:
     """
-    Initialisiert Standard-Geofences der Tinglev Elementfabrik, falls noch keine vorhanden sind.
+    Initialisiert oder aktualisiert Standard-Geofences der Tinglev Elementfabrik.
     """
     count = db.query(Geofence).count()
     if count == 0:
@@ -85,6 +85,17 @@ def seed_default_geofences(db: Session) -> None:
             db.add(new_g)
         db.commit()
         logger.info("4 Standard-Geofences erfolgreich angelegt.")
+    else:
+        # Bestehenden Factory Geofence auf die offizielle Bezeichnung und Adresse aktualisieren
+        factory_geo = db.query(Geofence).filter(
+            (Geofence.type == GeofenceType.FACTORY) | (Geofence.name.ilike("%Altlandsberg%"))
+        ).first()
+        if factory_geo:
+            factory_geo.name = "Werk Altlandsberg (Zentrale)"
+            factory_geo.description = "Hauptwerk & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
+            factory_geo.latitude = 52.5272
+            factory_geo.longitude = 13.8052
+            db.commit()
 
 class GeofenceMonitorService:
     """

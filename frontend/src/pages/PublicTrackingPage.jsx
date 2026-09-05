@@ -235,7 +235,7 @@ export function PublicTrackingPage() {
                 <Building2 className="w-4 h-4 text-blue-400" />
                 <span>Tinglev Elementfabrik GmbH</span>
               </p>
-              <p className="text-[11px] text-slate-400">Disposition & Werk Altlandsberg-Bruchmühle</p>
+              <p className="text-[11px] text-slate-400">Werk Altlandsberg (Zentrale) • Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle</p>
               <p className="text-[11px] text-blue-400 font-mono">Zentrale: +49 (0) 33438 642-0</p>
             </div>
           </div>
