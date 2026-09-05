@@ -18,6 +18,16 @@ from app.schemas.geofence import (
 from app.services.auth_service import get_current_user
 from app.services.navkonzept_service import navkonzept_fleet_service
 from app.services.geofence_service import geofence_service
+from app.services.maintenance_service import maintenance_service
+from app.models.maintenance import MaintenanceInterval, MaintenanceLog, VehicleMeta
+from app.schemas.maintenance import (
+    MaintenanceIntervalCreate,
+    MaintenanceIntervalUpdate,
+    MaintenanceIntervalResponse,
+    MaintenanceLogCreate,
+    MaintenanceLogResponse,
+    MaintenanceAlertResponse
+)
 
 logger = logging.getLogger("fleet_endpoint")
 
@@ -36,12 +46,23 @@ router = APIRouter()
 )
 def get_fleet_vehicles(
     force_refresh: bool = Query(False, description="Cache umgehen und frische Daten von Navkonzept abfragen"),
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """
-    Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer.
+    Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer und aktualisiert die Laufleistung.
     """
-    return navkonzept_fleet_service.get_vehicles(force_refresh=force_refresh)
+    data = navkonzept_fleet_service.get_vehicles(force_refresh=force_refresh)
+    
+    # Automatische Aktualisierung der Gesamtkilometerstände in vehicles_meta
+    try:
+        vehicles = data.get("vehicles", [])
+        if vehicles:
+            maintenance_service.sync_telemetry_mileage(db, vehicles)
+    except Exception as e:
+        logger.warning("Fehler beim automatischen Mileage-Sync: %s", e)
+
+    return data
 
 # =========================================================================
 # 2. GEOFENCES CRUD
@@ -359,3 +380,179 @@ def delete_tracking_share(
     db.delete(share)
     db.commit()
     return None
+
+# =========================================================================
+# 6. VORAUSSCHAUENDE WARTUNG & WERKSTATT-SERVICES (MAINTENANCE)
+# =========================================================================
+
+@router.get(
+    "/maintenance/alerts",
+    response_model=List[Dict[str, Any]],
+    status_code=status.HTTP_200_OK,
+    summary="Dringende Wartungs-Warnungen (OVERDUE & DUE_SOON)",
+    description="Liefert alle Fahrzeuge mit überfälligen oder innerhalb des Vorwarn-Schwellenwerts fälligen Wartungen."
+)
+def get_maintenance_alerts(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return maintenance_service.get_maintenance_alerts(db)
+
+@router.get(
+    "/maintenance/intervals",
+    response_model=List[Dict[str, Any]],
+    status_code=status.HTTP_200_OK,
+    summary="Liste aller definierten Wartungsintervalle",
+    description="Liefert alle Wartungspläne mit aktuellem Kilometerstand, Restkilometern und Status."
+)
+def list_maintenance_intervals(
+    status_filter: Optional[str] = Query(None, alias="status", description="Filter nach Status (OK, DUE_SOON, OVERDUE)"),
+    vehicle_id: Optional[str] = Query(None, description="Filter nach Fahrzeug-ID"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return maintenance_service.get_enriched_intervals(db, status_filter=status_filter, vehicle_id=vehicle_id)
+
+@router.post(
+    "/maintenance/intervals",
+    response_model=Dict[str, Any],
+    status_code=status.HTTP_201_CREATED,
+    summary="Neues Wartungsintervall anlegen",
+    description="Erstellt ein neues Intervall für ein Fahrzeug (z. B. TÜV, UVV, Ölwechsel)."
+)
+def create_maintenance_interval(
+    payload: MaintenanceIntervalCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    next_due_km = payload.next_due_mileage
+    if next_due_km is None:
+        next_due_km = payload.last_service_mileage + payload.interval_km
+
+    interval = MaintenanceInterval(
+        vehicle_id=str(payload.vehicle_id),
+        plate=payload.plate,
+        service_type=payload.service_type,
+        interval_km=payload.interval_km,
+        last_service_mileage=payload.last_service_mileage,
+        last_service_date=payload.last_service_date,
+        next_due_mileage=next_due_km,
+        next_due_date=payload.next_due_date,
+        warning_threshold_km=payload.warning_threshold_km,
+        notes=payload.notes
+    )
+    db.add(interval)
+    db.commit()
+    db.refresh(interval)
+
+    # Re-evaluate
+    maintenance_service.evaluate_all_intervals(db)
+    
+    enriched = maintenance_service.get_enriched_intervals(db, vehicle_id=str(payload.vehicle_id))
+    for item in enriched:
+        if item["id"] == interval.id:
+            return item
+    return {"id": interval.id, "message": "Intervall erfolgreich erstellt"}
+
+@router.put(
+    "/maintenance/intervals/{interval_id}",
+    response_model=Dict[str, Any],
+    status_code=status.HTTP_200_OK,
+    summary="Wartungsintervall bearbeiten"
+)
+def update_maintenance_interval(
+    interval_id: int = Path(..., description="ID des Intervalls"),
+    payload: MaintenanceIntervalUpdate = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    interval = db.query(MaintenanceInterval).filter_by(id=interval_id).first()
+    if not interval:
+        raise HTTPException(status_code=404, detail="Wartungsintervall nicht gefunden.")
+
+    update_data = payload.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(interval, key, value)
+
+    if "interval_km" in update_data or "last_service_mileage" in update_data:
+        if not payload.next_due_mileage:
+            interval.next_due_mileage = interval.last_service_mileage + interval.interval_km
+
+    db.commit()
+    db.refresh(interval)
+
+    maintenance_service.evaluate_all_intervals(db)
+    enriched = maintenance_service.get_enriched_intervals(db)
+    for item in enriched:
+        if item["id"] == interval.id:
+            return item
+    return {"id": interval.id, "message": "Intervall aktualisiert"}
+
+@router.delete(
+    "/maintenance/intervals/{interval_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Wartungsintervall löschen"
+)
+def delete_maintenance_interval(
+    interval_id: int = Path(..., description="ID des Intervalls"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    interval = db.query(MaintenanceInterval).filter_by(id=interval_id).first()
+    if not interval:
+        raise HTTPException(status_code=404, detail="Wartungsintervall nicht gefunden.")
+
+    db.delete(interval)
+    db.commit()
+    return None
+
+@router.post(
+    "/maintenance/log",
+    response_model=MaintenanceLogResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Durchgeführte Wartung quittieren (Werkstatt-Log)",
+    description="Erfasst eine durchgeführte Inspektion, rolliert das nächste Fälligkeitsziel und setzt den Status auf OK."
+)
+def log_maintenance_service(
+    payload: MaintenanceLogCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return maintenance_service.log_service_completed(db, payload)
+
+@router.get(
+    "/maintenance/logs",
+    response_model=List[MaintenanceLogResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Werkstatt-Historie und Wartungsprotokolle",
+    description="Liefert alle archivierten Wartungsquittierungen chronologisch sortiert."
+)
+def list_maintenance_logs(
+    vehicle_id: Optional[str] = Query(None, description="Optional nach Fahrzeug filtern"),
+    limit: int = Query(50, description="Maximale Anzahl"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    query = db.query(MaintenanceLog)
+    if vehicle_id and vehicle_id.upper() != "ALL":
+        query = query.filter(MaintenanceLog.vehicle_id == str(vehicle_id))
+    
+    return query.order_by(MaintenanceLog.service_date.desc(), MaintenanceLog.created_at.desc()).limit(limit).all()
+
+@router.post(
+    "/maintenance/evaluate",
+    status_code=status.HTTP_200_OK,
+    summary="Wartungsstatus manuell neu evaluieren"
+)
+def evaluate_maintenance(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    maintenance_service.evaluate_all_intervals(db)
+    alerts = maintenance_service.get_maintenance_alerts(db)
+    return {
+        "status": "success",
+        "message": "Wartungsintervalle erfolgreich gegen aktuelle Kilometerstände evaluiert.",
+        "alerts_count": len(alerts)
+    }
+

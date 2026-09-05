@@ -969,6 +969,60 @@ class ApiService {
     return await response.json();
   }
 
+  // Predictive Fleet Maintenance & Vehicle Inspections (TÜV, UVV, Ölwechsel, Reifenservice)
+  getMaintenanceAlerts() {
+    return this.request('/fleet/maintenance/alerts');
+  }
+
+  getMaintenanceIntervals(status = 'ALL', vehicleId = null) {
+    const params = new URLSearchParams();
+    if (status && status !== 'ALL') params.append('status', status);
+    if (vehicleId && vehicleId !== 'ALL') params.append('vehicle_id', vehicleId);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/fleet/maintenance/intervals${queryString}`);
+  }
+
+  createMaintenanceInterval(intervalData) {
+    return this.request('/fleet/maintenance/intervals', {
+      method: 'POST',
+      body: JSON.stringify(intervalData),
+    });
+  }
+
+  updateMaintenanceInterval(intervalId, intervalData) {
+    return this.request(`/fleet/maintenance/intervals/${intervalId}`, {
+      method: 'PUT',
+      body: JSON.stringify(intervalData),
+    });
+  }
+
+  deleteMaintenanceInterval(intervalId) {
+    return this.request(`/fleet/maintenance/intervals/${intervalId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  logMaintenanceService(logData) {
+    return this.request('/fleet/maintenance/log', {
+      method: 'POST',
+      body: JSON.stringify(logData),
+    });
+  }
+
+  getMaintenanceLogs(vehicleId = null, limit = 50) {
+    const params = new URLSearchParams();
+    if (vehicleId && vehicleId !== 'ALL') params.append('vehicle_id', vehicleId);
+    if (limit) params.append('limit', limit);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/fleet/maintenance/logs${queryString}`);
+  }
+
+  evaluateMaintenance() {
+    return this.request('/fleet/maintenance/evaluate', {
+      method: 'POST',
+    });
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

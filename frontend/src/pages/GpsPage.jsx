@@ -33,7 +33,12 @@ import {
   Link2,
   MessageSquare,
   Send,
-  QrCode
+  QrCode,
+  Wrench,
+  AlertTriangle,
+  FileText,
+  History,
+  DollarSign
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -44,6 +49,15 @@ const TINGLEV_HQ = {
   lon: 13.8052,
   name: 'Tinglev Elementfabrik GmbH (Zentrale & Werk)',
   address: 'Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle'
+};
+
+const SERVICE_TYPE_INFO = {
+  OIL_SERVICE: { label: 'Motoröl & Filter (30.000 km)', badge: 'bg-amber-100 text-amber-800 border-amber-200', icon: '🛢️' },
+  TUEV_SP: { label: 'TÜV & Sicherheitsprüfung (SP)', badge: 'bg-blue-100 text-blue-800 border-blue-200', icon: '📋' },
+  UVV: { label: 'UVV-Kranprüfung (DGUV 52/54)', badge: 'bg-purple-100 text-purple-800 border-purple-200', icon: '🏗️' },
+  TIRES: { label: 'Reifenservice & Achsvermessung', badge: 'bg-slate-100 text-slate-800 border-slate-200', icon: '🛞' },
+  BRAKES: { label: 'Bremsen- & Druckluftservice', badge: 'bg-rose-100 text-rose-800 border-rose-200', icon: '🛑' },
+  GENERAL_INSPECTION: { label: 'Große Fahrzeuginspektion', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200', icon: '🔧' }
 };
 
 const GEOFENCE_TYPE_COLORS = {
@@ -110,10 +124,15 @@ function createHqDivIcon() {
 
 export function GpsPage() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('MAP'); // 'MAP' | 'STAYS' | 'GEOFENCES' | 'TRACKING_SHARES'
+  const [activeTab, setActiveTab] = useState('MAP'); // 'MAP' | 'STAYS' | 'GEOFENCES' | 'TRACKING_SHARES' | 'MAINTENANCE'
   const [vehicles, setVehicles] = useState([]);
   const [geofences, setGeofences] = useState([]);
   const [trackingShares, setTrackingShares] = useState([]);
+  const [maintenanceIntervals, setMaintenanceIntervals] = useState([]);
+  const [maintenanceAlerts, setMaintenanceAlerts] = useState([]);
+  const [maintenanceLogs, setMaintenanceLogs] = useState([]);
+  const [maintenanceFilter, setMaintenanceFilter] = useState('ALL'); // 'ALL' | 'OVERDUE' | 'DUE_SOON' | 'OK'
+  const [maintenanceVehicleFilter, setMaintenanceVehicleFilter] = useState('ALL');
   const [staysSummary, setStaysSummary] = useState(null);
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [isLive, setIsLive] = useState(true);
@@ -153,6 +172,41 @@ export function GpsPage() {
     notes: ''
   });
 
+  // Maintenance Log Modal State (Service quittieren)
+  const [isLogServiceModalOpen, setIsLogServiceModalOpen] = useState(false);
+  const [selectedIntervalForLog, setSelectedIntervalForLog] = useState(null);
+  const [logServiceForm, setLogServiceForm] = useState({
+    interval_id: null,
+    vehicle_id: '',
+    plate: '',
+    service_type: 'OIL_SERVICE',
+    service_mileage: 0,
+    service_date: new Date().toISOString().split('T')[0],
+    performed_by: 'Werkstatt Altlandsberg',
+    workshop_name: 'Tinglev Werkstatt Altlandsberg',
+    invoice_number: '',
+    cost_euros: 0,
+    notes: ''
+  });
+
+  // Maintenance Interval Create / Edit Modal
+  const [isIntervalModalOpen, setIsIntervalModalOpen] = useState(false);
+  const [editingInterval, setEditingInterval] = useState(null);
+  const [intervalForm, setIntervalForm] = useState({
+    vehicle_id: '',
+    plate: '',
+    service_type: 'OIL_SERVICE',
+    interval_km: 30000,
+    last_service_mileage: 0,
+    last_service_date: new Date().toISOString().split('T')[0],
+    next_due_date: '',
+    warning_threshold_km: 1500,
+    notes: ''
+  });
+
+  // Maintenance History Logs Modal
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
@@ -163,10 +217,12 @@ export function GpsPage() {
   const fetchFleetTelemetry = async (forceRefresh = false) => {
     if (forceRefresh) setIsRefreshing(true);
     try {
-      const [vehiclesData, geofencesData, sharesData] = await Promise.all([
+      const [vehiclesData, geofencesData, sharesData, alertsData, intervalsData] = await Promise.all([
         api.getFleetVehicles(forceRefresh),
         api.getGeofences(),
-        api.getTrackingShares(false)
+        api.getTrackingShares(false),
+        api.getMaintenanceAlerts(),
+        api.getMaintenanceIntervals('ALL')
       ]);
 
       if (vehiclesData && Array.isArray(vehiclesData.vehicles)) {
@@ -179,8 +235,14 @@ export function GpsPage() {
       if (Array.isArray(sharesData)) {
         setTrackingShares(sharesData);
       }
+      if (Array.isArray(alertsData)) {
+        setMaintenanceAlerts(alertsData);
+      }
+      if (Array.isArray(intervalsData)) {
+        setMaintenanceIntervals(intervalsData);
+      }
     } catch (err) {
-      console.error('Fehler beim Laden der Telemetrie/Geofences/Tracking:', err);
+      console.error('Fehler beim Laden der Telemetrie/Geofences/Tracking/Wartung:', err);
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -210,11 +272,28 @@ export function GpsPage() {
     }
   };
 
+  // Load Maintenance Data
+  const fetchMaintenanceData = async (status = maintenanceFilter, vehId = maintenanceVehicleFilter) => {
+    try {
+      const [intervals, alerts, logs] = await Promise.all([
+        api.getMaintenanceIntervals(status, vehId),
+        api.getMaintenanceAlerts(),
+        api.getMaintenanceLogs(vehId === 'ALL' ? null : vehId)
+      ]);
+      if (Array.isArray(intervals)) setMaintenanceIntervals(intervals);
+      if (Array.isArray(alerts)) setMaintenanceAlerts(alerts);
+      if (Array.isArray(logs)) setMaintenanceLogs(logs);
+    } catch (err) {
+      console.error('Fehler beim Laden der Wartungsdaten:', err);
+    }
+  };
+
   // Initial load
   useEffect(() => {
     fetchFleetTelemetry(false);
     fetchStaysData(selectedDate);
     fetchTrackingShares();
+    fetchMaintenanceData();
   }, []);
 
   // When tab changes
@@ -223,8 +302,10 @@ export function GpsPage() {
       fetchStaysData(selectedDate);
     } else if (activeTab === 'TRACKING_SHARES') {
       fetchTrackingShares();
+    } else if (activeTab === 'MAINTENANCE') {
+      fetchMaintenanceData(maintenanceFilter, maintenanceVehicleFilter);
     }
-  }, [selectedDate, activeTab]);
+  }, [selectedDate, activeTab, maintenanceFilter, maintenanceVehicleFilter]);
 
   // 45-Second Interval Countdown for Live Telemetry
   useEffect(() => {
@@ -236,6 +317,8 @@ export function GpsPage() {
             fetchStaysData(selectedDate);
           } else if (activeTab === 'TRACKING_SHARES') {
             fetchTrackingShares();
+          } else if (activeTab === 'MAINTENANCE') {
+            fetchMaintenanceData(maintenanceFilter, maintenanceVehicleFilter);
           }
           return 45;
         }
@@ -244,7 +327,7 @@ export function GpsPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [activeTab, selectedDate]);
+  }, [activeTab, selectedDate, maintenanceFilter, maintenanceVehicleFilter]);
 
   // Filtered vehicles
   const filteredVehicles = useMemo(() => {
@@ -627,6 +710,120 @@ export function GpsPage() {
     }
   };
 
+  // Maintenance Handlers
+  const handleOpenLogService = (interval) => {
+    setSelectedIntervalForLog(interval);
+    setLogServiceForm({
+      interval_id: interval.id,
+      vehicle_id: interval.vehicle_id,
+      plate: interval.plate,
+      service_type: interval.service_type,
+      service_mileage: interval.current_mileage || interval.last_service_mileage,
+      service_date: new Date().toISOString().split('T')[0],
+      performed_by: 'Werkstatt Altlandsberg',
+      workshop_name: 'Tinglev Werkstatt Altlandsberg',
+      invoice_number: '',
+      cost_euros: 0,
+      notes: ''
+    });
+    setIsLogServiceModalOpen(true);
+  };
+
+  const handleSaveLogService = async (e) => {
+    e.preventDefault();
+    try {
+      await api.logMaintenanceService(logServiceForm);
+      setIsLogServiceModalOpen(false);
+      fetchMaintenanceData();
+      alert('Wartungsservice erfolgreich quittiert! Das nächste Fälligkeitsziel wurde aktualisiert.');
+    } catch (err) {
+      alert('Fehler beim Quittieren des Services: ' + err.message);
+    }
+  };
+
+  const handleOpenCreateInterval = (vehicleId = null) => {
+    const defaultVehicle = vehicleId 
+      ? vehicles.find((v) => String(v.id) === String(vehicleId)) 
+      : vehicles[0];
+
+    setEditingInterval(null);
+    setIntervalForm({
+      vehicle_id: defaultVehicle ? String(defaultVehicle.id) : '101',
+      plate: defaultVehicle ? defaultVehicle.plate : 'MOL-TE 101',
+      service_type: 'OIL_SERVICE',
+      interval_km: 30000,
+      last_service_mileage: defaultVehicle?.mileage || 0,
+      last_service_date: new Date().toISOString().split('T')[0],
+      next_due_date: '',
+      warning_threshold_km: 1500,
+      notes: ''
+    });
+    setIsIntervalModalOpen(true);
+  };
+
+  const handleOpenEditInterval = (interval) => {
+    setEditingInterval(interval);
+    setIntervalForm({
+      vehicle_id: interval.vehicle_id,
+      plate: interval.plate,
+      service_type: interval.service_type,
+      interval_km: interval.interval_km,
+      last_service_mileage: interval.last_service_mileage,
+      last_service_date: interval.last_service_date || '',
+      next_due_date: interval.next_due_date || '',
+      warning_threshold_km: interval.warning_threshold_km,
+      notes: interval.notes || ''
+    });
+    setIsIntervalModalOpen(true);
+  };
+
+  const handleSaveInterval = async (e) => {
+    e.preventDefault();
+    try {
+      const selectedVeh = vehicles.find((v) => String(v.id) === String(intervalForm.vehicle_id));
+      const payload = {
+        ...intervalForm,
+        plate: selectedVeh ? selectedVeh.plate : intervalForm.plate,
+        interval_km: parseInt(intervalForm.interval_km) || 30000,
+        last_service_mileage: parseInt(intervalForm.last_service_mileage) || 0,
+        warning_threshold_km: parseInt(intervalForm.warning_threshold_km) || 1500,
+        last_service_date: intervalForm.last_service_date || null,
+        next_due_date: intervalForm.next_due_date || null
+      };
+
+      if (editingInterval) {
+        await api.updateMaintenanceInterval(editingInterval.id, payload);
+      } else {
+        await api.createMaintenanceInterval(payload);
+      }
+
+      setIsIntervalModalOpen(false);
+      fetchMaintenanceData();
+    } catch (err) {
+      alert('Fehler beim Speichern des Intervalls: ' + err.message);
+    }
+  };
+
+  const handleDeleteInterval = async (intervalId) => {
+    if (!window.confirm('Möchten Sie dieses Wartungsintervall wirklich löschen?')) return;
+    try {
+      await api.deleteMaintenanceInterval(intervalId);
+      fetchMaintenanceData();
+    } catch (err) {
+      alert('Fehler beim Löschen des Intervalls: ' + err.message);
+    }
+  };
+
+  const handleEvaluateMaintenance = async () => {
+    try {
+      const res = await api.evaluateMaintenance();
+      fetchMaintenanceData();
+      alert(`Wartungsüberwachung ausgeführt: ${res.alerts_count} fällige Services identifiziert.`);
+    } catch (err) {
+      alert('Fehler bei der Evaluierung: ' + err.message);
+    }
+  };
+
   return (
     <div className="space-y-6 pb-16 animate-fade-in">
       {/* 1. Header Banner */}
@@ -743,6 +940,23 @@ export function GpsPage() {
           {trackingShares.length > 0 && (
             <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500 text-white font-mono">
               {trackingShares.length}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('MAINTENANCE')}
+          className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+            activeTab === 'MAINTENANCE'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-100'
+          }`}
+        >
+          <Wrench className="w-4 h-4" />
+          <span>Wartung & Werkstatt</span>
+          {maintenanceAlerts.length > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-mono font-bold animate-pulse">
+              {maintenanceAlerts.length}
             </span>
           )}
         </button>
@@ -1360,6 +1574,330 @@ export function GpsPage() {
         </div>
       )}
 
+      {/* 7. TAB CONTENT: VORAUSSCHAUENDE WARTUNG & WERKSTATT-SERVICES */}
+      {activeTab === 'MAINTENANCE' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Maintenance KPIs Header Banner */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Überfällige Services</p>
+                <p className="text-2xl sm:text-3xl font-black text-rose-600 mt-1">
+                  {maintenanceIntervals.filter((i) => i.status === 'OVERDUE').length} <span className="text-xs font-bold text-rose-600/70">Wartungen</span>
+                </p>
+                <p className="text-[11px] text-rose-600 font-semibold mt-1">Dringender Werkstatttermin nötig</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 animate-bounce" />
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Bald fällig (&le; 1.500 km / 30 T.)</p>
+                <p className="text-2xl sm:text-3xl font-black text-amber-600 mt-1">
+                  {maintenanceIntervals.filter((i) => i.status === 'DUE_SOON').length} <span className="text-xs font-bold text-amber-600/70">Avisiert</span>
+                </p>
+                <p className="text-[11px] text-amber-600 font-medium mt-1">Werkstatt-Disposition planen</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <Clock className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Im Wartungsplan (OK)</p>
+                <p className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1">
+                  {maintenanceIntervals.filter((i) => i.status === 'OK').length} <span className="text-xs font-bold text-emerald-600/70">Services</span>
+                </p>
+                <p className="text-[11px] text-slate-400 font-medium mt-1">Laufleistung im grünen Bereich</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Werkstatt-Protokolle</p>
+                <p className="text-2xl sm:text-3xl font-black text-blue-600 mt-1">
+                  {maintenanceLogs.length} <span className="text-xs font-bold text-blue-400">Einträge</span>
+                </p>
+                <p className="text-[11px] text-slate-400 font-medium mt-1">Quittierte Inspektionen</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <FileText className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          {/* Main Maintenance Table Card */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center space-x-2.5">
+                  <h3 className="text-xl font-black text-slate-900">Vorausschauende Wartung & Fuhrpark-Inspektionen</h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">
+                    Telemetrie-Laufleistung
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+                  Automatische Synchronisation der Gesamtkilometerstände via Navkonzept zur Einhaltung gesetzlicher Prüffristen (TÜV/SP, UVV) und herstellerkonformer Öl- und Reifenservices.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2.5">
+                <button
+                  onClick={handleEvaluateMaintenance}
+                  className="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+                  title="Wartungszustand aller Fahrzeuge neu berechnen"
+                >
+                  <RotateCw className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Jetzt evaluieren</span>
+                </button>
+
+                <button
+                  onClick={() => setIsHistoryModalOpen(true)}
+                  className="flex items-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+                >
+                  <History className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Werkstatt-Historie ({maintenanceLogs.length})</span>
+                </button>
+
+                <button
+                  onClick={() => handleOpenCreateInterval()}
+                  className="flex items-center space-x-1.5 px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 active:scale-95 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Wartungsplan anlegen</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filter Toolbar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
+              <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/80 rounded-2xl">
+                <button
+                  onClick={() => setMaintenanceFilter('ALL')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    maintenanceFilter === 'ALL' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  Alle ({maintenanceIntervals.length})
+                </button>
+                <button
+                  onClick={() => setMaintenanceFilter('OVERDUE')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    maintenanceFilter === 'OVERDUE' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-500 hover:text-rose-600'
+                  }`}
+                >
+                  Überfällig ({maintenanceIntervals.filter((i) => i.status === 'OVERDUE').length})
+                </button>
+                <button
+                  onClick={() => setMaintenanceFilter('DUE_SOON')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    maintenanceFilter === 'DUE_SOON' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-500 hover:text-amber-600'
+                  }`}
+                >
+                  Bald fällig ({maintenanceIntervals.filter((i) => i.status === 'DUE_SOON').length})
+                </button>
+                <button
+                  onClick={() => setMaintenanceFilter('OK')}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    maintenanceFilter === 'OK' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-emerald-600'
+                  }`}
+                >
+                  Im Plan ({maintenanceIntervals.filter((i) => i.status === 'OK').length})
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-slate-400 font-semibold">Fahrzeug:</span>
+                <select
+                  value={maintenanceVehicleFilter}
+                  onChange={(e) => setMaintenanceVehicleFilter(e.target.value)}
+                  className="px-3 py-1.5 text-xs bg-slate-50 rounded-xl border border-slate-200 font-medium focus:outline-none"
+                >
+                  <option value="ALL">Alle Fahrzeuge</option>
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.plate} ({v.brand || 'LKW'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Intervals List Grid */}
+            {maintenanceIntervals.length === 0 ? (
+              <div className="py-16 text-center text-slate-400 text-xs space-y-3">
+                <Wrench className="w-8 h-8 mx-auto text-slate-300" />
+                <p className="font-bold text-slate-700 text-sm">Keine Wartungsintervalle für diesen Filter gefunden.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {maintenanceIntervals.map((interval) => {
+                  const typeInfo = SERVICE_TYPE_INFO[interval.service_type] || {
+                    label: interval.service_type,
+                    badge: 'bg-slate-100 text-slate-800 border-slate-200',
+                    icon: '🔧'
+                  };
+
+                  const isOverdue = interval.status === 'OVERDUE';
+                  const isDueSoon = interval.status === 'DUE_SOON';
+                  const progressPct = interval.progress_percentage || 0;
+
+                  // Progress bar color
+                  let progressBarColor = 'bg-emerald-500';
+                  if (isOverdue) progressBarColor = 'bg-rose-600';
+                  else if (isDueSoon) progressBarColor = 'bg-amber-500';
+
+                  const dueDateStr = interval.next_due_date
+                    ? new Date(interval.next_due_date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                    : null;
+
+                  return (
+                    <div
+                      key={interval.id}
+                      className={`p-5 rounded-3xl border transition-all flex flex-col justify-between space-y-4 shadow-sm bg-white ${
+                        isOverdue
+                          ? 'border-rose-300 ring-2 ring-rose-500/10 hover:border-rose-400'
+                          : isDueSoon
+                          ? 'border-amber-300 ring-2 ring-amber-500/10 hover:border-amber-400'
+                          : 'border-slate-100 hover:border-slate-200'
+                      }`}
+                    >
+                      <div className="space-y-3">
+                        {/* Header: Plate & Status */}
+                        <div className="flex items-center justify-between">
+                          <span className="px-2.5 py-1 rounded-xl bg-slate-900 text-white font-mono font-bold text-xs tracking-wider shadow-sm">
+                            {interval.plate}
+                          </span>
+
+                          {isOverdue ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center space-x-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping"></span>
+                              <span>Überfällig</span>
+                            </span>
+                          ) : isDueSoon ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center space-x-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                              <span>Bald fällig</span>
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                              Im Plan
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Service Type Title */}
+                        <div>
+                          <div className="flex items-center space-x-1.5">
+                            <span className="text-sm">{typeInfo.icon}</span>
+                            <h4 className="font-extrabold text-sm text-slate-900 leading-tight">
+                              {typeInfo.label}
+                            </h4>
+                          </div>
+                          {interval.notes && (
+                            <p className="text-[11px] text-slate-500 mt-1 line-clamp-1 italic">
+                              „{interval.notes}“
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Mileage Progress Bar */}
+                        <div className="space-y-1.5 bg-slate-50/90 p-3 rounded-2xl border border-slate-100 text-xs">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-slate-500 font-medium">Laufleistung:</span>
+                            <span className="font-mono font-bold text-slate-800">
+                              {interval.current_mileage?.toLocaleString('de-DE')} / {interval.next_due_mileage?.toLocaleString('de-DE')} km
+                            </span>
+                          </div>
+
+                          {/* Bar */}
+                          <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${progressBarColor} transition-all duration-500`}
+                              style={{ width: `${Math.min(100, Math.max(5, progressPct))}%` }}
+                            ></div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10px] pt-0.5">
+                            <span className="font-semibold text-slate-400">
+                              Intervall: {interval.interval_km.toLocaleString('de-DE')} km
+                            </span>
+                            <span
+                              className={`font-mono font-bold ${
+                                isOverdue
+                                  ? 'text-rose-600'
+                                  : isDueSoon
+                                  ? 'text-amber-600'
+                                  : 'text-emerald-600'
+                              }`}
+                            >
+                              {interval.remaining_km <= 0
+                                ? `Seit ${Math.abs(interval.remaining_km).toLocaleString('de-DE')} km überfällig!`
+                                : `noch ${interval.remaining_km?.toLocaleString('de-DE')} km`}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Dates Info */}
+                        <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-500 px-1 font-medium">
+                          <div>
+                            <span className="block text-slate-400">Letzter Service:</span>
+                            <span className="font-bold text-slate-700">
+                              {interval.last_service_date || '–'} ({interval.last_service_mileage?.toLocaleString('de-DE')} km)
+                            </span>
+                          </div>
+                          {dueDateStr && (
+                            <div>
+                              <span className="block text-slate-400">Fristdatum:</span>
+                              <span className={`font-bold ${isOverdue ? 'text-rose-600' : 'text-slate-700'}`}>
+                                {dueDateStr}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button
+                          onClick={() => handleOpenLogService(interval)}
+                          className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-sm active:scale-95 transition-all"
+                        >
+                          <Wrench className="w-3.5 h-3.5" />
+                          <span>Service quittieren</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleOpenEditInterval(interval)}
+                          className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+                          title="Intervall bearbeiten"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => handleDeleteInterval(interval.id)}
+                          className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors"
+                          title="Intervall löschen"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* GEOFENCE CREATE / EDIT MODAL */}
       {isGeofenceModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
@@ -1744,6 +2282,402 @@ export function GpsPage() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 8. MAINTENANCE LOG SERVICE MODAL (SERVICE QUITTIEREN) */}
+      {isLogServiceModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-slate-100 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <Wrench className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">Wartungsservice quittieren</h3>
+                  <p className="text-xs text-slate-500">
+                    {logServiceForm.plate} • {SERVICE_TYPE_INFO[logServiceForm.service_type]?.label || logServiceForm.service_type}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsLogServiceModalOpen(false)}
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveLogService} className="space-y-4 text-xs">
+              <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl text-[11px] text-emerald-800 space-y-1">
+                <span className="font-bold block">Automatische Fortschreibung:</span>
+                <p>
+                  Mit Quittierung wird das nächste Fälligkeitsziel um das definierte Intervall weitergerollt und der Status auf <strong>Im Plan (OK)</strong> gesetzt.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Km-Stand bei Service *</label>
+                  <input
+                    type="number"
+                    required
+                    value={logServiceForm.service_mileage}
+                    onChange={(e) => setLogServiceForm({ ...logServiceForm, service_mileage: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Datum der Durchführung *</label>
+                  <input
+                    type="date"
+                    required
+                    value={logServiceForm.service_date}
+                    onChange={(e) => setLogServiceForm({ ...logServiceForm, service_date: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Durchgeführt von</label>
+                  <input
+                    type="text"
+                    value={logServiceForm.performed_by}
+                    onChange={(e) => setLogServiceForm({ ...logServiceForm, performed_by: e.target.value })}
+                    placeholder="z. B. M. Schmidt (Meister)"
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Werkstatt / Betrieb</label>
+                  <input
+                    type="text"
+                    value={logServiceForm.workshop_name}
+                    onChange={(e) => setLogServiceForm({ ...logServiceForm, workshop_name: e.target.value })}
+                    placeholder="z. B. Tinglev Werkstatt Altlandsberg"
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Kosten (€ Netto)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={logServiceForm.cost_euros}
+                    onChange={(e) => setLogServiceForm({ ...logServiceForm, cost_euros: parseFloat(e.target.value) || 0 })}
+                    placeholder="0.00"
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Rechnungs- / Auftrags-Nr.</label>
+                  <input
+                    type="text"
+                    value={logServiceForm.invoice_number}
+                    onChange={(e) => setLogServiceForm({ ...logServiceForm, invoice_number: e.target.value })}
+                    placeholder="z. B. RE-2026-089"
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5">Werkstatt-Notizen / Prüfbericht</label>
+                <textarea
+                  rows="2"
+                  value={logServiceForm.notes}
+                  onChange={(e) => setLogServiceForm({ ...logServiceForm, notes: e.target.value })}
+                  placeholder="z. B. Ölfilter & Kraftstoffvorfilter getauscht, Bremsbeläge i. O., ohne Mängel..."
+                  className="w-full px-3.5 py-2 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none text-xs"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsLogServiceModalOpen(false)}
+                  className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold shadow-md shadow-emerald-600/20 active:scale-95 transition-all flex items-center space-x-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Service quittieren</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 9. MAINTENANCE INTERVAL CREATE / EDIT MODAL */}
+      {isIntervalModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-slate-100 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Wrench className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">
+                    {editingInterval ? 'Wartungsplan bearbeiten' : 'Neues Wartungsintervall anlegen'}
+                  </h3>
+                  <p className="text-xs text-slate-500">Laufleistungs- und Fristenüberwachung konfigurieren</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsIntervalModalOpen(false)}
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveInterval} className="space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Fahrzeug *</label>
+                  <select
+                    required
+                    value={intervalForm.vehicle_id}
+                    onChange={(e) => {
+                      const v = vehicles.find((item) => String(item.id) === String(e.target.value));
+                      setIntervalForm({
+                        ...intervalForm,
+                        vehicle_id: e.target.value,
+                        plate: v ? v.plate : intervalForm.plate,
+                        last_service_mileage: v?.mileage || intervalForm.last_service_mileage
+                      });
+                    }}
+                    className="w-full px-3 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    {vehicles.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.plate} - {v.brand || 'LKW'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Service-Typ *</label>
+                  <select
+                    required
+                    value={intervalForm.service_type}
+                    onChange={(e) => setIntervalForm({ ...intervalForm, service_type: e.target.value })}
+                    className="w-full px-3 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    <option value="OIL_SERVICE">🛢️ Motoröl & Filter (30.000 km)</option>
+                    <option value="TUEV_SP">📋 TÜV & Sicherheitsprüfung (SP)</option>
+                    <option value="UVV">🏗️ UVV-Prüfung (Kran / Innenlader)</option>
+                    <option value="TIRES">🛞 Reifenservice & Achsvermessung</option>
+                    <option value="BRAKES">🛑 Bremsen- & Druckluftservice</option>
+                    <option value="GENERAL_INSPECTION">🔧 Große Fahrzeuginspektion</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Intervall (km) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1000"
+                    step="1000"
+                    value={intervalForm.interval_km}
+                    onChange={(e) => setIntervalForm({ ...intervalForm, interval_km: parseInt(e.target.value) || 30000 })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Vorwarn-Schwelle (km) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="100"
+                    step="100"
+                    value={intervalForm.warning_threshold_km}
+                    onChange={(e) => setIntervalForm({ ...intervalForm, warning_threshold_km: parseInt(e.target.value) || 1500 })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Letzter Service (km)</label>
+                  <input
+                    type="number"
+                    value={intervalForm.last_service_mileage}
+                    onChange={(e) => setIntervalForm({ ...intervalForm, last_service_mileage: parseInt(e.target.value) || 0 })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">Letzter Service (Datum)</label>
+                  <input
+                    type="date"
+                    value={intervalForm.last_service_date}
+                    onChange={(e) => setIntervalForm({ ...intervalForm, last_service_date: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-medium focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5">Nächstes Fristdatum (optional z. B. für TÜV/UVV)</label>
+                <input
+                  type="date"
+                  value={intervalForm.next_due_date}
+                  onChange={(e) => setIntervalForm({ ...intervalForm, next_due_date: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-medium focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5">Hinweise / Vorgaben</label>
+                <textarea
+                  rows="2"
+                  value={intervalForm.notes}
+                  onChange={(e) => setIntervalForm({ ...intervalForm, notes: e.target.value })}
+                  placeholder="z. B. Herstellerfreigabe beachten, nur Originalfilter verwenden..."
+                  className="w-full px-3.5 py-2 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none text-xs"
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsIntervalModalOpen(false)}
+                  className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all"
+                >
+                  {editingInterval ? 'Änderungen speichern' : 'Wartungsplan anlegen'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 10. MAINTENANCE HISTORY LOGS MODAL */}
+      {isHistoryModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-3xl w-full border border-slate-100 shadow-2xl space-y-6 max-h-[90vh] flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <History className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">Werkstatt-Historie & Wartungsberichte</h3>
+                  <p className="text-xs text-slate-500">Archiv aller quittierten Inspektionen, UVV- und Reparaturarbeiten</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsHistoryModalOpen(false)}
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto pr-1 flex-1">
+              {maintenanceLogs.length === 0 ? (
+                <div className="py-16 text-center text-slate-400 text-xs space-y-2">
+                  <History className="w-8 h-8 mx-auto text-slate-300" />
+                  <p>Bisher wurden keine Wartungsprotokolle erfasst.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {maintenanceLogs.map((log) => {
+                    const typeInfo = SERVICE_TYPE_INFO[log.service_type] || {
+                      label: log.service_type,
+                      badge: 'bg-slate-100 text-slate-800 border-slate-200',
+                      icon: '🔧'
+                    };
+
+                    return (
+                      <div
+                        key={log.id}
+                        className="p-4 rounded-2xl border border-slate-100 bg-slate-50/70 hover:bg-slate-50 transition-all text-xs space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <span className="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs">
+                              {log.plate}
+                            </span>
+                            <span className="font-bold text-slate-800 flex items-center space-x-1">
+                              <span>{typeInfo.icon}</span>
+                              <span>{typeInfo.label}</span>
+                            </span>
+                          </div>
+
+                          <span className="font-mono text-slate-500 font-semibold text-[11px]">
+                            {log.service_date}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-2 text-[11px] text-slate-600 bg-white p-2.5 rounded-xl border border-slate-100">
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-semibold">Km bei Service:</span>
+                            <span className="font-bold font-mono text-slate-900">{log.service_mileage?.toLocaleString('de-DE')} km</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-semibold">Werkstatt / Prüfer:</span>
+                            <span className="font-bold text-slate-900 truncate block">{log.workshop_name}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 block font-semibold">Kosten / Beleg:</span>
+                            <span className="font-bold font-mono text-slate-900">
+                              {log.cost_euros ? `${log.cost_euros.toFixed(2)} €` : '–'} {log.invoice_number ? `(${log.invoice_number})` : ''}
+                            </span>
+                          </div>
+                        </div>
+
+                        {log.notes && (
+                          <p className="text-[11px] text-slate-500 italic bg-white p-2 rounded-xl border border-slate-100/80">
+                            „{log.notes}“
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsHistoryModalOpen(false)}
+                className="px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs shadow-md transition-all"
+              >
+                Schließen
+              </button>
+            </div>
           </div>
         </div>
       )}

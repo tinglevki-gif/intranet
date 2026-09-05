@@ -99,11 +99,13 @@ from app.models.ticket import Ticket, TicketMessage
 from app.models.calendar_source import ExternalCalendarSource
 from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
 from app.models.delivery_tracking import DeliveryTrackingShare
+from app.models.maintenance import VehicleMeta, MaintenanceInterval, MaintenanceLog
 from app.services.role_service import seed_default_roles
 from app.services.training_ai_service import seed_default_training_manuals
 from app.services.language_service import seed_default_languages
 from app.services.setting_service import seed_default_settings
 from app.services.geofence_service import seed_default_geofences, geofence_service
+from app.services.maintenance_service import maintenance_service
 
 # Upload Directories & Paths Setup (supports PyInstaller frozen mode)
 if getattr(sys, 'frozen', False):
@@ -149,6 +151,7 @@ try:
     seed_default_languages(db)
     seed_default_settings(db)
     seed_default_geofences(db)
+    maintenance_service.seed_default_maintenance_data(db)
     logger.info("Initialisierungsprüfung erfolgreich beendet.")
 except Exception as e:
     logger.error(f"Fehler bei der Initialisierung beim Serverstart: {e}", exc_info=True)
