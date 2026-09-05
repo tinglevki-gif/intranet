@@ -14,6 +14,10 @@ class DeliveryTrackingShare(Base):
     """
     __tablename__ = "delivery_tracking_shares"
 
+    @staticmethod
+    def generate_token() -> str:
+        return generate_secure_share_token()
+
     id = Column(Integer, primary_key=True, index=True)
     token = Column(String(100), unique=True, index=True, default=generate_secure_share_token, nullable=False)
     vehicle_id = Column(String(100), nullable=False, index=True)
