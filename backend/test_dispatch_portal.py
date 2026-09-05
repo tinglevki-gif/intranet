@@ -15,8 +15,12 @@ from datetime import datetime, timezone, timedelta
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app.core.database import SessionLocal
-from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
+from app.models.role import Role
 from app.models.user import User
+from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
+from app.models.tracking_share import DeliveryTrackingShare
+from app.models.maintenance import MaintenanceInterval, MaintenanceLog, VehicleMeta
+from app.models.reconciliation import TripReconciliation
 from app.services.dispatch_service import dispatch_service, DispatchClassificationService
 from app.schemas.dispatch import NearestVehicleRequest, DispatchStatusType
 
