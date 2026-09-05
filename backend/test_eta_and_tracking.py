@@ -1,7 +1,3 @@
-"""
-Unit and Integration tests for EtaCalculationService and Live Delivery Tracking Shares
-"""
-import pytest
 import datetime
 from app.services.eta_service import EtaCalculationService
 from app.models.delivery_tracking import DeliveryTrackingShare
