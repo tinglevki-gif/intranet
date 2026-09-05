@@ -234,7 +234,7 @@ export function Navbar({ onToggleSidebar }) {
               {/* Theme Preference in User Drawer */}
               <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('theme.label', 'Thema')}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('theme.label', 'Erscheinungsbild')}</span>
                 </div>
                 <ThemeSelector variant="pills" className="w-full flex justify-between" />
               </div>

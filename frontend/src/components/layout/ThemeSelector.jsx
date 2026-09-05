@@ -31,13 +31,13 @@ export function ThemeSelector({ variant = 'dropdown', className = '' }) {
     },
     {
       id: 'light',
-      label: t('theme.light', 'Clara / Hell'),
+      label: t('theme.light', 'Hell'),
       desc: t('theme.light_desc', 'Klares, helles Design'),
       icon: Sun,
     },
     {
       id: 'dark',
-      label: t('theme.dark', 'Oscura / Dunkel'),
+      label: t('theme.dark', 'Dunkel'),
       desc: t('theme.dark_desc', 'Modernes, augenschonendes Dunkeldesign'),
       icon: Moon,
     },
@@ -64,7 +64,13 @@ export function ThemeSelector({ variant = 'dropdown', className = '' }) {
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
-              <span>{opt.id === 'standard' ? 'Standard' : opt.id === 'light' ? 'Clara' : 'Oscura'}</span>
+              <span>
+                {opt.id === 'standard'
+                  ? t('theme.standard_short', 'Standard')
+                  : opt.id === 'light'
+                  ? t('theme.light_short', 'Hell')
+                  : t('theme.dark_short', 'Dunkel')}
+              </span>
             </button>
           );
         })}
@@ -94,8 +100,8 @@ export function ThemeSelector({ variant = 'dropdown', className = '' }) {
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
               {theme === 'standard' 
-                ? `${t('theme.standard', 'Standard')} (${resolvedTheme === 'dark' ? t('theme.dark', 'Dunkel') : t('theme.light', 'Hell')})` 
-                : (theme === 'dark' ? t('theme.dark', 'Oscura / Dunkel') : t('theme.light', 'Clara / Hell'))}
+                ? `${t('theme.standard_short', 'Standard')} (${resolvedTheme === 'dark' ? t('theme.dark_short', 'Dunkel') : t('theme.light_short', 'Hell')})` 
+                : (theme === 'dark' ? t('theme.dark_short', 'Dunkel') : t('theme.light_short', 'Hell'))}
             </p>
           </div>
 

@@ -63,7 +63,7 @@ export function AdminSettingsPage() {
         <div className="flex items-center space-x-3 pb-3 border-b border-slate-100">
           <Palette className="w-5 h-5 text-[#009FE3]" />
           <div>
-            <h2 className="text-base font-bold text-slate-900">{t('theme.title', 'Design-Modus / Tema visual')}</h2>
+            <h2 className="text-base font-bold text-slate-900">{t('theme.title', 'Design-Modus')}</h2>
             <p className="text-xs text-slate-500">{t('theme.standard_desc', 'Wählen Sie zwischen Standard (System), Hell und Dunkel.')}</p>
           </div>
         </div>
