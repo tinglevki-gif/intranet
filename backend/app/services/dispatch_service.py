@@ -370,15 +370,25 @@ class DispatchClassificationService:
 
             evaluated_items.append({
                 "id": v.get("id"),
+                "vehicle_id": v.get("id"),
                 "plate": v.get("plate", ""),
                 "brand": v.get("brand", "LKW Schwerlast"),
                 "current_lat": v_lat,
                 "current_lon": v_lon,
+                "lat": v_lat,
+                "lon": v_lon,
+                "speed": v_speed,
                 "current_speed": v_speed,
+                "location": v.get("location", ""),
                 "location_name": v.get("location", ""),
                 "dispatch_status": v_disp,
+                "dispatch_status_label": v_disp.get("label", ""),
+                "is_available_for_dispatch": v_disp.get("is_available_for_dispatch", True),
+                "distance_km": dist_crow_km,
                 "distance_crow_km": dist_crow_km,
+                "road_distance_km": dist_road_km,
                 "distance_road_km": dist_road_km,
+                "estimated_drive_minutes": duration_minutes,
                 "duration_minutes": duration_minutes,
                 "estimated_arrival_time": eta_str
             })
@@ -388,12 +398,22 @@ class DispatchClassificationService:
 
         limited_results = evaluated_items[:req.limit]
 
+        query_str = req.query or req.address_or_postal_code or f"{target_lat:.4f}, {target_lon:.4f}"
+
         return {
-            "search_query": req.address_or_postal_code or f"{target_lat:.4f}, {target_lon:.4f}",
+            "search_query": query_str,
+            "query_location": {
+                "name": location_name,
+                "formatted_address": location_name,
+                "latitude": target_lat,
+                "longitude": target_lon
+            },
             "target_latitude": target_lat,
             "target_longitude": target_lon,
             "target_location_name": location_name,
+            "total_found": len(evaluated_items),
             "total_evaluated": len(evaluated_items),
+            "vehicles": limited_results,
             "results": limited_results
         }
 

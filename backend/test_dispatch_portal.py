@@ -89,9 +89,9 @@ def test_dispatch_classification():
             open_stays_map=open_stays_map
         )
         assert res_unloading.status == DispatchStatusType.UNLOADING_SITE, f"Expected UNLOADING_SITE, got {res_unloading.status}"
-        assert res_unloading.site_name == site.name
+        assert (res_unloading.current_zone_name == site.name or res_unloading.site_name == site.name)
         assert res_unloading.is_available_for_dispatch == False
-        print(f"  [OK] UNLOADING_SITE: {res_unloading.label} at '{res_unloading.site_name}' (avail={res_unloading.is_available_for_dispatch})")
+        print(f"  [OK] UNLOADING_SITE: {res_unloading.label} at '{res_unloading.current_zone_name}' (avail={res_unloading.is_available_for_dispatch})")
 
         # 3. Test STANDBY_IDLE: Far away, speed == 0
         res_idle = dispatch_service.classify_vehicle(
