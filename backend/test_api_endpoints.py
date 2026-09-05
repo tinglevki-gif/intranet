@@ -18,7 +18,7 @@ def test_api():
             print("No user found in DB!")
             return
         
-        token = create_access_token(subject=user.email)
+        token = create_access_token(subject=str(user.id))
         headers = {"Authorization": f"Bearer {token}"}
 
         # 1. Test GET /fleet/security/logs?type=ALL&limit=50
