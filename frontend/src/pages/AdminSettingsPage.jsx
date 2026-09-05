@@ -7,6 +7,7 @@ import { LanguageManagementCard } from '../components/admin/LanguageManagementCa
 import { OneDriveConfigCard } from '../components/admin/OneDriveConfigCard';
 import { MenuManagementCard } from '../components/admin/MenuManagementCard';
 import { BrandingManagementCard } from '../components/admin/BrandingManagementCard';
+import { DashboardConfigCard } from '../components/admin/DashboardConfigCard';
 import { ThemeSelector } from '../components/layout/ThemeSelector';
 import { api } from '../services/api';
 
@@ -49,13 +50,16 @@ export function AdminSettingsPage() {
       {/* 1. SuperAdmin Company Branding & Logo Customizer */}
       <BrandingManagementCard />
 
-      {/* 2. SuperAdmin Menu & Navigation Management Card (Reorder, Toggle Active, Global Impact) */}
+      {/* 2. Minimalist Dashboard Customizer (SuperAdmin Control) */}
+      <DashboardConfigCard />
+
+      {/* 3. SuperAdmin Menu & Navigation Management Card (Reorder, Toggle Active, Global Impact) */}
       <MenuManagementCard />
 
-      {/* 2. Dynamic System Languages (i18n) Management Card */}
+      {/* 4. Dynamic System Languages (i18n) Management Card */}
       <LanguageManagementCard />
 
-      {/* 3. Microsoft OneDrive & SharePoint Cloud Storage Integrations */}
+      {/* 5. Microsoft OneDrive & SharePoint Cloud Storage Integrations */}
       <OneDriveConfigCard />
 
       {/* Visual Theme Appearance Card */}

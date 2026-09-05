@@ -1,4 +1,5 @@
 import os
+import json
 import uuid
 import shutil
 from typing import List
@@ -12,7 +13,9 @@ from app.schemas.setting import (
     SystemSettingUpdate, 
     PublicSettingResponse,
     BrandingResponse,
-    BrandingUpdate
+    BrandingUpdate,
+    DashboardConfigResponse,
+    DashboardConfigUpdate
 )
 from app.services.auth_service import get_current_user, require_roles
 from app.services.setting_service import get_setting_value
@@ -24,6 +27,23 @@ BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."
 COMPANY_UPLOAD_DIR = os.path.join(BACKEND_DIR, "uploads", "company")
 os.makedirs(COMPANY_UPLOAD_DIR, exist_ok=True)
 
+DEFAULT_DASHBOARD_CONFIG = {
+    "default_mode": "standard",
+    "greeting_style": "compact",
+    "custom_motto": "TINGLEV ELEMENTFABRIK • DIGITALER ARBEITSPLATZ",
+    "show_search_bar": True,
+    "show_quick_modules": True,
+    "quick_modules_style": "pills",
+    "show_kpi_metrics": True,
+    "kpi_metrics_style": "inline_badges",
+    "show_announcements": True,
+    "announcements_limit": 3,
+    "show_quick_tools": True,
+    "show_events": True,
+    "events_limit": 3,
+    "layout_density": "compact",
+}
+
 # Helper function to get current branding dictionary
 def fetch_branding_dict(db: Session) -> BrandingResponse:
     return BrandingResponse(
@@ -32,6 +52,17 @@ def fetch_branding_dict(db: Session) -> BrandingResponse:
         company_tagline=get_setting_value(db, "company_tagline", "PORTAL INTRANET"),
         company_logo_url=get_setting_value(db, "company_logo_url", "")
     )
+
+def fetch_dashboard_config_dict(db: Session) -> DashboardConfigResponse:
+    raw = get_setting_value(db, "dashboard_minimal_config", "")
+    if raw:
+        try:
+            parsed = json.loads(raw)
+            cfg = {**DEFAULT_DASHBOARD_CONFIG, **parsed}
+            return DashboardConfigResponse(**cfg)
+        except Exception:
+            pass
+    return DashboardConfigResponse(**DEFAULT_DASHBOARD_CONFIG)
 
 
 # --- Public / User Endpoints ---
@@ -43,6 +74,17 @@ def get_branding(db: Session = Depends(get_db)):
     Accessible to all users (including login screen and sidebar).
     """
     return fetch_branding_dict(db)
+
+
+@router.get("/dashboard-config", response_model=DashboardConfigResponse, tags=["Dashboard Konfiguration"])
+def get_dashboard_config(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Returns the current minimal dashboard layout & widget configuration.
+    """
+    return fetch_dashboard_config_dict(db)
 
 
 @router.get("/{key}", response_model=PublicSettingResponse, tags=["System-Einstellungen & Integrationen"])
@@ -69,6 +111,60 @@ def get_setting_by_key(
 
 
 # --- SuperAdmin Endpoints ---
+
+@admin_router.put("/dashboard-config", response_model=DashboardConfigResponse, tags=["SuperAdmin Einstellungen"])
+def update_dashboard_config(
+    payload: DashboardConfigUpdate,
+    db: Session = Depends(get_db)
+):
+    """
+    SuperAdmin only: Update the minimal dashboard configuration and active widgets.
+    """
+    current_cfg = fetch_dashboard_config_dict(db).dict()
+    updated_dict = {**current_cfg, **{k: v for k, v in payload.dict().items() if v is not None}}
+    val_json = json.dumps(updated_dict, ensure_ascii=False)
+
+    setting = db.query(SystemSetting).filter(SystemSetting.key == "dashboard_minimal_config").first()
+    if setting:
+        setting.value = val_json
+    else:
+        setting = SystemSetting(
+            key="dashboard_minimal_config",
+            value=val_json,
+            default_value=json.dumps(DEFAULT_DASHBOARD_CONFIG, ensure_ascii=False),
+            label="Minimal-Dashboard Konfiguration",
+            category="dashboard",
+            is_public=True
+        )
+        db.add(setting)
+
+    db.commit()
+    return fetch_dashboard_config_dict(db)
+
+
+@admin_router.post("/dashboard-config/reset", response_model=DashboardConfigResponse, tags=["SuperAdmin Einstellungen"])
+def reset_dashboard_config(db: Session = Depends(get_db)):
+    """
+    SuperAdmin only: Reset minimal dashboard configuration to standard defaults.
+    """
+    val_json = json.dumps(DEFAULT_DASHBOARD_CONFIG, ensure_ascii=False)
+    setting = db.query(SystemSetting).filter(SystemSetting.key == "dashboard_minimal_config").first()
+    if setting:
+        setting.value = val_json
+    else:
+        setting = SystemSetting(
+            key="dashboard_minimal_config",
+            value=val_json,
+            default_value=val_json,
+            label="Minimal-Dashboard Konfiguration",
+            category="dashboard",
+            is_public=True
+        )
+        db.add(setting)
+
+    db.commit()
+    return fetch_dashboard_config_dict(db)
+
 
 @admin_router.put("/branding", response_model=BrandingResponse, tags=["SuperAdmin Einstellungen"])
 def update_branding(
@@ -223,3 +319,4 @@ def reset_setting_to_default(
     db.commit()
     db.refresh(setting)
     return setting
+

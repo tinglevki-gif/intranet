@@ -300,6 +300,24 @@ class ApiService {
     });
   }
 
+  // Minimal Dashboard Configuration & Widgets
+  getDashboardConfig() {
+    return this.request('/settings/dashboard-config');
+  }
+
+  updateDashboardConfig(configData) {
+    return this.request('/admin/settings/dashboard-config', {
+      method: 'PUT',
+      body: JSON.stringify(configData),
+    });
+  }
+
+  resetDashboardConfig() {
+    return this.request('/admin/settings/dashboard-config/reset', {
+      method: 'POST',
+    });
+  }
+
   // Global Unified Intranet Search (Employees, Documents, Tools, News)
   globalSearch(query, limit = 6) {
     if (!query || !query.trim()) {

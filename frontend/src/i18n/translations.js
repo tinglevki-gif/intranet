@@ -130,6 +130,47 @@ export const translations = {
       dark_desc: 'Elegantes, augenschonendes Dunkeldesign',
     },
 
+    // Dashboard Modes & Minimalist Configuration
+    dashboard_mode: {
+      title: 'Dashboard-Ansicht',
+      standard: 'Standard-Ansicht',
+      standard_desc: 'Vollständiges Dashboard mit allen Widgets, Heldenbanner und KPIs',
+      minimal: 'Minimal-Ansicht',
+      minimal_desc: 'Fokussierte, schlanke Arbeitsansicht mit schnellen Zugriffen',
+      customize_btn: 'Minimal-Ansicht anpassen',
+      active_badge: 'Aktiv',
+    },
+
+    dashboard_config: {
+      title: 'Minimal-Dashboard Konfiguration (SuperAdmin)',
+      subtitle: 'Passen Sie die sichtbaren Widgets, Limits und das Standard-Layout der Minimal-Ansicht für alle Mitarbeiter an',
+      default_mode_label: 'Standard-Ansicht für neue Benutzer',
+      mode_standard_opt: 'Standard-Dashboard (Vollständig)',
+      mode_minimal_opt: 'Minimal-Dashboard (Kompakt)',
+      section_widgets: 'Sichtbare Widgets & Komponenten',
+      show_hero_label: 'Kompakter Begrüßungs-Header mit Datum & Wetter',
+      custom_motto_label: 'Firmenmotto / Begrüßungstext',
+      show_modules_label: 'Modul-Schnellzugriff (Pills & Chips)',
+      modules_style_label: 'Modul-Stil',
+      style_pills: 'Farbige Pills (Kompakt)',
+      style_cards: 'Miniatur-Karten',
+      show_kpis_label: 'KPI-Schlüsselindikatoren anzeigen',
+      kpi_style_label: 'KPI-Darstellung',
+      kpi_inline: 'Inline-Badges (1 Zeile)',
+      kpi_cards: 'Kompakte Boxen',
+      show_announcements_label: 'Wichtige Unternehmensmitteilungen',
+      announcements_limit_label: 'Max. Anzahl sichtbarer Mitteilungen',
+      show_tools_label: 'Tools & Portale (Schnellzugriff)',
+      show_events_label: 'Anstehende Firmentermine (Agenda)',
+      events_limit_label: 'Max. Anzahl anstehender Termine',
+      save_btn: 'Dashboard-Konfiguration speichern',
+      saving_btn: 'Wird gespeichert...',
+      reset_btn: 'Auf Werkseinstellungen zurücksetzen',
+      toast_saved: 'Minimal-Dashboard Konfiguration erfolgreich aktualisiert!',
+      toast_reset: 'Dashboard-Konfiguration auf Standard zurückgesetzt!',
+      preview_title: 'Live-Vorschau der Minimal-Ansicht',
+    },
+
     // Roles
     roles: {
       ADMIN: 'SuperAdmin',
