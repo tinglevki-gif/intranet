@@ -91,10 +91,11 @@ class DispatchClassificationService:
         plate: str,
         vehicle_id: str,
         geofences: List[Geofence],
-        open_stays_map: Dict[Tuple[str, int], VehicleStay]
+        open_stays_map: Dict[Tuple[str, int], VehicleStay],
+        last_events_map: Optional[Dict[str, VehicleGeofenceEvent]] = None
     ) -> DispatchStatusInfo:
         """
-        Klassifiziert ein Fahrzeug anhand von GPS-Position, Tempo und Geofences in einen der 5 Dispositions-Zustände.
+        Klassifiziert ein Fahrzeug anhand von GPS-Position, Tempo, Geofences und Ereignishistorie in einen der 5 Dispositions-Zustände.
         """
         # 1. Distanz zum Hauptwerk Altlandsberg berechnen
         dist_to_factory = calculate_haversine_distance(lat, lon, FACTORY_COORDS["lat"], FACTORY_COORDS["lon"])
@@ -121,6 +122,7 @@ class DispatchClassificationService:
                     icon=cfg["icon"],
                     description=f"Steht im {inside_geofence.name} (Beladung / Bereitstellung Betonfertigteile)",
                     current_zone_name=inside_geofence.name,
+                    site_name=inside_geofence.name,
                     distance_to_factory_km=dist_to_factory_km,
                     is_available_for_dispatch=cfg["is_available"]
                 )
@@ -133,6 +135,7 @@ class DispatchClassificationService:
                     icon=cfg["icon"],
                     description=f"Verlässt {inside_geofence.name} mit {int(speed)} km/h zur Baustelle",
                     current_zone_name=inside_geofence.name,
+                    site_name=inside_geofence.name,
                     distance_to_factory_km=dist_to_factory_km,
                     is_available_for_dispatch=cfg["is_available"]
                 )
@@ -148,6 +151,7 @@ class DispatchClassificationService:
                     icon=cfg["icon"],
                     description=f"Kranentladung an {inside_geofence.name} (Stillstand)",
                     current_zone_name=inside_geofence.name,
+                    site_name=inside_geofence.name,
                     distance_to_factory_km=dist_to_factory_km,
                     is_available_for_dispatch=cfg["is_available"]
                 )
@@ -161,6 +165,7 @@ class DispatchClassificationService:
                     icon=cfg["icon"],
                     description=f"Ausfahrt von {inside_geofence.name} ({int(speed)} km/h) – Rückfahrt Werk",
                     current_zone_name=inside_geofence.name,
+                    site_name=inside_geofence.name,
                     distance_to_factory_km=dist_to_factory_km,
                     is_available_for_dispatch=cfg["is_available"]
                 )
@@ -175,16 +180,27 @@ class DispatchClassificationService:
                 icon=cfg["icon"],
                 description=f"Pausiert / Geparkt in {inside_geofence.name}",
                 current_zone_name=inside_geofence.name,
+                site_name=inside_geofence.name,
                 distance_to_factory_km=dist_to_factory_km,
                 is_available_for_dispatch=cfg["is_available"]
             )
 
         # FALL 4: Außerhalb definierter Geofences
         if is_moving:
-            # Determinierung Inbound vs Outbound
-            # Wenn Kennzeichen oder ID bestimmten Fahrten zugeordnet sind oder westlich/östlich
-            # Als Faustregel: Fahrzeuge mit ungeraden IDs oder westlich von Berlin gelten als Rückkehrer
-            is_return = (hash(plate) % 2 == 0) or (dist_to_factory_km > 30.0 and lon > 13.40)
+            # Überprüfung anhand des letzten Geofence-Events falls vorhanden
+            last_ev = None
+            if last_events_map:
+                last_ev = last_events_map.get(str(vehicle_id)) or last_events_map.get(plate)
+            
+            is_return = False
+            if last_ev and last_ev.geofence:
+                if last_ev.geofence.type == GeofenceType.FACTORY and last_ev.event_type == GeofenceEventType.EXIT:
+                    is_return = False
+                elif last_ev.geofence.type in (GeofenceType.CONSTRUCTION_SITE, GeofenceType.SUPPLIER):
+                    is_return = True
+            else:
+                # Heuristik: Kennzeichen-Hash oder Distanz
+                is_return = (hash(plate) % 2 == 0)
             
             if is_return:
                 cfg = STATUS_CONFIG[DispatchStatusType.INBOUND_RETURN]
@@ -195,6 +211,7 @@ class DispatchClassificationService:
                     icon=cfg["icon"],
                     description=f"Rückfahrt zum Werk Altlandsberg (Leerfahrt, {int(speed)} km/h, noch {dist_to_factory_km} km)",
                     current_zone_name=None,
+                    site_name=None,
                     distance_to_factory_km=dist_to_factory_km,
                     is_available_for_dispatch=cfg["is_available"]
                 )
@@ -207,6 +224,7 @@ class DispatchClassificationService:
                     icon=cfg["icon"],
                     description=f"Auf Anfahrt zur Baustelle ({int(speed)} km/h, {dist_to_factory_km} km ab Werk)",
                     current_zone_name=None,
+                    site_name=None,
                     distance_to_factory_km=dist_to_factory_km,
                     is_available_for_dispatch=cfg["is_available"]
                 )
@@ -220,6 +238,7 @@ class DispatchClassificationService:
                 icon=cfg["icon"],
                 description=f"Standby / Pause außerhalb ({dist_to_factory_km} km bis Werk)",
                 current_zone_name=None,
+                site_name=None,
                 distance_to_factory_km=dist_to_factory_km,
                 is_available_for_dispatch=cfg["is_available"]
             )
@@ -235,6 +254,21 @@ class DispatchClassificationService:
         geofences: List[Geofence] = db.query(Geofence).filter(Geofence.is_active == True).all()
         open_stays: List[VehicleStay] = db.query(VehicleStay).filter(VehicleStay.exit_time == None).all()
         open_stays_map = {(str(s.vehicle_id), s.geofence_id): s for s in open_stays}
+
+        # Letzte Events pro Fahrzeug für genaue Richtungsbestimmung (Inbound vs Outbound)
+        latest_events = (
+            db.query(VehicleGeofenceEvent)
+            .order_by(VehicleGeofenceEvent.timestamp.desc())
+            .limit(200)
+            .all()
+        )
+        last_events_map = {}
+        for ev in latest_events:
+            v_key = str(ev.vehicle_id)
+            if v_key not in last_events_map:
+                last_events_map[v_key] = ev
+            if ev.plate and ev.plate not in last_events_map:
+                last_events_map[ev.plate] = ev
 
         loading_factory_count = 0
         outbound_transit_count = 0
@@ -262,7 +296,8 @@ class DispatchClassificationService:
                 plate=plate,
                 vehicle_id=v_id,
                 geofences=geofences,
-                open_stays_map=open_stays_map
+                open_stays_map=open_stays_map,
+                last_events_map=last_events_map
             )
 
             # Zähler erhöhen

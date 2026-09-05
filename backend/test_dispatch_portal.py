@@ -120,6 +120,8 @@ def test_dispatch_classification():
         db.add(ev_exit_factory)
         db.commit()
 
+        events_map = {"904": ev_exit_factory, "MOL-TE 104": ev_exit_factory}
+
         res_outbound = dispatch_service.classify_vehicle(
             lat=52.5100,
             lon=13.5000,
@@ -127,7 +129,8 @@ def test_dispatch_classification():
             plate="MOL-TE 104",
             vehicle_id="904",
             geofences=geofences,
-            open_stays_map=open_stays_map
+            open_stays_map=open_stays_map,
+            last_events_map=events_map
         )
         assert res_outbound.status == DispatchStatusType.OUTBOUND_TRANSIT, f"Expected OUTBOUND_TRANSIT, got {res_outbound.status}"
         print(f"  [OK] OUTBOUND_TRANSIT: {res_outbound.label} (heading to customer)")
@@ -144,6 +147,8 @@ def test_dispatch_classification():
         db.add(ev_exit_site)
         db.commit()
 
+        events_map_return = {"905": ev_exit_site, "MOL-TE 105": ev_exit_site}
+
         res_inbound = dispatch_service.classify_vehicle(
             lat=52.5200,
             lon=13.6000,
@@ -151,7 +156,8 @@ def test_dispatch_classification():
             plate="MOL-TE 105",
             vehicle_id="905",
             geofences=geofences,
-            open_stays_map=open_stays_map
+            open_stays_map=open_stays_map,
+            last_events_map=events_map_return
         )
         assert res_inbound.status == DispatchStatusType.INBOUND_RETURN, f"Expected INBOUND_RETURN, got {res_inbound.status}"
         assert res_inbound.is_available_for_dispatch == True
