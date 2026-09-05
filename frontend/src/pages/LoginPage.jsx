@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useBranding } from '../context/BrandingContext';
 import { TinglevMark } from '../components/common/TinglevLogo';
+import { ThemeSelector } from '../components/layout/ThemeSelector';
 import { 
   Lock, 
   Mail, 
@@ -42,6 +43,11 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#001424] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Top right theme switcher */}
+      <div className="absolute top-6 right-6 z-20">
+        <ThemeSelector />
+      </div>
+
       {/* Ambient background glows with Tinglev Blue and Orange */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#009FE3]/15 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F05A22]/10 rounded-full blur-3xl pointer-events-none"></div>

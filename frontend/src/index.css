@@ -58,6 +58,135 @@
 }
 
 /* =========================================================================
+   DARK THEME CORPORATE DESIGN (TINGLEV PETROLEUM & DEEP NAVY AESTHETIC)
+   ========================================================================= */
+html.dark body {
+  background-color: #070d17;
+  color: #f1f5f9;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #1e3352;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #009FE3;
+}
+
+/* Dark Glassmorphism */
+html.dark .glass-nav {
+  background: rgba(8, 14, 26, 0.92);
+  border-bottom-color: rgba(26, 45, 72, 0.8);
+}
+
+html.dark .glass-panel {
+  background: rgba(15, 29, 51, 0.88);
+  border-color: rgba(26, 45, 72, 0.7);
+}
+
+html.dark .glass-card {
+  background: rgba(15, 29, 51, 0.94);
+  border-color: rgba(26, 45, 72, 0.8);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.5), 0 2px 8px -2px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Cards & Surfaces */
+html.dark .bg-white {
+  background-color: #0f1d33;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-50\/50 {
+  background-color: #091222;
+}
+
+html.dark .bg-slate-100 {
+  background-color: #14233c;
+}
+
+html.dark .bg-slate-200 {
+  background-color: #1a2e4d;
+}
+
+/* Dark Hover States */
+html.dark .hover\:bg-slate-50:hover {
+  background-color: #14233c;
+}
+
+html.dark .hover\:bg-slate-100:hover {
+  background-color: #192d4d;
+}
+
+html.dark .hover\:bg-slate-200:hover {
+  background-color: #20375c;
+}
+
+html.dark .hover\:bg-white:hover {
+  background-color: #162947;
+}
+
+/* Dark Text & Typography */
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: #f8fafc;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+
+html.dark .text-slate-500 {
+  color: #94a3b8;
+}
+
+html.dark .text-slate-400 {
+  color: #64748b;
+}
+
+/* Dark Borders & Dividers */
+html.dark .border-slate-100,
+html.dark .border-slate-200 {
+  border-color: #1a2d48;
+}
+
+html.dark .border-slate-300 {
+  border-color: #243c60;
+}
+
+html.dark .divide-slate-50 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1a2d48;
+}
+
+/* Dark Form Controls */
+html.dark input:not([type='checkbox']):not([type='radio']):not([type='submit']):not([type='button']),
+html.dark select,
+html.dark textarea {
+  background-color: #0b1526;
+  border-color: #1e3352;
+  color: #f1f5f9;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b;
+}
+
+html.dark select option {
+  background-color: #0b1526;
+  color: #f1f5f9;
+}
+
+/* Dark Shadows */
+html.dark .shadow-card,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 4px 10px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================================================
    FACTORY SHOP FLOOR PRINT ISOLATION (A4 LANDSCAPE)
    ========================================================================= */
 @media print {

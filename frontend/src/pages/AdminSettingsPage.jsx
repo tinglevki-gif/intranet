@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { ShieldCheck, Sliders, Server, Database, Key, CheckCircle, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Sliders, Server, Database, Key, CheckCircle, RefreshCw, Palette } from 'lucide-react';
 import { RoleBadge } from '../components/common/Badge';
 import { LanguageManagementCard } from '../components/admin/LanguageManagementCard';
 import { OneDriveConfigCard } from '../components/admin/OneDriveConfigCard';
 import { MenuManagementCard } from '../components/admin/MenuManagementCard';
 import { BrandingManagementCard } from '../components/admin/BrandingManagementCard';
+import { ThemeSelector } from '../components/layout/ThemeSelector';
+import { api } from '../services/api';
 
 export function AdminSettingsPage() {
   const { user, refreshMenu } = useAuth();
@@ -15,12 +17,8 @@ export function AdminSettingsPage() {
 
   const handleReseed = async () => {
     try {
-      const token = localStorage.getItem('intranet_token');
-      await fetch('http://127.0.0.1:8000/api/v1/auth/seed', {
+      await api.request('/auth/seed', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
       await refreshMenu();
       setReseeded(true);
@@ -59,6 +57,20 @@ export function AdminSettingsPage() {
 
       {/* 3. Microsoft OneDrive & SharePoint Cloud Storage Integrations */}
       <OneDriveConfigCard />
+
+      {/* Visual Theme Appearance Card */}
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-4">
+        <div className="flex items-center space-x-3 pb-3 border-b border-slate-100">
+          <Palette className="w-5 h-5 text-[#009FE3]" />
+          <div>
+            <h2 className="text-base font-bold text-slate-900">{t('theme.title', 'Design-Modus / Tema visual')}</h2>
+            <p className="text-xs text-slate-500">{t('theme.standard_desc', 'Wählen Sie zwischen Standard (System), Hell und Dunkel.')}</p>
+          </div>
+        </div>
+        <div className="pt-2">
+          <ThemeSelector variant="pills" />
+        </div>
+      </div>
 
       {/* Backend & Security Parameters */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6">

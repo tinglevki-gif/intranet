@@ -115,6 +115,18 @@ export const translations = {
       cloudy: 'Bedeckt',
     },
 
+    // Theme (Oscura, Clara, Standard)
+    theme: {
+      title: 'Design-Modus / Tema visual',
+      label: 'Thema',
+      standard: 'Standard (System)',
+      light: 'Clara / Hell',
+      dark: 'Oscura / Dunkel',
+      standard_desc: 'Passt sich automatisch den Systemeinstellungen an',
+      light_desc: 'Klares, helles Tinglev Corporate-Design',
+      dark_desc: 'Elegantes, augenschonendes Dunkeldesign',
+    },
+
     // Roles
     roles: {
       ADMIN: 'SuperAdmin',

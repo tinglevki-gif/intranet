@@ -15,6 +15,7 @@ import { RoleBadge } from '../common/Badge';
 import { WeatherWidget } from './WeatherWidget';
 import { UserAvatar } from '../common/UserAvatar';
 import { GlobalSearchBar } from './GlobalSearchBar';
+import { ThemeSelector } from './ThemeSelector';
 
 const NOTIFICATIONS_STORAGE_KEY = 'intranet_read_notif_ids';
 
@@ -112,6 +113,9 @@ export function Navbar({ onToggleSidebar }) {
           <span>{t('navbar.systems_operational')}</span>
         </div>
 
+        {/* Visual Theme Selector (Standard / Clara / Oscura) */}
+        <ThemeSelector />
+
         {/* Notification Bell */}
         <div className="relative" ref={notifMenuRef}>
           <button
@@ -207,7 +211,7 @@ export function Navbar({ onToggleSidebar }) {
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-64 bg-white rounded-3xl shadow-2xl border border-slate-100 py-2 z-50 animate-fade-in">
+            <div className="absolute right-0 mt-2 w-72 bg-white rounded-3xl shadow-2xl border border-slate-100 py-2 z-50 animate-fade-in">
               <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/50 rounded-t-3xl">
                 <p className="text-sm font-bold text-slate-900">{user?.full_name}</p>
                 <p className="text-xs text-slate-500 truncate">{user?.email}</p>
@@ -225,6 +229,14 @@ export function Navbar({ onToggleSidebar }) {
                   <span className="text-slate-400">{t('navbar.department')}</span>
                   <span className="font-medium truncate max-w-[130px]">{user?.department}</span>
                 </div>
+              </div>
+
+              {/* Theme Preference in User Drawer */}
+              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('theme.label', 'Thema')}</span>
+                </div>
+                <ThemeSelector variant="pills" className="w-full flex justify-between" />
               </div>
 
               <div className="pt-2 border-t border-slate-100">

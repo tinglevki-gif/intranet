@@ -9,7 +9,7 @@ export function AppLayout() {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex print:bg-white print:min-h-0 print:block">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#070d17] text-slate-900 dark:text-slate-100 flex print:bg-white print:min-h-0 print:block transition-colors duration-200">
       {/* Dynamic Sidebar */}
       <div className="print:hidden">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -25,7 +25,7 @@ export function AppLayout() {
           <Outlet />
         </main>
 
-        <footer className="px-8 py-4 text-center text-xs text-slate-400 border-t border-slate-200/60 bg-white/50 mt-auto print:hidden">
+        <footer className="px-8 py-4 text-center text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/60 dark:border-slate-800/80 bg-white/50 dark:bg-[#0b1526]/50 mt-auto print:hidden">
           {t('brand.rights')} • {t('brand.version')}
         </footer>
       </div>

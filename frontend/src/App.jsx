@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { NewsProvider } from './context/NewsContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { BrandingProvider } from './context/BrandingContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 
@@ -56,11 +57,12 @@ function PlaceholderModule({ title, description, badge }) {
 
 export function App() {
   return (
-    <LanguageProvider>
-      <BrandingProvider>
-        <AuthProvider>
-          <NewsProvider>
-            <BrowserRouter>
+    <ThemeProvider>
+      <LanguageProvider>
+        <BrandingProvider>
+          <AuthProvider>
+            <NewsProvider>
+              <BrowserRouter>
             <Routes>
             {/* Public Authentication Route */}
             <Route path="/login" element={<LoginPage />} />
@@ -303,5 +305,6 @@ export function App() {
       </AuthProvider>
       </BrandingProvider>
     </LanguageProvider>
+  </ThemeProvider>
   );
 }
