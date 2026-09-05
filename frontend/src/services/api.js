@@ -1053,6 +1053,14 @@ class ApiService {
     return this.request(`/fleet/reports/reconciliations/${reportId}`);
   }
 
+  // Dispatcher Portal & Umkreissuche (Nearest Vehicle Proximity Search)
+  findNearestVehicles(payload) {
+    return this.request('/fleet/dispatch/nearest-vehicle', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

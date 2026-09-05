@@ -35,21 +35,26 @@ from app.schemas.reconciliation import (
     MonthlyWaitingTimesSummaryResponse
 )
 from app.services.reconciliation_service import reconciliation_service
+from app.services.dispatch_service import dispatch_service
+from app.schemas.dispatch import (
+    NearestVehicleRequest,
+    NearestVehicleResponse
+)
 
 logger = logging.getLogger("fleet_endpoint")
 
 router = APIRouter()
 
 # =========================================================================
-# 1. LIVE FLEET TELEMETRY (NAVKONZEPT)
+# 1. LIVE FLEET TELEMETRY (NAVKONZEPT) & DISPATCH CLASSIFICATION
 # =========================================================================
 
 @router.get(
     "/vehicles",
     response_model=FleetVehiclesResponse,
     status_code=status.HTTP_200_OK,
-    summary="Liefert Live-Fahrzeugtelemetrie (Navkonzept)",
-    description="Liefert die aktuellen GPS-Koordinaten, Geschwindigkeiten, Status und Standorte der Fahrzeugflotte (45s In-Memory-Cache)."
+    summary="Liefert Live-Fahrzeugtelemetrie (Navkonzept) mit Disponenten-Klassifizierung",
+    description="Liefert die aktuellen GPS-Koordinaten, Geschwindigkeiten, Status, Standorte und Disponenten-Status der Fahrzeugflotte."
 )
 def get_fleet_vehicles(
     force_refresh: bool = Query(False, description="Cache umgehen und frische Daten von Navkonzept abfragen"),
@@ -57,7 +62,8 @@ def get_fleet_vehicles(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer und aktualisiert die Laufleistung.
+    Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer, aktualisiert Laufleistungen
+    und berechnet die logistischen Disponenten-Status (LOADING_FACTORY, OUTBOUND_TRANSIT, etc.).
     """
     data = navkonzept_fleet_service.get_vehicles(force_refresh=force_refresh)
     
@@ -68,6 +74,12 @@ def get_fleet_vehicles(
             maintenance_service.sync_telemetry_mileage(db, vehicles)
     except Exception as e:
         logger.warning("Fehler beim automatischen Mileage-Sync: %s", e)
+
+    # Automatische Klassifizierung für Disponenten-Portal (5 logistische Zustände & Dispatch Summary)
+    try:
+        data = dispatch_service.enrich_fleet_telemetry(db, data)
+    except Exception as e:
+        logger.error("Fehler bei Disponenten-Klassifizierung: %s", e)
 
     return data
 
@@ -707,5 +719,52 @@ def get_reconciliation_by_id(
         created_at=r.created_at,
         audit_trail=r.audit_trail or []
     )
+
+# =========================================================================
+# 6. DISPONENTEN-PORTAL & UMKREISSUCHE (NEAREST VEHICLE)
+# =========================================================================
+
+@router.post(
+    "/dispatch/nearest-vehicle",
+    response_model=NearestVehicleResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Nächstgelegenes Fahrzeug finden (Umkreissuche)",
+    description="Findet verfügbare oder sich auf dem Rückweg befindliche Lkw für eine PLZ, Adresse, Baustelle oder GPS-Koordinaten."
+)
+def find_nearest_vehicle_post(
+    payload: NearestVehicleRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return dispatch_service.find_nearest_vehicles(db, payload)
+
+@router.get(
+    "/dispatch/nearest-vehicle",
+    response_model=NearestVehicleResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Nächstgelegenes Fahrzeug per GET-Parameter suchen"
+)
+def find_nearest_vehicle_get(
+    query: Optional[str] = Query(None, description="PLZ, Ort oder Adresse"),
+    latitude: Optional[float] = Query(None, description="Ziel-Breitengrad"),
+    longitude: Optional[float] = Query(None, description="Ziel-Längengrad"),
+    geofence_id: Optional[int] = Query(None, description="ID des Ziel-Geofences"),
+    radius_km: Optional[float] = Query(150.0, description="Maximaler Suchradius in km"),
+    limit: Optional[int] = Query(10, description="Maximale Anzahl Ergebnisse"),
+    only_available: Optional[bool] = Query(True, description="Nur verfügbare / rückfahrende Lkw"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    req = NearestVehicleRequest(
+        query=query,
+        latitude=latitude,
+        longitude=longitude,
+        geofence_id=geofence_id,
+        radius_km=radius_km,
+        limit=limit,
+        only_available=only_available
+    )
+    return dispatch_service.find_nearest_vehicles(db, req)
+
 
 

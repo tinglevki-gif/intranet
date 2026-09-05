@@ -1,5 +1,6 @@
 from typing import List, Optional, Any, Union
 from pydantic import BaseModel, Field
+from app.schemas.dispatch import DispatchStatusInfo, DispatchSummary
 
 class VehicleTelemetryItem(BaseModel):
     id: Union[int, str] = Field(..., description="Fahrzeug-Identifikationsnummer")
@@ -12,6 +13,7 @@ class VehicleTelemetryItem(BaseModel):
     mileage: Optional[Union[float, int]] = Field(None, description="Kilometerstand (km)")
     timestamp: Optional[str] = Field(None, description="Zeitstempel der letzten GPS-Meldung")
     isActive: bool = Field(True, description="Status Aktiv/Inaktiv")
+    dispatch_status: Optional[DispatchStatusInfo] = Field(None, description="Berechneter Dispositionsstatus für Tourenplanung")
 
 class FleetVehiclesResponse(BaseModel):
     total: int = Field(..., description="Gesamtanzahl ortbarer Fahrzeuge")
@@ -19,4 +21,6 @@ class FleetVehiclesResponse(BaseModel):
     parked_count: int = Field(0, description="Fahrzeuge im Stillstand / geparkt (speed == 0)")
     cached_at: Optional[str] = Field(None, description="Zeitstempel des Caches")
     is_live: bool = Field(True, description="True wenn Live-Daten aus Navkonzept bezogen wurden")
+    dispatch_summary: Optional[DispatchSummary] = Field(None, description="Disponenten-Zähler nach logistischem Status")
     vehicles: List[VehicleTelemetryItem] = Field(default_factory=list, description="Fahrzeugliste")
+

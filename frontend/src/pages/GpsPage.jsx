@@ -38,7 +38,8 @@ import {
   AlertTriangle,
   FileText,
   History,
-  DollarSign
+  DollarSign,
+  Crosshair
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -67,15 +68,91 @@ const GEOFENCE_TYPE_COLORS = {
   PARKING: { border: '#059669', fill: '#10b981', label: 'Parkplatz / Rast', badge: 'bg-emerald-100 text-emerald-800' }
 };
 
+// Dispatch Status Definitions for Disponenten-Portal
+const DISPATCH_STATUS_CONFIG = {
+  LOADING_FACTORY: {
+    label: 'Im Werk beladen',
+    shortLabel: 'Im Werk',
+    icon: '🏭',
+    badge: 'bg-amber-100 text-amber-900 border-amber-300',
+    color: 'amber',
+    tileBg: 'from-amber-500/10 to-orange-500/10 border-amber-300 hover:border-amber-500',
+    activeTile: 'bg-amber-600 text-white ring-2 ring-amber-400 shadow-md',
+    desc: 'Im Werk Altlandsberg (speed = 0)'
+  },
+  OUTBOUND_TRANSIT: {
+    label: 'Auf Anfahrt Baustelle',
+    shortLabel: 'Auf Anfahrt',
+    icon: '🚛',
+    badge: 'bg-blue-100 text-blue-900 border-blue-300',
+    color: 'blue',
+    tileBg: 'from-blue-500/10 to-indigo-500/10 border-blue-300 hover:border-blue-500',
+    activeTile: 'bg-blue-600 text-white ring-2 ring-blue-400 shadow-md',
+    desc: 'Fährt zur Baustelle (speed > 0)'
+  },
+  UNLOADING_SITE: {
+    label: 'Beim Entladen',
+    shortLabel: 'Beim Entladen',
+    icon: '🏗️',
+    badge: 'bg-purple-100 text-purple-900 border-purple-300',
+    color: 'purple',
+    tileBg: 'from-purple-500/10 to-violet-500/10 border-purple-300 hover:border-purple-500',
+    activeTile: 'bg-purple-600 text-white ring-2 ring-purple-400 shadow-md',
+    desc: 'Auf Baustelle (speed = 0)'
+  },
+  INBOUND_RETURN: {
+    label: 'Auf Rückweg (Leer)',
+    shortLabel: 'Rückweg',
+    icon: '🔄',
+    badge: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+    color: 'emerald',
+    tileBg: 'from-emerald-500/10 to-teal-500/10 border-emerald-300 hover:border-emerald-500',
+    activeTile: 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-md',
+    desc: 'Fährt zurück zum Werk (verfügbar)'
+  },
+  STANDBY_IDLE: {
+    label: 'Standby / Pause',
+    shortLabel: 'Standby',
+    icon: '⏸️',
+    badge: 'bg-slate-100 text-slate-700 border-slate-300',
+    color: 'slate',
+    tileBg: 'from-slate-500/10 to-gray-500/10 border-slate-300 hover:border-slate-500',
+    activeTile: 'bg-slate-700 text-white ring-2 ring-slate-400 shadow-md',
+    desc: 'Parkt / Pause (> 30 Min.)'
+  }
+};
+
 // Create custom SVG HTML Icon for Leaflet
-function createTruckDivIcon(speed, plate) {
+function createTruckDivIcon(speed, plate, dispatchStatus) {
   const isMoving = (speed || 0) > 0;
+  let gradientClasses = 'from-slate-700 to-blue-600';
+  let ringClasses = 'ring-blue-500/30';
+
+  if (dispatchStatus === 'LOADING_FACTORY') {
+    gradientClasses = 'from-amber-600 to-orange-500';
+    ringClasses = 'ring-amber-500/40';
+  } else if (dispatchStatus === 'OUTBOUND_TRANSIT') {
+    gradientClasses = 'from-blue-600 to-indigo-600';
+    ringClasses = 'ring-blue-500/40';
+  } else if (dispatchStatus === 'UNLOADING_SITE') {
+    gradientClasses = 'from-purple-600 to-violet-600';
+    ringClasses = 'ring-purple-500/40';
+  } else if (dispatchStatus === 'INBOUND_RETURN') {
+    gradientClasses = 'from-emerald-600 to-teal-500';
+    ringClasses = 'ring-emerald-500/40';
+  } else if (dispatchStatus === 'STANDBY_IDLE') {
+    gradientClasses = 'from-slate-600 to-gray-700';
+    ringClasses = 'ring-slate-400/40';
+  } else if (isMoving) {
+    gradientClasses = 'from-emerald-600 to-teal-400';
+    ringClasses = 'ring-emerald-500/40';
+  }
   
   const iconHtml = isMoving 
     ? `
       <div class="relative flex items-center justify-center w-11 h-11 truck-marker-moving" title="${plate} - In Fahrt (${speed} km/h)">
         <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70 animate-ping"></span>
-        <div class="relative inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white shadow-lg border-2 border-white ring-2 ring-emerald-500/40">
+        <div class="relative inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-gradient-to-tr ${gradientClasses} text-white shadow-lg border-2 border-white ring-2 ${ringClasses}">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
@@ -85,7 +162,7 @@ function createTruckDivIcon(speed, plate) {
     `
     : `
       <div class="relative flex items-center justify-center w-10 h-10 truck-marker-parked" title="${plate} - Geparkt">
-        <div class="relative inline-flex items-center justify-center w-8 h-8 rounded-2xl bg-gradient-to-tr from-slate-700 to-blue-600 text-white shadow-md border-2 border-white ring-2 ring-blue-500/30">
+        <div class="relative inline-flex items-center justify-center w-8 h-8 rounded-2xl bg-gradient-to-tr ${gradientClasses} text-white shadow-md border-2 border-white ring-2 ${ringClasses}">
           <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
@@ -124,7 +201,7 @@ function createHqDivIcon() {
 
 export function GpsPage() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('MAP'); // 'MAP' | 'STAYS' | 'GEOFENCES' | 'TRACKING_SHARES' | 'MAINTENANCE'
+  const [activeTab, setActiveTab] = useState('MAP'); // 'MAP' | 'STAYS' | 'GEOFENCES' | 'TRACKING_SHARES' | 'MAINTENANCE' | 'DEMURRAGE'
   const [vehicles, setVehicles] = useState([]);
   const [geofences, setGeofences] = useState([]);
   const [trackingShares, setTrackingShares] = useState([]);
@@ -140,9 +217,23 @@ export function GpsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [countdown, setCountdown] = useState(45);
   const [filterStatus, setFilterStatus] = useState('ALL'); // 'ALL' | 'IN_MOTION' | 'PARKED'
+  const [dispatchFilter, setDispatchFilter] = useState('ALL'); // 'ALL' | 'LOADING_FACTORY' | 'OUTBOUND_TRANSIT' | 'UNLOADING_SITE' | 'INBOUND_RETURN' | 'STANDBY_IDLE'
+  const [dispatchSummary, setDispatchSummary] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [copiedTokenId, setCopiedTokenId] = useState(null);
+
+  // Nearest Vehicle (Umkreissuche) Modal State
+  const [isNearestModalOpen, setIsNearestModalOpen] = useState(false);
+  const [isSearchingNearest, setIsSearchingNearest] = useState(false);
+  const [nearestTargetType, setNearestTargetType] = useState('PLZ'); // 'PLZ' | 'GEOFENCE' | 'COORDS'
+  const [nearestQuery, setNearestQuery] = useState('10115 Berlin');
+  const [nearestSelectedGeofenceId, setNearestSelectedGeofenceId] = useState('');
+  const [nearestLat, setNearestLat] = useState(52.5200);
+  const [nearestLon, setNearestLon] = useState(13.4050);
+  const [nearestRadius, setNearestRadius] = useState(150);
+  const [nearestOnlyAvailable, setNearestOnlyAvailable] = useState(true);
+  const [nearestResults, setNearestResults] = useState(null);
 
   // Geofence Modal State
   const [isGeofenceModalOpen, setIsGeofenceModalOpen] = useState(false);
@@ -249,6 +340,9 @@ export function GpsPage() {
       if (vehiclesData && Array.isArray(vehiclesData.vehicles)) {
         setVehicles(vehiclesData.vehicles);
         setIsLive(vehiclesData.is_live);
+        if (vehiclesData.dispatch_summary) {
+          setDispatchSummary(vehiclesData.dispatch_summary);
+        }
         if (vehiclesData.vehicles.length > 0 && !reconciliationForm.plate) {
           setReconciliationForm(prev => ({ ...prev, plate: vehiclesData.vehicles[0].plate }));
         }
@@ -275,6 +369,35 @@ export function GpsPage() {
       setIsLoading(false);
       setIsRefreshing(false);
       setCountdown(45);
+    }
+  };
+
+  // Nearest Vehicle Proximity Search (Umkreissuche für Disponenten)
+  const handleSearchNearestVehicles = async (e) => {
+    if (e) e.preventDefault();
+    setIsSearchingNearest(true);
+    try {
+      const payload = {
+        radius_km: Number(nearestRadius) || 150,
+        limit: 10,
+        only_available: Boolean(nearestOnlyAvailable)
+      };
+
+      if (nearestTargetType === 'GEOFENCE' && nearestSelectedGeofenceId) {
+        payload.geofence_id = Number(nearestSelectedGeofenceId);
+      } else if (nearestTargetType === 'COORDS') {
+        payload.latitude = Number(nearestLat);
+        payload.longitude = Number(nearestLon);
+      } else {
+        payload.query = (nearestQuery || '10115 Berlin').trim();
+      }
+
+      const res = await api.findNearestVehicles(payload);
+      setNearestResults(res);
+    } catch (err) {
+      alert('Fehler bei der Umkreissuche: ' + err.message);
+    } finally {
+      setIsSearchingNearest(false);
     }
   };
 
@@ -385,6 +508,10 @@ export function GpsPage() {
         (filterStatus === 'IN_MOTION' && isMoving) ||
         (filterStatus === 'PARKED' && !isMoving);
 
+      const matchesDispatch = 
+        dispatchFilter === 'ALL' || 
+        (v.dispatch_status && v.dispatch_status.status === dispatchFilter);
+
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch = 
         !q ||
@@ -392,9 +519,9 @@ export function GpsPage() {
         (v.brand && v.brand.toLowerCase().includes(q)) ||
         (v.location && v.location.toLowerCase().includes(q));
 
-      return matchesStatus && matchesSearch;
+      return matchesStatus && matchesDispatch && matchesSearch;
     });
-  }, [vehicles, filterStatus, searchQuery]);
+  }, [vehicles, filterStatus, dispatchFilter, searchQuery]);
 
   // Statistics KPIs
   const stats = useMemo(() => {
@@ -524,16 +651,41 @@ export function GpsPage() {
       if (typeof veh.lat !== 'number' || typeof veh.lon !== 'number') return;
 
       const isMoving = (veh.speed || 0) > 0;
+      const dispatchStatus = veh.dispatch_status?.status;
       const marker = L.marker([veh.lat, veh.lon], {
-        icon: createTruckDivIcon(veh.speed, veh.plate)
+        icon: createTruckDivIcon(veh.speed, veh.plate, dispatchStatus)
       });
 
       const formattedMileage = veh.mileage 
         ? `${Number(veh.mileage).toLocaleString('de-DE')} km` 
         : '–';
 
+      const dispatch = veh.dispatch_status;
+      const dispatchBadgeHtml = dispatch 
+        ? `
+          <div class="px-2.5 py-1 rounded-xl text-[11px] font-bold ${
+            dispatch.status === 'LOADING_FACTORY' ? 'bg-amber-100 text-amber-900 border border-amber-300' :
+            dispatch.status === 'OUTBOUND_TRANSIT' ? 'bg-blue-100 text-blue-900 border border-blue-300' :
+            dispatch.status === 'UNLOADING_SITE' ? 'bg-purple-100 text-purple-900 border border-purple-300' :
+            dispatch.status === 'INBOUND_RETURN' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+            'bg-slate-100 text-slate-700 border border-slate-300'
+          } flex items-center justify-between">
+            <span class="flex items-center space-x-1.5">
+              <span>${
+                dispatch.status === 'LOADING_FACTORY' ? '🏭' :
+                dispatch.status === 'OUTBOUND_TRANSIT' ? '🚛' :
+                dispatch.status === 'UNLOADING_SITE' ? '🏗️' :
+                dispatch.status === 'INBOUND_RETURN' ? '🔄' : '⏸️'
+              }</span>
+              <span>${dispatch.label}</span>
+            </span>
+            ${dispatch.site_name ? `<span class="text-[10px] font-medium opacity-80 truncate max-w-[110px]">${dispatch.site_name}</span>` : ''}
+          </div>
+        `
+        : '';
+
       const popupHtml = `
-        <div class="p-4 space-y-3 min-w-[260px] text-xs">
+        <div class="p-4 space-y-3 min-w-[270px] text-xs">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div class="flex items-center space-x-2">
               <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs tracking-wider shadow-sm">
@@ -546,6 +698,8 @@ export function GpsPage() {
                 : '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">Geparkt</span>'
             }
           </div>
+
+          ${dispatchBadgeHtml}
 
           <div>
             <h4 class="font-extrabold text-sm text-slate-900">${veh.brand || 'LKW Transportzug'}</h4>
@@ -1075,6 +1229,104 @@ export function GpsPage() {
       {/* 3. TAB CONTENT: MAP VIEW */}
       {activeTab === 'MAP' && (
         <div className="space-y-6 animate-fade-in">
+          {/* Disponenten-Leitzentrale (5 Status-Kacheln + Umkreissuche) */}
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-5 border border-slate-700 shadow-xl text-white space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-inner">
+                  <Compass className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-base font-black tracking-tight text-white">Disponenten-Leitzentrale</h2>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/30 text-blue-300 border border-blue-400/30">
+                      Live-Disposition
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300">
+                    Status-Klassifizierung &amp; Logistik-Steuerung der Schwerlast-Flotte
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                {dispatchFilter !== 'ALL' && (
+                  <button
+                    onClick={() => setDispatchFilter('ALL')}
+                    className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-600 transition-colors flex items-center space-x-1.5"
+                  >
+                    <X className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Filter aufheben ({filteredVehicles.length}/{vehicles.length})</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setIsNearestModalOpen(true);
+                    if (!nearestResults && vehicles.length > 0) {
+                      handleSearchNearestVehicles();
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 active:scale-95 transition-all flex items-center space-x-2 border border-blue-400/30"
+                >
+                  <Search className="w-4 h-4 text-blue-200" />
+                  <span>Nächstgelegenes Fahrzeug finden</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 5 Disponenten-Kacheln mit 1-Klick-Filterung */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {Object.entries(DISPATCH_STATUS_CONFIG).map(([statusCode, cfg]) => {
+                const count = dispatchSummary 
+                  ? (statusCode === 'LOADING_FACTORY' ? dispatchSummary.loading_factory :
+                     statusCode === 'OUTBOUND_TRANSIT' ? dispatchSummary.outbound_transit :
+                     statusCode === 'UNLOADING_SITE' ? dispatchSummary.unloading_site :
+                     statusCode === 'INBOUND_RETURN' ? dispatchSummary.inbound_return :
+                     dispatchSummary.standby_idle)
+                  : vehicles.filter(v => v.dispatch_status?.status === statusCode).length;
+
+                const isSelected = dispatchFilter === statusCode;
+
+                return (
+                  <button
+                    key={statusCode}
+                    onClick={() => setDispatchFilter(prev => prev === statusCode ? 'ALL' : statusCode)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all relative overflow-hidden flex flex-col justify-between ${
+                      isSelected
+                        ? `${cfg.activeTile} scale-[1.02]`
+                        : `bg-slate-800/80 border-slate-700/80 hover:border-slate-600 hover:bg-slate-800 text-slate-300`
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl">{cfg.icon}</span>
+                      <span className={`px-2.5 py-0.5 rounded-xl font-mono font-black text-sm ${
+                        isSelected 
+                          ? 'bg-white/20 text-white' 
+                          : 'bg-slate-900 text-slate-100 border border-slate-700'
+                      }`}>
+                        {count || 0}
+                      </span>
+                    </div>
+
+                    <div className="mt-2.5">
+                      <p className={`font-bold text-xs ${isSelected ? 'text-white font-extrabold' : 'text-slate-100'}`}>
+                        {cfg.label}
+                      </p>
+                      <p className={`text-[10px] mt-0.5 truncate ${isSelected ? 'text-white/80' : 'text-slate-400'}`}>
+                        {cfg.desc}
+                      </p>
+                    </div>
+
+                    {isSelected && (
+                      <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-white animate-ping"></div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* KPI Metrics Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card flex items-center justify-between">
@@ -1239,6 +1491,8 @@ export function GpsPage() {
                   filteredVehicles.map((veh) => {
                     const isMoving = (veh.speed || 0) > 0;
                     const isSelected = selectedVehicle?.id === veh.id;
+                    const dispatch = veh.dispatch_status;
+                    const statusCfg = dispatch ? DISPATCH_STATUS_CONFIG[dispatch.status] : null;
 
                     return (
                       <div
@@ -1255,7 +1509,7 @@ export function GpsPage() {
                             <span className="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs">
                               {veh.plate}
                             </span>
-                            <span className="font-bold text-slate-900 truncate max-w-[140px]">
+                            <span className="font-bold text-slate-900 truncate max-w-[130px]">
                               {veh.brand || 'LKW'}
                             </span>
                           </div>
@@ -1271,6 +1525,21 @@ export function GpsPage() {
                             </span>
                           )}
                         </div>
+
+                        {/* Dispatch Status Badge */}
+                        {dispatch && statusCfg && (
+                          <div className="flex items-center space-x-1.5">
+                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border flex items-center space-x-1 ${statusCfg.badge}`}>
+                              <span>{statusCfg.icon}</span>
+                              <span>{dispatch.label}</span>
+                            </span>
+                            {dispatch.site_name && (
+                              <span className="text-[10px] text-slate-500 font-medium truncate max-w-[140px]">
+                                ({dispatch.site_name})
+                              </span>
+                            )}
+                          </div>
+                        )}
 
                         <div className="text-[11px] text-slate-600 flex items-start space-x-1">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
@@ -3544,6 +3813,351 @@ export function GpsPage() {
                   Schließen
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. MODAL: NÄCHSTGELEGENES FAHRZEUG FINDEN (UMKREISSUCHE DISPONENTEN) */}
+      {isNearestModalOpen && (
+        <div className="fixed inset-0 z-[1000] bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 overflow-hidden my-8 flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400 shadow-inner">
+                  <Crosshair className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">Nächstgelegenes Fahrzeug finden</h3>
+                  <p className="text-xs text-slate-300">Intelligente Umkreissuche für Disponenten (Distanz &amp; ETA)</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsNearestModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-5 text-xs">
+              {/* Target Type Selector Tabs */}
+              <div className="space-y-2">
+                <label className="font-bold text-slate-700 block">Zielort / Suchkriterium:</label>
+                <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 rounded-2xl">
+                  <button
+                    type="button"
+                    onClick={() => setNearestTargetType('PLZ')}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
+                      nearestTargetType === 'PLZ' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    PLZ / Adresse
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNearestTargetType('GEOFENCE')}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
+                      nearestTargetType === 'GEOFENCE' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    Baustelle / Geofence
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNearestTargetType('COORDS')}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
+                      nearestTargetType === 'COORDS' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    GPS-Koordinaten
+                  </button>
+                </div>
+              </div>
+
+              {/* Target Input based on Type */}
+              {nearestTargetType === 'PLZ' && (
+                <div className="space-y-2.5">
+                  <div className="relative">
+                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={nearestQuery}
+                      onChange={(e) => setNearestQuery(e.target.value)}
+                      placeholder="z. B. 10115 Berlin, Alexanderplatz, 15345 Altlandsberg..."
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-xs font-medium"
+                    />
+                  </div>
+                  {/* Quick select chips */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-slate-400 font-semibold">Schnellauswahl:</span>
+                    {[
+                      '10115 Berlin',
+                      '10178 Berlin Hbf',
+                      '15345 Altlandsberg',
+                      '12529 Schönefeld',
+                      '14467 Potsdam',
+                      '15230 Frankfurt (Oder)'
+                    ].map((chip) => (
+                      <button
+                        key={chip}
+                        type="button"
+                        onClick={() => setNearestQuery(chip)}
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-colors ${
+                          nearestQuery === chip 
+                            ? 'bg-blue-600 text-white border-blue-600' 
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
+                        }`}
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {nearestTargetType === 'GEOFENCE' && (
+                <div className="space-y-2">
+                  <select
+                    value={nearestSelectedGeofenceId}
+                    onChange={(e) => setNearestSelectedGeofenceId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-xs font-semibold text-slate-800"
+                  >
+                    <option value="">-- Geofence-Baustelle auswählen --</option>
+                    {geofences.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.name} ({g.type === 'CONSTRUCTION_SITE' ? 'Baustelle' : g.type === 'FACTORY' ? 'Werk' : g.type})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {nearestTargetType === 'COORDS' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 block mb-1">Breitengrad (Lat):</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={nearestLat}
+                      onChange={(e) => setNearestLat(parseFloat(e.target.value))}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs font-mono font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 block mb-1">Längengrad (Lon):</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={nearestLon}
+                      onChange={(e) => setNearestLon(parseFloat(e.target.value))}
+                      className="w-full px-3.5 py-2.5 bg-slate-50 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-xs font-mono font-bold"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Radius & Filters */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-[11px] font-bold text-slate-700">Suchradius:</label>
+                    <span className="font-mono font-black text-blue-600 text-xs">{nearestRadius} km</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    {[50, 100, 150, 250].map((rad) => (
+                      <button
+                        key={rad}
+                        type="button"
+                        onClick={() => setNearestRadius(rad)}
+                        className={`flex-1 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
+                          nearestRadius === rad
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white hover:bg-slate-100 text-slate-600 border-slate-200'
+                        }`}
+                      >
+                        {rad} km
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-end">
+                  <label className="flex items-center space-x-2.5 cursor-pointer bg-white p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={nearestOnlyAvailable}
+                      onChange={(e) => setNearestOnlyAvailable(e.target.checked)}
+                      className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <span className="font-bold text-slate-800 text-[11px] block">Nur verfügbare Fahrzeuge</span>
+                      <span className="text-[10px] text-slate-400 block">Rückweg (Leer), Standby oder im Werk</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Button: Suche ausführen */}
+              <button
+                type="button"
+                onClick={handleSearchNearestVehicles}
+                disabled={isSearchingNearest}
+                className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-lg shadow-blue-600/20 active:scale-98 transition-all flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                {isSearchingNearest ? (
+                  <>
+                    <RotateCw className="w-4 h-4 animate-spin" />
+                    <span>Berechne Straßenstrecken &amp; Fahrzeiten...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" />
+                    <span>Fahrzeuge im Umkreis berechnen</span>
+                  </>
+                )}
+              </button>
+
+              {/* Results Display */}
+              {nearestResults && (
+                <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-xs">
+                        Gefundene Fahrzeuge ({nearestResults.total_found || 0})
+                      </h4>
+                      {nearestResults.query_location && (
+                        <p className="text-[10px] text-slate-500">
+                          Ziel: <span className="font-semibold text-slate-700">{nearestResults.query_location.name || nearestResults.query_location.formatted_address}</span>
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      Sortiert nach Fahrzeit ETA
+                    </span>
+                  </div>
+
+                  {(!nearestResults.vehicles || nearestResults.vehicles.length === 0) ? (
+                    <div className="p-6 text-center bg-slate-50 rounded-2xl text-slate-400 space-y-1">
+                      <AlertCircle className="w-6 h-6 mx-auto text-slate-300" />
+                      <p className="font-bold text-slate-600">Keine passenden Fahrzeuge im Radius {nearestRadius} km gefunden.</p>
+                      <p className="text-[10px]">Erhöhen Sie den Suchradius oder deaktivieren Sie den Filter „Nur verfügbare Fahrzeuge“.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                      {nearestResults.vehicles.map((item, idx) => {
+                        const statusCfg = DISPATCH_STATUS_CONFIG[item.dispatch_status] || {
+                          label: item.dispatch_status_label,
+                          badge: 'bg-slate-100 text-slate-700',
+                          icon: '🚛'
+                        };
+
+                        return (
+                          <div
+                            key={item.vehicle_id}
+                            className="p-3.5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm transition-all space-y-2"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2">
+                                <span className="w-5 h-5 rounded-full bg-slate-900 text-white font-mono font-black text-[10px] flex items-center justify-center">
+                                  {idx + 1}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs">
+                                  {item.plate}
+                                </span>
+                                <span className="font-bold text-slate-900">
+                                  {item.brand || 'LKW'}
+                                </span>
+                              </div>
+
+                              <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border flex items-center space-x-1 ${statusCfg.badge}`}>
+                                <span>{statusCfg.icon}</span>
+                                <span>{item.dispatch_status_label}</span>
+                              </span>
+                            </div>
+
+                            {/* Distance & ETA Details */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 bg-slate-50 p-2.5 rounded-xl text-[11px]">
+                              <div>
+                                <span className="text-[10px] text-slate-400 block font-semibold">Straßenstrecke:</span>
+                                <span className="font-mono font-bold text-slate-900">
+                                  ~{item.road_distance_km} km
+                                </span>
+                                <span className="text-[9px] text-slate-400 block">({item.distance_km} km Luftlinie)</span>
+                              </div>
+
+                              <div>
+                                <span className="text-[10px] text-slate-400 block font-semibold">Geschätzte Fahrzeit:</span>
+                                <span className="font-mono font-black text-blue-600 text-xs">
+                                  ~{item.estimated_drive_minutes} Min.
+                                </span>
+                                <span className="text-[9px] text-slate-400 block">(@ 65 km/h LKW)</span>
+                              </div>
+
+                              <div className="col-span-2 sm:col-span-1">
+                                <span className="text-[10px] text-slate-400 block font-semibold">Geschwindigkeit:</span>
+                                <span className="font-mono font-bold text-slate-800">
+                                  {item.speed || 0} km/h
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                              <span className="truncate max-w-[280px] flex items-center space-x-1">
+                                <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                                <span>{item.location || 'Standort ermittelt'}</span>
+                              </span>
+
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsNearestModalOpen(false);
+                                    const v = vehicles.find(x => x.id === item.vehicle_id);
+                                    if (v) handleSelectVehicle(v);
+                                  }}
+                                  className="px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[10px] transition-colors"
+                                >
+                                  Auf Karte
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsNearestModalOpen(false);
+                                    handleOpenCreateTracking(item.vehicle_id);
+                                  }}
+                                  className="px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] shadow-sm transition-colors flex items-center space-x-1"
+                                >
+                                  <Share2 className="w-3 h-3" />
+                                  <span>Tracking-Link</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+              <span className="text-[11px] text-slate-400">
+                Logistik-Berechnung nach § 412 HGB / AddSecure FleetVision
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsNearestModalOpen(false)}
+                className="px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs shadow-md transition-all"
+              >
+                Schließen
+              </button>
             </div>
           </div>
         </div>
