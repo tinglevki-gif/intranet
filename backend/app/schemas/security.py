@@ -27,7 +27,7 @@ class FleetSecurityEventResponse(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FleetSecurityLogsResponse(BaseModel):
     items: List[FleetSecurityEventResponse]
@@ -67,7 +67,7 @@ class FleetSecuritySettingResponse(BaseModel):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FleetSecurityAcknowledgeRequest(BaseModel):
     note: Optional[str] = Field(None, description="Notiz zur Quittierung / Begründung")

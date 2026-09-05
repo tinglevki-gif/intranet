@@ -287,7 +287,7 @@ class SecurityService:
                     vehicle_id=veh_id,
                     plate=plate,
                     current_mileage=int(veh.get("mileage", 0) or 0),
-                    last_seen=event_ts,
+                    last_telemetry_at=event_ts,
                     last_lat=lat,
                     last_lon=lon
                 )
@@ -392,7 +392,7 @@ class SecurityService:
             if lat is not None and lon is not None:
                 meta.last_lat = lat
                 meta.last_lon = lon
-                meta.last_seen = event_ts
+                meta.last_telemetry_at = event_ts
 
         if new_events or len(vehicles) > 0:
             db.commit()

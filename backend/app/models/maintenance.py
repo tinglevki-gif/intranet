@@ -16,6 +16,8 @@ class VehicleMeta(Base):
     brand = Column(String(100), nullable=True)
     current_mileage = Column(Integer, default=0, nullable=False)
     last_telemetry_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
+    last_lat = Column(Float, nullable=True)
+    last_lon = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
 

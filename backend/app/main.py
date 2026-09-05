@@ -39,6 +39,8 @@ with engine.connect() as conn:
             conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS extracted_metadata TEXT DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS detected_language VARCHAR DEFAULT 'deu';"))
             conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS folder_path VARCHAR DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE vehicles_meta ADD COLUMN IF NOT EXISTS last_lat FLOAT DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE vehicles_meta ADD COLUMN IF NOT EXISTS last_lon FLOAT DEFAULT NULL;"))
             conn.commit()
             logger.info("PostgreSQL schema migrations verified.")
         elif dialect == "sqlite":
