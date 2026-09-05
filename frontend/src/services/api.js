@@ -894,6 +894,50 @@ class ApiService {
     return this.request(`/fleet/vehicles${q}`);
   }
 
+  // Geofencing & Standzeitüberwachung (Stays & Dwell Times)
+  getGeofences() {
+    return this.request('/fleet/geofences');
+  }
+
+  createGeofence(geofenceData) {
+    return this.request('/fleet/geofences', {
+      method: 'POST',
+      body: JSON.stringify(geofenceData),
+    });
+  }
+
+  updateGeofence(geofenceId, geofenceData) {
+    return this.request(`/fleet/geofences/${geofenceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(geofenceData),
+    });
+  }
+
+  deleteGeofence(geofenceId) {
+    return this.request(`/fleet/geofences/${geofenceId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  getVehicleStays(dateStr = null, geofenceId = null, vehicleId = null) {
+    const params = new URLSearchParams();
+    if (dateStr) params.append('date', dateStr);
+    if (geofenceId) params.append('geofence_id', geofenceId);
+    if (vehicleId) params.append('vehicle_id', vehicleId);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/fleet/stays${queryString}`);
+  }
+
+  getGeofenceEvents(limit = 50) {
+    return this.request(`/fleet/events?limit=${limit}`);
+  }
+
+  runGeofenceEvaluation() {
+    return this.request('/fleet/monitor/run', {
+      method: 'POST',
+    });
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

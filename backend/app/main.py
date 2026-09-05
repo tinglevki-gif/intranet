@@ -97,10 +97,12 @@ from app.models.language import LanguageConfig
 from app.models.system_setting import SystemSetting
 from app.models.ticket import Ticket, TicketMessage
 from app.models.calendar_source import ExternalCalendarSource
+from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
 from app.services.role_service import seed_default_roles
 from app.services.training_ai_service import seed_default_training_manuals
 from app.services.language_service import seed_default_languages
 from app.services.setting_service import seed_default_settings
+from app.services.geofence_service import seed_default_geofences, geofence_service
 
 # Upload Directories & Paths Setup (supports PyInstaller frozen mode)
 if getattr(sys, 'frozen', False):
@@ -145,11 +147,33 @@ try:
     seed_default_training_manuals(db, UPLOAD_ROOT)
     seed_default_languages(db)
     seed_default_settings(db)
+    seed_default_geofences(db)
     logger.info("Initialisierungsprüfung erfolgreich beendet.")
 except Exception as e:
     logger.error(f"Fehler bei der Initialisierung beim Serverstart: {e}", exc_info=True)
 finally:
     db.close()
+
+import asyncio
+
+async def geofence_background_worker():
+    """
+    Background worker running every 60 seconds to evaluate vehicle positions against geofences.
+    """
+    logger.info("Geofence Background Worker gestartet (60s Intervall).")
+    while True:
+        try:
+            await asyncio.sleep(60)
+            db_session = SessionLocal()
+            try:
+                geofence_service.evaluate_fleet(db_session)
+            finally:
+                db_session.close()
+        except asyncio.CancelledError:
+            logger.info("Geofence Background Worker beendet.")
+            break
+        except Exception as e:
+            logger.error(f"Fehler im Geofence Background Worker: {e}", exc_info=True)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -159,6 +183,20 @@ app = FastAPI(
     docs_url=f"{settings.API_V1_STR}/docs",
     redoc_url=f"{settings.API_V1_STR}/redoc",
 )
+
+@app.on_event("startup")
+async def startup_event():
+    # Initial evaluation upon startup
+    db_session = SessionLocal()
+    try:
+        geofence_service.evaluate_fleet(db_session)
+    except Exception as e:
+        logger.warning(f"Erste Geofence-Evaluierung beim Serverstart: {e}")
+    finally:
+        db_session.close()
+    
+    # Start background loop
+    asyncio.create_task(geofence_background_worker())
 
 # Configure CORS for local development and frontend client
 app.add_middleware(
