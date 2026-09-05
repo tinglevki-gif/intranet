@@ -1,6 +1,7 @@
 import datetime
 from app.services.eta_service import EtaCalculationService, eta_calculation_service
 from app.services.geofence_service import calculate_haversine_distance
+from app.models.user import User
 from app.models.delivery_tracking import DeliveryTrackingShare
 
 def test_haversine_and_road_distance():

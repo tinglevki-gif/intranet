@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from app.core.database import Base
+from app.models.user import User
 
 def generate_secure_share_token() -> str:
     """Generates a cryptographically secure URL-safe token (e.g. 24 bytes base64)."""
