@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 class TripReconciliationRequest(BaseModel):
     plate: str = Field(..., min_length=2, max_length=50, description="Amtliches Kennzeichen des Lkw (z. B. MOL-TE 101)")
     delivery_note_number: str = Field(..., min_length=2, max_length=100, description="Lieferschein-Nummer (z. B. LS-2026-8842)")
-    date: dt.date = Field(..., description="Datum der Anlieferungsfahrt (YYYY-MM-DD)")
+    date: str = Field(..., description="Datum der Anlieferungsfahrt (YYYY-MM-DD)")
     site_geofence_id: int = Field(..., description="ID des Zielbaustellen-Geofence")
     free_unloading_minutes: int = Field(default=60, ge=0, le=480, description="Vereinbarte kostenlose Entladezeit in Minuten (Standard: 60)")
     hourly_demurrage_rate: float = Field(default=95.0, ge=0.0, description="Stundensatz für Standgeld in Euro (Standard: 95.00 €/Std.)")
@@ -25,7 +25,7 @@ class TripReconciliationResponse(BaseModel):
     report_number: str = Field(..., description="Eindeutige Prüfbericht-Nummer (z. B. SGN-2026-0905-101)")
     delivery_note_number: str = Field(..., description="Lieferschein-Nummer")
     plate: str = Field(..., description="Kennzeichen")
-    trip_date: dt.date = Field(..., description="Datum")
+    trip_date: str = Field(..., description="Datum")
     site_geofence_id: int
     site_name: str = Field(..., description="Name der Zielbaustelle")
     factory_geofence_id: Optional[int] = None
