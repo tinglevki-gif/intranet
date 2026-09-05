@@ -50,8 +50,39 @@ def test_share_eta_simulation():
     assert result["distance_remaining_km"] > 0
     print(f"Simulated ETA Calculation Result: {result['estimated_arrival_time']}, Restdistanz: {result['distance_remaining_km']} km, Restdauer: {result['duration_remaining_minutes']} min")
 
+def test_db_persistence_and_public_endpoint():
+    from app.core.database import SessionLocal
+    db = SessionLocal()
+    try:
+        token = "test-live-montage-2026"
+        db.query(DeliveryTrackingShare).filter_by(token=token).delete()
+        db.commit()
+
+        share = DeliveryTrackingShare(
+            vehicle_id="1",
+            token=token,
+            destination_name="Baustelle Berlin Potsdamer Platz (Kran 1)",
+            destination_lat=52.5096,
+            destination_lon=13.3759,
+            expires_at=datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=12),
+            is_active=True,
+            notes="Betonfertigteile Los 1, Kranabnahme 14:00 Uhr"
+        )
+        db.add(share)
+        db.commit()
+        db.refresh(share)
+        print(f"✅ Created and persisted test share in DB with token: {share.token}")
+
+        saved_share = db.query(DeliveryTrackingShare).filter_by(token=token).first()
+        assert saved_share is not None
+        assert saved_share.destination_name == "Baustelle Berlin Potsdamer Platz (Kran 1)"
+        assert saved_share.is_active is True
+    finally:
+        db.close()
+
 if __name__ == "__main__":
     test_haversine_and_road_distance()
     test_tracking_share_token_generation()
     test_share_eta_simulation()
+    test_db_persistence_and_public_endpoint()
     print("\n✅ All ETA & Delivery Tracking test cases passed successfully!")
