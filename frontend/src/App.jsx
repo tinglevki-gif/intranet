@@ -30,6 +30,7 @@ import { AbwicklungPage } from './pages/AbwicklungPage';
 import { PlanungPage } from './pages/PlanungPage';
 import { SchulungenPage } from './pages/SchulungenPage';
 import { TicketsPage } from './pages/TicketsPage';
+import { PublicTrackingPage } from './pages/PublicTrackingPage';
 
 // Placeholder view for secondary HR / IT sub-modules
 function PlaceholderModule({ title, description, badge }) {
@@ -64,8 +65,9 @@ export function App() {
             <NewsProvider>
               <BrowserRouter>
             <Routes>
-            {/* Public Authentication Route */}
+            {/* Public Authentication & Tracking Routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/track/:token" element={<PublicTrackingPage />} />
 
             {/* Protected Intranet Application Routes */}
             <Route

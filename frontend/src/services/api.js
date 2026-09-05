@@ -938,6 +938,37 @@ class ApiService {
     });
   }
 
+  // Live Delivery Tracking & ETA Sharing for Construction Sites / Mobile Cranes
+  getTrackingShares(includeExpired = false) {
+    const q = includeExpired ? '?include_expired=true' : '';
+    return this.request(`/fleet/tracking-shares${q}`);
+  }
+
+  createTrackingShare(shareData) {
+    return this.request('/fleet/tracking-shares', {
+      method: 'POST',
+      body: JSON.stringify(shareData),
+    });
+  }
+
+  deleteTrackingShare(shareId) {
+    return this.request(`/fleet/tracking-shares/${shareId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getPublicTracking(token) {
+    const url = `${API_BASE_URL}/public/track/${token}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Tracking-Link nicht gefunden oder abgelaufen' }));
+      const error = new Error(err.detail || `HTTP ${response.status}`);
+      error.status = response.status;
+      throw error;
+    }
+    return await response.json();
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

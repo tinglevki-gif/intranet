@@ -98,6 +98,7 @@ from app.models.system_setting import SystemSetting
 from app.models.ticket import Ticket, TicketMessage
 from app.models.calendar_source import ExternalCalendarSource
 from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
+from app.models.delivery_tracking import DeliveryTrackingShare
 from app.services.role_service import seed_default_roles
 from app.services.training_ai_service import seed_default_training_manuals
 from app.services.language_service import seed_default_languages

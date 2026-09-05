@@ -250,3 +250,112 @@ def trigger_geofence_evaluation(
     current_user: User = Depends(get_current_user)
 ):
     return geofence_service.evaluate_fleet(db)
+
+# =========================================================================
+# 5. LIVE-LIEFERVERFOLGUNG & DISPONENTEN FREIGABEN (TRACKING SHARES)
+# =========================================================================
+
+from datetime import datetime, timedelta
+from app.models.delivery_tracking import DeliveryTrackingShare
+from app.schemas.delivery_tracking import DeliveryTrackingShareCreate, DeliveryTrackingShareResponse
+
+@router.get(
+    "/tracking-shares",
+    response_model=List[DeliveryTrackingShareResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Aktive Live-Tracking-Links der Disposition",
+    description="Liefert alle erstellten Live-Tracking-Freigaben für Baustellen und Mobilkräne."
+)
+def list_tracking_shares(
+    include_expired: bool = Query(False, description="Auch abgelaufene Links anzeigen"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    query = db.query(DeliveryTrackingShare)
+    if not include_expired:
+        query = query.filter(
+            DeliveryTrackingShare.is_active == True,
+            DeliveryTrackingShare.expires_at > datetime.utcnow()
+        )
+    
+    shares = query.order_by(DeliveryTrackingShare.created_at.desc()).all()
+    
+    result = []
+    for s in shares:
+        author_name = s.created_by.full_name if s.created_by else "Disposition"
+        result.append(DeliveryTrackingShareResponse(
+            id=s.id,
+            token=s.token,
+            vehicle_id=s.vehicle_id,
+            destination_name=s.destination_name,
+            destination_lat=s.destination_lat,
+            destination_lon=s.destination_lon,
+            created_at=s.created_at,
+            expires_at=s.expires_at,
+            is_active=s.is_active,
+            notes=s.notes,
+            created_by_name=author_name,
+            share_url=f"/track/{s.token}"
+        ))
+    return result
+
+@router.post(
+    "/tracking-shares",
+    response_model=DeliveryTrackingShareResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Neuen Baustellen-Tracking-Link generieren",
+    description="Erstellt einen zeitlich befristeten Sicherheits-Token zur Live-Lieferverfolgung für Bauleiter & Montageleiter."
+)
+def create_tracking_share(
+    payload: DeliveryTrackingShareCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    expires_at = datetime.utcnow() + timedelta(hours=payload.duration_hours)
+    
+    new_share = DeliveryTrackingShare(
+        vehicle_id=payload.vehicle_id,
+        destination_name=payload.destination_name,
+        destination_lat=payload.destination_lat,
+        destination_lon=payload.destination_lon,
+        expires_at=expires_at,
+        is_active=True,
+        notes=payload.notes,
+        created_by_id=current_user.id
+    )
+    db.add(new_share)
+    db.commit()
+    db.refresh(new_share)
+
+    return DeliveryTrackingShareResponse(
+        id=new_share.id,
+        token=new_share.token,
+        vehicle_id=new_share.vehicle_id,
+        destination_name=new_share.destination_name,
+        destination_lat=new_share.destination_lat,
+        destination_lon=new_share.destination_lon,
+        created_at=new_share.created_at,
+        expires_at=new_share.expires_at,
+        is_active=new_share.is_active,
+        notes=new_share.notes,
+        created_by_name=current_user.full_name,
+        share_url=f"/track/{new_share.token}"
+    )
+
+@router.delete(
+    "/tracking-shares/{share_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Tracking-Link widerrufen / löschen"
+)
+def delete_tracking_share(
+    share_id: int = Path(..., description="ID der Freigabe"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    share = db.query(DeliveryTrackingShare).filter(DeliveryTrackingShare.id == share_id).first()
+    if not share:
+        raise HTTPException(status_code=404, detail="Tracking-Freigabe nicht gefunden.")
+
+    db.delete(share)
+    db.commit()
+    return None
