@@ -60,45 +60,49 @@ def test_dispatch_classification():
             db.commit()
             db.refresh(site)
 
+        geofences = db.query(Geofence).filter(Geofence.is_active == True).all()
+        open_stays = db.query(VehicleStay).filter(VehicleStay.exit_time == None).all()
+        open_stays_map = {(str(s.vehicle_id), s.geofence_id): s for s in open_stays}
+
         # 1. Test LOADING_FACTORY: At factory, speed == 0
-        veh_loading = {
-            "id": 901,
-            "plate": "MOL-TE 101",
-            "lat": factory.latitude,
-            "lon": factory.longitude,
-            "speed": 0,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        res_loading = dispatch_service.classify_vehicle(db, veh_loading)
+        res_loading = dispatch_service.classify_vehicle(
+            lat=factory.latitude,
+            lon=factory.longitude,
+            speed=0,
+            plate="MOL-TE 101",
+            vehicle_id="901",
+            geofences=geofences,
+            open_stays_map=open_stays_map
+        )
         assert res_loading.status == DispatchStatusType.LOADING_FACTORY, f"Expected LOADING_FACTORY, got {res_loading.status}"
         assert res_loading.is_available_for_dispatch == True
         print(f"  [OK] LOADING_FACTORY: {res_loading.label} (avail={res_loading.is_available_for_dispatch})")
 
         # 2. Test UNLOADING_SITE: At site, speed == 0
-        veh_unloading = {
-            "id": 902,
-            "plate": "MOL-TE 102",
-            "lat": site.latitude,
-            "lon": site.longitude,
-            "speed": 0,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        res_unloading = dispatch_service.classify_vehicle(db, veh_unloading)
+        res_unloading = dispatch_service.classify_vehicle(
+            lat=site.latitude,
+            lon=site.longitude,
+            speed=0,
+            plate="MOL-TE 102",
+            vehicle_id="902",
+            geofences=geofences,
+            open_stays_map=open_stays_map
+        )
         assert res_unloading.status == DispatchStatusType.UNLOADING_SITE, f"Expected UNLOADING_SITE, got {res_unloading.status}"
         assert res_unloading.site_name == site.name
         assert res_unloading.is_available_for_dispatch == False
         print(f"  [OK] UNLOADING_SITE: {res_unloading.label} at '{res_unloading.site_name}' (avail={res_unloading.is_available_for_dispatch})")
 
         # 3. Test STANDBY_IDLE: Far away, speed == 0
-        veh_idle = {
-            "id": 903,
-            "plate": "MOL-TE 103",
-            "lat": 52.3500,
-            "lon": 13.9000,
-            "speed": 0,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        res_idle = dispatch_service.classify_vehicle(db, veh_idle)
+        res_idle = dispatch_service.classify_vehicle(
+            lat=52.3500,
+            lon=13.9000,
+            speed=0,
+            plate="MOL-TE 103",
+            vehicle_id="903",
+            geofences=geofences,
+            open_stays_map=open_stays_map
+        )
         assert res_idle.status == DispatchStatusType.STANDBY_IDLE, f"Expected STANDBY_IDLE, got {res_idle.status}"
         assert res_idle.is_available_for_dispatch == True
         print(f"  [OK] STANDBY_IDLE: {res_idle.label} (avail={res_idle.is_available_for_dispatch})")
@@ -118,15 +122,15 @@ def test_dispatch_classification():
         db.add(ev_exit_factory)
         db.commit()
 
-        veh_outbound = {
-            "id": 904,
-            "plate": "MOL-TE 104",
-            "lat": 52.5100,
-            "lon": 13.5000,
-            "speed": 62,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        res_outbound = dispatch_service.classify_vehicle(db, veh_outbound)
+        res_outbound = dispatch_service.classify_vehicle(
+            lat=52.5100,
+            lon=13.5000,
+            speed=62,
+            plate="MOL-TE 104",
+            vehicle_id="904",
+            geofences=geofences,
+            open_stays_map=open_stays_map
+        )
         assert res_outbound.status == DispatchStatusType.OUTBOUND_TRANSIT, f"Expected OUTBOUND_TRANSIT, got {res_outbound.status}"
         print(f"  [OK] OUTBOUND_TRANSIT: {res_outbound.label} (heading to customer)")
 
@@ -144,15 +148,15 @@ def test_dispatch_classification():
         db.add(ev_exit_site)
         db.commit()
 
-        veh_inbound = {
-            "id": 905,
-            "plate": "MOL-TE 105",
-            "lat": 52.5200,
-            "lon": 13.6000,
-            "speed": 68,
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
-        res_inbound = dispatch_service.classify_vehicle(db, veh_inbound)
+        res_inbound = dispatch_service.classify_vehicle(
+            lat=52.5200,
+            lon=13.6000,
+            speed=68,
+            plate="MOL-TE 105",
+            vehicle_id="905",
+            geofences=geofences,
+            open_stays_map=open_stays_map
+        )
         assert res_inbound.status == DispatchStatusType.INBOUND_RETURN, f"Expected INBOUND_RETURN, got {res_inbound.status}"
         assert res_inbound.is_available_for_dispatch == True
         print(f"  [OK] INBOUND_RETURN: {res_inbound.label} (avail={res_inbound.is_available_for_dispatch})")
