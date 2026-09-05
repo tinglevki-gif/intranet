@@ -1,8 +1,9 @@
 import datetime
-from app.services.eta_service import EtaCalculationService, eta_calculation_service
-from app.services.geofence_service import calculate_haversine_distance
+from app.models.role import Role
 from app.models.user import User
 from app.models.delivery_tracking import DeliveryTrackingShare
+from app.services.eta_service import EtaCalculationService, eta_calculation_service
+from app.services.geofence_service import calculate_haversine_distance
 
 def test_haversine_and_road_distance():
     # Factory Altlandsberg (52.5272, 13.8052) to Berlin Potsdamer Platz (52.5096, 13.3759)
@@ -30,7 +31,7 @@ def test_tracking_share_token_generation():
 def test_share_eta_simulation():
     # Create simulated DeliveryTrackingShare instance
     share = DeliveryTrackingShare(
-        vehicle_id=1,
+        vehicle_id="1",
         token=DeliveryTrackingShare.generate_token(),
         destination_name="Großbaustelle Berlin Potsdamer Platz (Kran 1)",
         destination_lat=52.5096,
