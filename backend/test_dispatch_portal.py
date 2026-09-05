@@ -22,7 +22,7 @@ from app.models.delivery_tracking import DeliveryTrackingShare
 from app.models.maintenance import MaintenanceInterval, MaintenanceLog, VehicleMeta
 from app.models.reconciliation import TripReconciliation
 from app.services.dispatch_service import dispatch_service, DispatchClassificationService
-from app.schemas.dispatch import NearestVehicleRequest, DispatchStatusType
+from app.schemas.dispatch import NearestVehicleRequest, NearestVehicleResponse, DispatchStatusType
 
 def test_dispatch_classification():
     print("\n" + "=" * 70)
