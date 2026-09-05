@@ -31,6 +31,11 @@ class Settings(BaseModel):
     PERSEUS_API_BASE_URL: str = os.getenv("PERSEUS_API_BASE_URL", "https://perseus-api.prd.production.my.perseus.de")
     PERSEUS_BEARER_TOKEN: Optional[str] = os.getenv("PERSEUS_BEARER_TOKEN", None)
     
+    # Navkonzept (AddSecure FleetVision) Live Telemetry Integration
+    NAVKONZEPT_COOKIE: str = os.getenv("NAVKONZEPT_COOKIE", "auth_clue=sso; PHPSESSID=TU_PHPSESSID_AQUI")
+    NAVKONZEPT_FIRM_ID: int = int(os.getenv("NAVKONZEPT_FIRM_ID", "332"))
+    NAVKONZEPT_API_URL: str = os.getenv("NAVKONZEPT_API_URL", "https://portal.navkonzept.com/api/map/leaflet/ajaxGetTableData")
+    
     # CORS Origins
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:5173",

@@ -16,7 +16,8 @@ from app.api.v1.endpoints import (
     canteen,
     ai,
     perseus,
-    search
+    search,
+    fleet
 )
 
 api_router = APIRouter()
@@ -42,3 +43,4 @@ api_router.include_router(calendar.admin_router, prefix="/admin/calendar-sources
 api_router.include_router(navigation.admin_router, prefix="/admin/menu", tags=["SuperAdmin Menüverwaltung"])
 api_router.include_router(schulungen.router, prefix="/schulungen", tags=["Schulungen & KI-Chatbot"])
 api_router.include_router(tickets.router, prefix="/tickets", tags=["Helpdesk & Ticket-System"])
+api_router.include_router(fleet.router, prefix="/fleet", tags=["Flottenortung & GPS Telemetrie (Navkonzept)"])

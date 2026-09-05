@@ -45,6 +45,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       PERSEUS_API_BASE_URL: ${PERSEUS_API_BASE_URL:-https://perseus-api.prd.production.my.perseus.de}
       PERSEUS_BEARER_TOKEN: ${PERSEUS_BEARER_TOKEN:-}
+      NAVKONZEPT_COOKIE: ${NAVKONZEPT_COOKIE:-auth_clue=sso; PHPSESSID=TU_PHPSESSID_AQUI}
+      NAVKONZEPT_FIRM_ID: ${NAVKONZEPT_FIRM_ID:-332}
     ports:
       - "8000:8000"
     volumes:

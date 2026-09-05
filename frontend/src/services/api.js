@@ -888,6 +888,12 @@ class ApiService {
     });
   }
 
+  // Navkonzept Fleet Live Telemetry & GPS Tracking
+  getFleetVehicles(forceRefresh = false) {
+    const q = forceRefresh ? '?force_refresh=true' : '';
+    return this.request(`/fleet/vehicles${q}`);
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

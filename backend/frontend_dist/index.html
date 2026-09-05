@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de" class="h-full bg-slate-50">
+<html lang="de" class="h-full">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 160' fill='%23009FE3'><path d='M0 0H47V102H0V0Z'/><path d='M0 108H47V160H35L0 125V108Z'/><path d='M53 0H65L100 35V52H53V0Z'/><path d='M53 58H100V160H53V58Z'/></svg>" />
@@ -8,10 +8,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>TINGLEV ELEMENTFABRIK | Intranet Portal</title>
-    <script type="module" crossorigin src="/assets/index-BV3MCgf6.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CSw8zIuT.css">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('intranet_theme') || 'standard';
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = saved === 'dark' || (saved === 'standard' && prefersDark);
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-C0_oui6q.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CR21NERG.css">
   </head>
-  <body class="h-full font-sans antialiased text-slate-900 selection:bg-[#009FE3] selection:text-white bg-[#f8fafc]">
+  <body class="h-full font-sans antialiased text-slate-900 dark:text-slate-100 selection:bg-[#009FE3] selection:text-white bg-[#f8fafc] dark:bg-[#070d17] transition-colors duration-200">
     <div id="root" class="h-full flex flex-col"></div>
   </body>
 </html>
