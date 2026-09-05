@@ -87,8 +87,8 @@ def run_tests():
                 "id": "999",
                 "plate": "MOL-TE 999",
                 "brand": "MAN TGX 26.510",
-                "lat": 52.5273,
-                "lon": 13.8053,
+                "lat": 52.5585,
+                "lon": 13.7657,
                 "location": "Werk Altlandsberg (Hofbereich Zufahrt Tor 2)",
                 "speed": 29.5, # > 20 km/h limit!
                 "mileage": 150000,
