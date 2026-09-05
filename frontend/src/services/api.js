@@ -1023,6 +1023,36 @@ class ApiService {
     });
   }
 
+  // Trip Reconciliation & Demurrage Reporting (Standgeld & Entladeverzögerungen nach § 412 HGB)
+  createTripReconciliation(payload) {
+    return this.request('/fleet/reports/trip-reconciliation', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  getWaitingTimesReport(month = null, threshold = 60, siteId = null) {
+    const params = new URLSearchParams();
+    if (month) params.append('month', month);
+    if (threshold !== null && threshold !== undefined) params.append('threshold_minutes', threshold);
+    if (siteId && siteId !== 'ALL') params.append('site_geofence_id', siteId);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/fleet/reports/waiting-times${queryString}`);
+  }
+
+  getReconciliationReports(siteId = null, plate = null, limit = 50) {
+    const params = new URLSearchParams();
+    if (siteId && siteId !== 'ALL') params.append('site_geofence_id', siteId);
+    if (plate && plate !== 'ALL') params.append('plate', plate);
+    if (limit) params.append('limit', limit);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/fleet/reports/reconciliations${queryString}`);
+  }
+
+  getReconciliationReportById(reportId) {
+    return this.request(`/fleet/reports/reconciliations/${reportId}`);
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();

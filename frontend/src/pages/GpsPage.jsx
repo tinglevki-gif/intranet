@@ -207,6 +207,27 @@ export function GpsPage() {
   // Maintenance History Logs Modal
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
+  // -------------------------------------------------------------
+  // Trip Reconciliation & Demurrage (Standgeld & Fahrtabgleich § 412 HGB)
+  // -------------------------------------------------------------
+  const [reconciliationMonth, setReconciliationMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [reconciliationSiteFilter, setReconciliationSiteFilter] = useState('ALL');
+  const [monthlyWaitingTimes, setMonthlyWaitingTimes] = useState(null);
+  const [reconciliationsList, setReconciliationsList] = useState([]);
+  const [selectedReconciliation, setSelectedReconciliation] = useState(null);
+  const [isReconciliationModalOpen, setIsReconciliationModalOpen] = useState(false);
+  const [isCalculatingReconciliation, setIsCalculatingReconciliation] = useState(false);
+  const [reconciliationSubTab, setReconciliationSubTab] = useState('CALCULATOR'); // 'CALCULATOR', 'MONTHLY', 'ARCHIVE'
+  const [reconciliationForm, setReconciliationForm] = useState({
+    plate: 'MOL-TE 101',
+    delivery_note_number: '',
+    date: new Date().toISOString().split('T')[0],
+    site_geofence_id: '',
+    free_unloading_minutes: 60,
+    hourly_demurrage_rate: 95.0,
+    notes: ''
+  });
+
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
@@ -228,9 +249,16 @@ export function GpsPage() {
       if (vehiclesData && Array.isArray(vehiclesData.vehicles)) {
         setVehicles(vehiclesData.vehicles);
         setIsLive(vehiclesData.is_live);
+        if (vehiclesData.vehicles.length > 0 && !reconciliationForm.plate) {
+          setReconciliationForm(prev => ({ ...prev, plate: vehiclesData.vehicles[0].plate }));
+        }
       }
       if (Array.isArray(geofencesData)) {
         setGeofences(geofencesData);
+        const firstSite = geofencesData.find(g => g.type === 'CONSTRUCTION_SITE') || geofencesData[0];
+        if (firstSite && !reconciliationForm.site_geofence_id) {
+          setReconciliationForm(prev => ({ ...prev, site_geofence_id: String(firstSite.id) }));
+        }
       }
       if (Array.isArray(sharesData)) {
         setTrackingShares(sharesData);
@@ -288,12 +316,27 @@ export function GpsPage() {
     }
   };
 
+  // Load Reconciliation & Demurrage Data
+  const fetchReconciliationData = async (month = reconciliationMonth, siteId = reconciliationSiteFilter) => {
+    try {
+      const [waitingTimes, reports] = await Promise.all([
+        api.getWaitingTimesReport(month, 60, siteId),
+        api.getReconciliationReports(siteId)
+      ]);
+      if (waitingTimes) setMonthlyWaitingTimes(waitingTimes);
+      if (Array.isArray(reports)) setReconciliationsList(reports);
+    } catch (err) {
+      console.error('Fehler beim Laden der Standgeld- und Fahrtabgleichsdaten:', err);
+    }
+  };
+
   // Initial load
   useEffect(() => {
     fetchFleetTelemetry(false);
     fetchStaysData(selectedDate);
     fetchTrackingShares();
     fetchMaintenanceData();
+    fetchReconciliationData();
   }, []);
 
   // When tab changes
@@ -304,8 +347,10 @@ export function GpsPage() {
       fetchTrackingShares();
     } else if (activeTab === 'MAINTENANCE') {
       fetchMaintenanceData(maintenanceFilter, maintenanceVehicleFilter);
+    } else if (activeTab === 'DEMURRAGE') {
+      fetchReconciliationData(reconciliationMonth, reconciliationSiteFilter);
     }
-  }, [selectedDate, activeTab, maintenanceFilter, maintenanceVehicleFilter]);
+  }, [selectedDate, activeTab, maintenanceFilter, maintenanceVehicleFilter, reconciliationMonth, reconciliationSiteFilter]);
 
   // 45-Second Interval Countdown for Live Telemetry
   useEffect(() => {
@@ -319,6 +364,8 @@ export function GpsPage() {
             fetchTrackingShares();
           } else if (activeTab === 'MAINTENANCE') {
             fetchMaintenanceData(maintenanceFilter, maintenanceVehicleFilter);
+          } else if (activeTab === 'DEMURRAGE') {
+            fetchReconciliationData(reconciliationMonth, reconciliationSiteFilter);
           }
           return 45;
         }
@@ -327,7 +374,7 @@ export function GpsPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [activeTab, selectedDate, maintenanceFilter, maintenanceVehicleFilter]);
+  }, [activeTab, selectedDate, maintenanceFilter, maintenanceVehicleFilter, reconciliationMonth, reconciliationSiteFilter]);
 
   // Filtered vehicles
   const filteredVehicles = useMemo(() => {
@@ -824,6 +871,52 @@ export function GpsPage() {
     }
   };
 
+  // -------------------------------------------------------------
+  // Reconciliation & Demurrage Handlers
+  // -------------------------------------------------------------
+  const handleRunReconciliation = async (e) => {
+    e.preventDefault();
+    if (!reconciliationForm.delivery_note_number.trim()) {
+      alert('Bitte geben Sie eine Lieferschein-Nummer ein.');
+      return;
+    }
+    if (!reconciliationForm.site_geofence_id) {
+      alert('Bitte wählen Sie eine Zielbaustelle aus.');
+      return;
+    }
+
+    setIsCalculatingReconciliation(true);
+    try {
+      const payload = {
+        plate: reconciliationForm.plate,
+        delivery_note_number: reconciliationForm.delivery_note_number.trim(),
+        date: reconciliationForm.date,
+        site_geofence_id: parseInt(reconciliationForm.site_geofence_id),
+        free_unloading_minutes: parseInt(reconciliationForm.free_unloading_minutes) || 60,
+        hourly_demurrage_rate: parseFloat(reconciliationForm.hourly_demurrage_rate) || 95.0,
+        notes: reconciliationForm.notes ? reconciliationForm.notes.trim() : null
+      };
+
+      const result = await api.createTripReconciliation(payload);
+      setSelectedReconciliation(result);
+      setIsReconciliationModalOpen(true);
+      fetchReconciliationData(reconciliationMonth, reconciliationSiteFilter);
+    } catch (err) {
+      alert('Fehler beim Fahrtabgleich: ' + err.message);
+    } finally {
+      setIsCalculatingReconciliation(false);
+    }
+  };
+
+  const handleOpenReconciliationModal = (report) => {
+    setSelectedReconciliation(report);
+    setIsReconciliationModalOpen(true);
+  };
+
+  const handlePrintAuditReport = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-6 pb-16 animate-fade-in">
       {/* 1. Header Banner */}
@@ -957,6 +1050,23 @@ export function GpsPage() {
           {maintenanceAlerts.length > 0 && (
             <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-mono font-bold animate-pulse">
               {maintenanceAlerts.length}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('DEMURRAGE')}
+          className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+            activeTab === 'DEMURRAGE'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-100'
+          }`}
+        >
+          <DollarSign className="w-4 h-4" />
+          <span>Standgeld & Fahrtabgleich</span>
+          {monthlyWaitingTimes?.total_exceeded_deliveries > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500 text-white font-mono font-bold">
+              {monthlyWaitingTimes.total_exceeded_deliveries}
             </span>
           )}
         </button>
@@ -1898,6 +2008,494 @@ export function GpsPage() {
         </div>
       )}
 
+      {/* 7. TAB CONTENT: STANDGELD & FAHRTABGLEICH (§ 412 HGB) */}
+      {activeTab === 'DEMURRAGE' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Sub Navigation Bar */}
+          <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setReconciliationSubTab('CALCULATOR')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
+                  reconciliationSubTab === 'CALCULATOR'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                }`}
+              >
+                <DollarSign className="w-4 h-4" />
+                <span>Fahrtabgleich-Rechner</span>
+              </button>
+
+              <button
+                onClick={() => setReconciliationSubTab('MONTHLY')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
+                  reconciliationSubTab === 'MONTHLY'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Monatscontrolling & Verzögerungen</span>
+                {monthlyWaitingTimes?.total_exceeded_deliveries > 0 && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500 text-white font-mono">
+                    {monthlyWaitingTimes.total_exceeded_deliveries}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => setReconciliationSubTab('ARCHIVE')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-2xl text-xs font-bold transition-all ${
+                  reconciliationSubTab === 'ARCHIVE'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200/80'
+                }`}
+              >
+                <History className="w-4 h-4" />
+                <span>Archivierte Nachweise ({reconciliationsList.length})</span>
+              </button>
+            </div>
+
+            <button
+              onClick={() => fetchReconciliationData(reconciliationMonth, reconciliationSiteFilter)}
+              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors self-start md:self-auto"
+            >
+              <RotateCw className="w-3.5 h-3.5 text-blue-600" />
+              <span>Daten aktualisieren</span>
+            </button>
+          </div>
+
+          {/* SUB-TAB 1: RECONCILIATION CALCULATOR FORM */}
+          {reconciliationSubTab === 'CALCULATOR' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Form */}
+              <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-card space-y-6">
+                <div className="flex items-center space-x-3 border-b border-slate-100 pb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <DollarSign className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900">Fahrtabgleich & Standgeldberechnung</h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      GPS-gestützter Abgleich der Werkausfahrt, Ankunft und Standzeit mit manipulationssicherem Beleg
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleRunReconciliation} className="space-y-4 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1.5">Lieferschein-Nummer *</label>
+                      <input
+                        type="text"
+                        required
+                        value={reconciliationForm.delivery_note_number}
+                        onChange={(e) => setReconciliationForm({ ...reconciliationForm, delivery_note_number: e.target.value })}
+                        placeholder="z. B. LS-2026-8842"
+                        className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1.5">Fahrzeug (Kennzeichen) *</label>
+                      <select
+                        required
+                        value={reconciliationForm.plate}
+                        onChange={(e) => setReconciliationForm({ ...reconciliationForm, plate: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      >
+                        {vehicles.map((v) => (
+                          <option key={v.id} value={v.plate}>
+                            {v.plate} - {v.brand || 'Schwerlast-LKW'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1.5">Datum der Anlieferung *</label>
+                      <input
+                        type="date"
+                        required
+                        value={reconciliationForm.date}
+                        onChange={(e) => setReconciliationForm({ ...reconciliationForm, date: e.target.value })}
+                        className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1.5">Zielbaustelle (Geofence) *</label>
+                      <select
+                        required
+                        value={reconciliationForm.site_geofence_id}
+                        onChange={(e) => setReconciliationForm({ ...reconciliationForm, site_geofence_id: e.target.value })}
+                        className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      >
+                        <option value="">-- Zielbaustelle wählen --</option>
+                        {geofences.map((g) => (
+                          <option key={g.id} value={g.id}>
+                            {g.name} ({GEOFENCE_TYPE_COLORS[g.type]?.label || g.type})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1.5">Freie Entladezeit (Minuten) *</label>
+                      <input
+                        type="number"
+                        required
+                        min="0"
+                        max="480"
+                        value={reconciliationForm.free_unloading_minutes}
+                        onChange={(e) => setReconciliationForm({ ...reconciliationForm, free_unloading_minutes: parseInt(e.target.value) || 60 })}
+                        className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1 block">Standard gemäß VBGL: 60 Minuten</span>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1.5">Stundensatz Standgeld (€/h) *</label>
+                      <input
+                        type="number"
+                        step="0.5"
+                        required
+                        min="0"
+                        value={reconciliationForm.hourly_demurrage_rate}
+                        onChange={(e) => setReconciliationForm({ ...reconciliationForm, hourly_demurrage_rate: parseFloat(e.target.value) || 95.0 })}
+                        className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1 block">Schwerlastzug inkl. Fahrereinsatz (95.00 €)</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1.5">Baustellen- & Verzögerungshinweise (optional)</label>
+                    <textarea
+                      rows="3"
+                      value={reconciliationForm.notes}
+                      onChange={(e) => setReconciliationForm({ ...reconciliationForm, notes: e.target.value })}
+                      placeholder="z. B. Kranführer erst ab 10:30 Uhr einsatzbereit, Zufahrt durch Fremdfahrzeuge blockiert..."
+                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none text-xs"
+                    />
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                    <button
+                      type="submit"
+                      disabled={isCalculatingReconciliation}
+                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-lg shadow-blue-600/25 active:scale-95 transition-all flex items-center space-x-2 disabled:opacity-50"
+                    >
+                      {isCalculatingReconciliation ? (
+                        <>
+                          <RotateCw className="w-4 h-4 animate-spin" />
+                          <span>Fahrt wird abgeglichen...</span>
+                        </>
+                      ) : (
+                        <>
+                          <DollarSign className="w-4 h-4" />
+                          <span>Fahrtabgleich starten & Beleg generieren</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Right Column: Info & Quick Samples */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="bg-gradient-to-br from-slate-900 to-blue-950 text-white p-6 sm:p-7 rounded-3xl shadow-xl space-y-4">
+                  <div className="flex items-center space-x-2 text-cyan-400 font-extrabold text-xs tracking-wider uppercase">
+                    <Shield className="w-4 h-4" />
+                    <span>Rechtssicherheit & Nachweis (§ 412 HGB)</span>
+                  </div>
+                  <h4 className="text-lg font-black leading-snug">
+                    Manipulationssichere GPS-Dokumentation für Standgeldforderungen
+                  </h4>
+                  <p className="text-slate-300 text-xs leading-relaxed">
+                    Bei Verzögerungen der Entladung auf Kundenbaustellen sichert der automatisierte Fahrtabgleich den Nachweis:
+                  </p>
+                  <ul className="space-y-2 text-xs text-slate-200">
+                    <li className="flex items-start space-x-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>Exakte Abfahrt vom Werk Altlandsberg (GPS-Geofence EXIT)</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>Minutengenaues Eintreffen an der Baustelle (Geofence ENTER)</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>Nachweis von Stillstandszeiten mit Geschwindigkeit = 0 km/h</span>
+                    </li>
+                    <li className="flex items-start space-x-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      <span>Rechtssicherer Prüfbericht nach ADSp / VBGL mit Zeit- und Koordinatenstempel</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Muster-Fälle Schnellzugriff */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-card space-y-3">
+                  <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">
+                    Letzte erstellte Standgeldbelege
+                  </h4>
+                  {reconciliationsList.slice(0, 3).map((r) => (
+                    <div
+                      key={r.id || r.report_number}
+                      onClick={() => handleOpenReconciliationModal(r)}
+                      className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition-all border border-slate-100 flex items-center justify-between text-xs"
+                    >
+                      <div className="space-y-0.5">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-bold text-slate-900">{r.delivery_note_number}</span>
+                          <span className="font-mono text-[10px] text-slate-500">({r.plate})</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate max-w-[200px]">{r.site_name}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className={`font-mono font-bold text-xs block ${r.demurrage_total_netto > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          {r.demurrage_total_netto > 0 ? `${r.demurrage_total_netto.toFixed(2)} €` : '0,00 € (Im Plan)'}
+                        </span>
+                        <span className="text-[10px] text-slate-400">{r.trip_date}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SUB-TAB 2: MONTHLY CONTROLLING & ANALYSIS */}
+          {reconciliationSubTab === 'MONTHLY' && (
+            <div className="space-y-6">
+              {/* Filter & Toolbar */}
+              <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-slate-700">Monat:</span>
+                    <input
+                      type="month"
+                      value={reconciliationMonth}
+                      onChange={(e) => {
+                        setReconciliationMonth(e.target.value);
+                        fetchReconciliationData(e.target.value, reconciliationSiteFilter);
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold font-mono focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-slate-700">Baustelle:</span>
+                    <select
+                      value={reconciliationSiteFilter}
+                      onChange={(e) => {
+                        setReconciliationSiteFilter(e.target.value);
+                        fetchReconciliationData(reconciliationMonth, e.target.value);
+                      }}
+                      className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-medium focus:outline-none"
+                    >
+                      <option value="ALL">Alle Baustellen</option>
+                      {geofences.map((g) => (
+                        <option key={g.id} value={g.id}>
+                          {g.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="text-xs text-slate-500 font-medium">
+                  Basis: Entladezeit &gt; 60 Minuten (Stundensatz 95,00 €/h)
+                </div>
+              </div>
+
+              {/* KPI Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-white p-6 rounded-3xl border border-rose-100 shadow-card flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold text-rose-500 uppercase tracking-wider">Entladeverzögerungen</p>
+                    <p className="text-2xl sm:text-3xl font-black text-rose-700 mt-1">
+                      {monthlyWaitingTimes?.total_exceeded_deliveries || 0}
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Anlieferungen &gt; 60 Min. Standzeit</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <Clock className="w-6 h-6" />
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border border-amber-100 shadow-card flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Verzögerungsstunden</p>
+                    <p className="text-2xl sm:text-3xl font-black text-amber-700 mt-1">
+                      {monthlyWaitingTimes?.total_delay_hours?.toFixed(1) || '0.0'} <span className="text-xs text-slate-400 font-bold">Std.</span>
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Gesamt: {monthlyWaitingTimes?.total_delay_minutes || 0} Minuten Wartezeit
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <Gauge className="w-6 h-6" />
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-3xl border border-emerald-100 shadow-card flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Forderungssumme Standgeld</p>
+                    <p className="text-2xl sm:text-3xl font-black text-emerald-700 mt-1">
+                      {monthlyWaitingTimes?.total_demurrage_eur ? `${monthlyWaitingTimes.total_demurrage_eur.toLocaleString('de-DE', { minimumFractionDigits: 2 })} €` : '0,00 €'}
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">Abrechenbare Standgelder Netto</p>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <DollarSign className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Baustellen Ranking Table */}
+              <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-card space-y-4">
+                <h4 className="font-extrabold text-base text-slate-900">
+                  Baustellen-Übersicht & Standzeiten-Ranking ({reconciliationMonth})
+                </h4>
+
+                {(!monthlyWaitingTimes?.by_site || monthlyWaitingTimes.by_site.length === 0) ? (
+                  <div className="py-12 text-center text-slate-400 text-xs space-y-2">
+                    <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-400" />
+                    <p className="font-bold text-slate-700 text-sm">Keine Entladeverzögerungen über 60 Minuten im gewählten Monat.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left">
+                      <thead>
+                        <tr className="border-b border-slate-100 text-[11px] text-slate-400 uppercase tracking-wider font-bold">
+                          <th className="py-3 px-3">Baustelle</th>
+                          <th className="py-3 px-3 text-center">Vorfälle (&gt;60 Min)</th>
+                          <th className="py-3 px-3 text-center">Ø Verweildauer</th>
+                          <th className="py-3 px-3 text-center">Verzögerung (Std.)</th>
+                          <th className="py-3 px-3 text-right">Standgeldforderung</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium">
+                        {monthlyWaitingTimes.by_site.map((site) => (
+                          <tr key={site.geofence_id} className="hover:bg-slate-50 transition-colors">
+                            <td className="py-3.5 px-3">
+                              <span className="font-bold text-slate-900 block">{site.site_name}</span>
+                              <span className="text-[10px] text-slate-400 font-mono">Geofence #{site.geofence_id}</span>
+                            </td>
+                            <td className="py-3.5 px-3 text-center font-bold text-slate-800">
+                              <span className="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                                {site.incident_count} Transporte
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-3 text-center font-mono text-slate-700">
+                              {site.avg_dwell_minutes} Min.
+                            </td>
+                            <td className="py-3.5 px-3 text-center font-mono text-amber-700 font-bold">
+                              {(site.total_delay_minutes / 60).toFixed(1)} Std. ({site.total_delay_minutes} Min.)
+                            </td>
+                            <td className="py-3.5 px-3 text-right font-mono font-black text-rose-600 text-sm">
+                              {site.total_demurrage_eur?.toLocaleString('de-DE', { minimumFractionDigits: 2 })} €
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* SUB-TAB 3: ARCHIVE & REPORTS LIST */}
+          {reconciliationSubTab === 'ARCHIVE' && (
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-card space-y-4">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                <div>
+                  <h4 className="font-extrabold text-base text-slate-900">Archivierte Standgeld- & Fahrtabgleichsbelege</h4>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Manipulationssichere Einzelnachweise mit GPS-Audit-Trail und Rechtsbeleg
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-mono font-bold text-xs">
+                  {reconciliationsList.length} Belege
+                </span>
+              </div>
+
+              {reconciliationsList.length === 0 ? (
+                <div className="py-16 text-center text-slate-400 text-xs space-y-2">
+                  <FileText className="w-8 h-8 mx-auto text-slate-300" />
+                  <p>Bisher wurden keine Fahrtabgleiche gespeichert.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {reconciliationsList.map((rep) => {
+                    const isDemurrage = rep.demurrage_total_netto > 0;
+                    return (
+                      <div
+                        key={rep.id || rep.report_number}
+                        className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 p-3 rounded-2xl transition-all"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2.5">
+                            <span className="px-2.5 py-1 rounded-xl bg-slate-900 text-white font-mono font-bold text-xs">
+                              {rep.plate}
+                            </span>
+                            <span className="font-bold text-slate-900 text-sm">{rep.delivery_note_number}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">({rep.report_number})</span>
+                          </div>
+                          <div className="text-xs text-slate-600 flex items-center space-x-3">
+                            <span>📍 Ziel: <strong>{rep.site_name}</strong></span>
+                            <span>• Datum: <strong>{rep.trip_date}</strong></span>
+                            <span>• Standzeit: <strong>{rep.stay_duration_minutes} Min.</strong></span>
+                          </div>
+                          {rep.notes && (
+                            <p className="text-[11px] text-slate-500 italic">„{rep.notes}“</p>
+                          )}
+                        </div>
+
+                        <div className="flex items-center space-x-4 self-end sm:self-center">
+                          <div className="text-right">
+                            {isDemurrage ? (
+                              <div>
+                                <span className="text-sm font-black font-mono text-rose-600 block">
+                                  {rep.demurrage_total_netto?.toFixed(2)} €
+                                </span>
+                                <span className="text-[10px] text-rose-500 font-bold">
+                                  +{rep.billable_delay_minutes} Min. Verzögerung
+                                </span>
+                              </div>
+                            ) : (
+                              <div>
+                                <span className="text-xs font-bold text-emerald-600 block">0,00 €</span>
+                                <span className="text-[10px] text-emerald-500 font-medium">Im Plan (Freistandzeit)</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() => handleOpenReconciliationModal(rep)}
+                            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all flex items-center space-x-1.5"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Beleg anzeigen</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* GEOFENCE CREATE / EDIT MODAL */}
       {isGeofenceModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
@@ -2677,6 +3275,275 @@ export function GpsPage() {
               >
                 Schließen
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 11. TRIP RECONCILIATION & DEMURRAGE AUDIT REPORT MODAL (PRÜFBERICHT NACH § 412 HGB) */}
+      {isReconciliationModalOpen && selectedReconciliation && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-4xl w-full border border-slate-100 shadow-2xl space-y-6 max-h-[92vh] flex flex-col justify-between my-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4 shrink-0">
+              <div className="space-y-1">
+                <div className="flex items-center space-x-2">
+                  <span className="px-2.5 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-[10px] uppercase tracking-wider">
+                    Offizieller Prüfnachweis
+                  </span>
+                  <span className="font-mono text-xs font-bold text-slate-500">
+                    {selectedReconciliation.report_number}
+                  </span>
+                </div>
+                <h3 className="font-black text-xl text-slate-900">
+                  Prüfbericht zur Standgeldabrechnung (§ 412 HGB / VBGL)
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">
+                  Tinglev Elementfabrik GmbH • Zentrale & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handlePrintAuditReport}
+                  className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center space-x-1.5 transition-colors"
+                  title="Druckansicht öffnen"
+                >
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  <span>Drucken / PDF</span>
+                </button>
+                <button
+                  onClick={() => setIsReconciliationModalOpen(false)}
+                  className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Scrollable Body */}
+            <div className="overflow-y-auto pr-1 space-y-6 flex-1 text-xs">
+              {/* Status Banner */}
+              {selectedReconciliation.demurrage_total_netto > 0 ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-50 to-amber-50 border border-rose-200/80 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black">
+                      !
+                    </div>
+                    <div>
+                      <h4 className="font-black text-rose-900 text-sm uppercase tracking-wide">
+                        Abrechnungspflichtige Entladeverzögerung
+                      </h4>
+                      <p className="text-rose-700 text-xs">
+                        Vereinbarte Freistandzeit um <strong>{selectedReconciliation.billable_delay_minutes} Minuten</strong> überschritten
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs text-rose-600 block font-semibold">Standgeldforderung:</span>
+                    <span className="text-2xl font-black font-mono text-rose-700">
+                      {selectedReconciliation.demurrage_total_netto?.toFixed(2)} €
+                    </span>
+                    <span className="text-[10px] text-slate-400 block">zzgl. gesetzl. MwSt.</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+                    <div>
+                      <h4 className="font-bold text-emerald-900 text-sm">
+                        Entladung im Zeitplan (Freistandzeit eingehalten)
+                      </h4>
+                      <p className="text-emerald-700 text-xs">
+                        Standzeit: {selectedReconciliation.stay_duration_minutes} Minuten (unter {selectedReconciliation.free_unloading_minutes} Minuten Freigrenze)
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-xl bg-emerald-600 text-white font-mono font-bold text-xs">
+                    0,00 € • Im Plan
+                  </span>
+                </div>
+              )}
+
+              {/* Master Data Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Lieferschein-Nr.</span>
+                  <span className="font-bold font-mono text-slate-900 text-sm">{selectedReconciliation.delivery_note_number}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Fahrzeug (LKW)</span>
+                  <span className="font-bold font-mono text-slate-900 text-sm">{selectedReconciliation.plate}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Datum</span>
+                  <span className="font-bold text-slate-900 text-sm">{selectedReconciliation.trip_date}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Zielbaustelle</span>
+                  <span className="font-bold text-slate-900 text-sm truncate block" title={selectedReconciliation.site_name}>
+                    {selectedReconciliation.site_name}
+                  </span>
+                </div>
+              </div>
+
+              {/* Time & Demurrage Calculation Details */}
+              <div className="space-y-3">
+                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">
+                  Fahrt- & Entladezeiten-Abgleich
+                </h4>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Werkausfahrt (Altlandsberg):</span>
+                    <span className="font-bold font-mono text-slate-800 text-xs mt-0.5 block">
+                      {selectedReconciliation.factory_departure_time
+                        ? new Date(selectedReconciliation.factory_departure_time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr'
+                        : '–'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Eintreffen Baustelle:</span>
+                    <span className="font-bold font-mono text-slate-800 text-xs mt-0.5 block">
+                      {selectedReconciliation.site_arrival_time
+                        ? new Date(selectedReconciliation.site_arrival_time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr'
+                        : '–'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Abfahrt Baustelle:</span>
+                    <span className="font-bold font-mono text-slate-800 text-xs mt-0.5 block">
+                      {selectedReconciliation.site_departure_time
+                        ? new Date(selectedReconciliation.site_departure_time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr'
+                        : '–'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-white rounded-2xl border border-slate-200/80">
+                    <span className="text-[10px] text-slate-400 block font-semibold">Gesamte Standzeit:</span>
+                    <span className="font-bold font-mono text-slate-900 text-xs mt-0.5 block">
+                      {selectedReconciliation.stay_duration_minutes} Minuten ({(selectedReconciliation.stay_duration_minutes / 60).toFixed(1)} Std.)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Calculation breakdown */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-600">Gesamte Verweildauer an der Baustelle:</span>
+                    <span className="font-mono font-bold text-slate-900">{selectedReconciliation.stay_duration_minutes} Minuten</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-600">Vereinbarte kostenlose Entladezeit (Freistandzeit):</span>
+                    <span className="font-mono font-bold text-emerald-600">- {selectedReconciliation.free_unloading_minutes} Minuten</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+                    <span className="font-bold text-slate-800">Abrechenbare Standgeldzeit:</span>
+                    <span className="font-mono font-bold text-rose-600">
+                      = {selectedReconciliation.billable_delay_minutes} Minuten ({(selectedReconciliation.billable_delay_minutes / 60).toFixed(2)} Std.)
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+                    <span className="font-bold text-slate-800">
+                      Standgeldbetrag Netto ({selectedReconciliation.hourly_demurrage_rate?.toFixed(2)} €/h Stundensatz):
+                    </span>
+                    <span className="font-mono font-black text-rose-700 text-sm">
+                      {selectedReconciliation.demurrage_total_netto?.toFixed(2)} €
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* GPS Audit Trail Table */}
+              <div className="space-y-3">
+                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-400">
+                  Manipulationssicherer GPS-Audit-Trail (Ereignisnachweis)
+                </h4>
+
+                <div className="overflow-x-auto rounded-2xl border border-slate-200">
+                  <table className="w-full text-left text-[11px]">
+                    <thead className="bg-slate-100/80 text-slate-500 font-bold border-b border-slate-200">
+                      <tr>
+                        <th className="py-2.5 px-3">Zeitpunkt</th>
+                        <th className="py-2.5 px-3">Ereignis</th>
+                        <th className="py-2.5 px-3">Geofence / Standort</th>
+                        <th className="py-2.5 px-3">GPS-Koordinaten</th>
+                        <th className="py-2.5 px-3 text-center">Tempo</th>
+                        <th className="py-2.5 px-3">Tätigkeitsnachweis</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium">
+                      {(selectedReconciliation.audit_trail || []).map((step, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50">
+                          <td className="py-2 px-3 font-mono font-bold text-slate-900 whitespace-nowrap">
+                            {step.timestamp ? new Date(step.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' Uhr' : '–'}
+                          </td>
+                          <td className="py-2 px-3 whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded-md font-bold text-[10px] bg-slate-200 text-slate-800">
+                              {step.event_type}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 font-semibold text-slate-800 max-w-[150px] truncate">
+                            {step.location_name}
+                          </td>
+                          <td className="py-2 px-3 font-mono text-[10px] text-slate-500 whitespace-nowrap">
+                            {step.latitude?.toFixed(4)}, {step.longitude?.toFixed(4)}
+                          </td>
+                          <td className="py-2 px-3 font-mono text-center text-slate-700 whitespace-nowrap">
+                            {step.speed || 0} km/h
+                          </td>
+                          <td className="py-2 px-3 text-slate-600">
+                            {step.description}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Legal Notice Box */}
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] text-slate-500 leading-relaxed space-y-1">
+                <span className="font-bold text-slate-700 block">Rechtlicher Hinweis & Konformität:</span>
+                <p>
+                  {selectedReconciliation.compliance_text ||
+                    'Prüfbericht zur Standgeldabrechnung gemäß § 412 HGB / VBGL. Die Verweil- und Stillstandszeiten wurden automatisiert über das GPS-Telemetriesystem (Navkonzept / AddSecure FleetVision) erfasst.'}
+                </p>
+                {selectedReconciliation.notes && (
+                  <p className="pt-1 text-slate-600 italic">
+                    <strong>Zusätzliche Bemerkung:</strong> „{selectedReconciliation.notes}“
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-between shrink-0">
+              <span className="text-[11px] text-slate-400">
+                Erstellt am {selectedReconciliation.created_at ? new Date(selectedReconciliation.created_at).toLocaleString('de-DE') : new Date().toLocaleDateString('de-DE')}
+              </span>
+
+              <div className="flex items-center space-x-3">
+                <button
+                  type="button"
+                  onClick={handlePrintAuditReport}
+                  className="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 active:scale-95 transition-all flex items-center space-x-1.5"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Drucken / PDF-Export</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsReconciliationModalOpen(false)}
+                  className="px-5 py-2.5 rounded-2xl bg-slate-900 text-white font-bold text-xs shadow-md transition-all"
+                >
+                  Schließen
+                </button>
+              </div>
             </div>
           </div>
         </div>

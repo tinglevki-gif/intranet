@@ -20,6 +20,7 @@ from app.services.navkonzept_service import navkonzept_fleet_service
 from app.services.geofence_service import geofence_service
 from app.services.maintenance_service import maintenance_service
 from app.models.maintenance import MaintenanceInterval, MaintenanceLog, VehicleMeta
+from app.models.reconciliation import TripReconciliation
 from app.schemas.maintenance import (
     MaintenanceIntervalCreate,
     MaintenanceIntervalUpdate,
@@ -28,6 +29,12 @@ from app.schemas.maintenance import (
     MaintenanceLogResponse,
     MaintenanceAlertResponse
 )
+from app.schemas.reconciliation import (
+    TripReconciliationRequest,
+    TripReconciliationResponse,
+    MonthlyWaitingTimesSummaryResponse
+)
+from app.services.reconciliation_service import reconciliation_service
 
 logger = logging.getLogger("fleet_endpoint")
 
@@ -555,4 +562,150 @@ def evaluate_maintenance(
         "message": "Wartungsintervalle erfolgreich gegen aktuelle Kilometerstände evaluiert.",
         "alerts_count": len(alerts)
     }
+
+# =========================================================================
+# 7. FAHRTABGLEICH & STANDGELDBERECHNUNG (TRIP RECONCILIATION & REPORTS)
+# =========================================================================
+
+@router.post(
+    "/reports/trip-reconciliation",
+    response_model=TripReconciliationResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Fahrtabgleich & Standgeldberechnung durchführen",
+    description="Ermittelt Werkausfahrt, Baustelleneintreffen, Stillstandszeit und berechnet das Standgeld bei Überschreitung der 60 Min. Freistandzeit mit GPS-Nachweisen."
+)
+def generate_trip_reconciliation(
+    payload: TripReconciliationRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        return reconciliation_service.reconcile_trip(db=db, req=payload, user_id=current_user.id)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        logger.error("Fehler beim Fahrtabgleich: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Interner Fehler beim Fahrtabgleich: {str(e)}")
+
+@router.get(
+    "/reports/waiting-times",
+    response_model=MonthlyWaitingTimesSummaryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Monatsübersicht aller Entladezeit-Überschreitungen (>60 Min)",
+    description="Liefert die Monatsauswertung aller Standzeiten über 60 Minuten sortiert und aggregiert nach Baustellen/Kunden."
+)
+def get_monthly_waiting_times_report(
+    month: Optional[str] = Query(None, description="Monat im Format YYYY-MM (Standard: aktueller Monat)"),
+    threshold_minutes: int = Query(60, ge=0, le=480, description="Schwellenwert für kostenlose Entladezeit in Minuten (Standard: 60)"),
+    site_geofence_id: Optional[int] = Query(None, description="Optionaler Filter nach spezifischer Baustelle"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return reconciliation_service.get_monthly_waiting_times(
+        db=db,
+        month_str=month,
+        threshold_minutes=threshold_minutes,
+        site_geofence_id=site_geofence_id
+    )
+
+@router.get(
+    "/reports/reconciliations",
+    response_model=List[TripReconciliationResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Liste aller archivierten Fahrtabgleiche & Standgeldberichte"
+)
+def list_reconciliations(
+    limit: int = Query(50, ge=1, le=200),
+    site_geofence_id: Optional[int] = Query(None),
+    plate: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    query = db.query(TripReconciliation)
+    if site_geofence_id:
+        query = query.filter(TripReconciliation.site_geofence_id == site_geofence_id)
+    if plate:
+        query = query.filter(TripReconciliation.plate == plate)
+    
+    reconciliations = query.order_by(TripReconciliation.trip_date.desc(), TripReconciliation.created_at.desc()).limit(limit).all()
+    
+    result = []
+    for r in reconciliations:
+        site_name = r.site_geofence.name if r.site_geofence else f"Baustelle #{r.site_geofence_id}"
+        factory_name = r.factory_geofence.name if r.factory_geofence else "Werk Altlandsberg"
+        user_name = r.created_by.full_name if r.created_by else None
+        result.append(TripReconciliationResponse(
+            id=r.id,
+            report_number=r.report_number,
+            delivery_note_number=r.delivery_note_number,
+            plate=r.plate,
+            trip_date=r.trip_date,
+            site_geofence_id=r.site_geofence_id,
+            site_name=site_name,
+            factory_geofence_id=r.factory_geofence_id,
+            factory_name=factory_name,
+            factory_departure_time=r.factory_departure_time,
+            site_arrival_time=r.site_arrival_time,
+            site_departure_time=r.site_departure_time,
+            stay_duration_minutes=r.stay_duration_minutes,
+            free_unloading_minutes=r.free_unloading_minutes,
+            billable_delay_minutes=r.billable_delay_minutes,
+            hourly_demurrage_rate=r.hourly_demurrage_rate,
+            demurrage_total_netto=r.demurrage_total_netto,
+            is_demurrage_applicable=r.is_demurrage_applicable,
+            status=r.status,
+            compliance_text=r.compliance_text,
+            notes=r.notes,
+            created_by_name=user_name,
+            created_at=r.created_at,
+            audit_trail=r.audit_trail or []
+        ))
+    return result
+
+@router.get(
+    "/reports/reconciliations/{report_id}",
+    response_model=TripReconciliationResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Einzelnen Fahrtabgleich / Standgeldbeleg abrufen"
+)
+def get_reconciliation_by_id(
+    report_id: int = Path(..., description="ID des Standgeldberichts"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    r = db.query(TripReconciliation).filter(TripReconciliation.id == report_id).first()
+    if not r:
+        raise HTTPException(status_code=404, detail="Standgeldbericht nicht gefunden.")
+    
+    site_name = r.site_geofence.name if r.site_geofence else f"Baustelle #{r.site_geofence_id}"
+    factory_name = r.factory_geofence.name if r.factory_geofence else "Werk Altlandsberg"
+    user_name = r.created_by.full_name if r.created_by else None
+    
+    return TripReconciliationResponse(
+        id=r.id,
+        report_number=r.report_number,
+        delivery_note_number=r.delivery_note_number,
+        plate=r.plate,
+        trip_date=r.trip_date,
+        site_geofence_id=r.site_geofence_id,
+        site_name=site_name,
+        factory_geofence_id=r.factory_geofence_id,
+        factory_name=factory_name,
+        factory_departure_time=r.factory_departure_time,
+        site_arrival_time=r.site_arrival_time,
+        site_departure_time=r.site_departure_time,
+        stay_duration_minutes=r.stay_duration_minutes,
+        free_unloading_minutes=r.free_unloading_minutes,
+        billable_delay_minutes=r.billable_delay_minutes,
+        hourly_demurrage_rate=r.hourly_demurrage_rate,
+        demurrage_total_netto=r.demurrage_total_netto,
+        is_demurrage_applicable=r.is_demurrage_applicable,
+        status=r.status,
+        compliance_text=r.compliance_text,
+        notes=r.notes,
+        created_by_name=user_name,
+        created_at=r.created_at,
+        audit_trail=r.audit_trail or []
+    )
+
 
