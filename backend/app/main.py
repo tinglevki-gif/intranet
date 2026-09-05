@@ -101,6 +101,7 @@ from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
 from app.models.delivery_tracking import DeliveryTrackingShare
 from app.models.maintenance import VehicleMeta, MaintenanceInterval, MaintenanceLog
 from app.models.reconciliation import TripReconciliation
+from app.models.security import FleetSecurityEvent, FleetSecuritySetting
 from app.services.role_service import seed_default_roles
 from app.services.training_ai_service import seed_default_training_manuals
 from app.services.language_service import seed_default_languages
@@ -108,6 +109,7 @@ from app.services.setting_service import seed_default_settings
 from app.services.geofence_service import seed_default_geofences, geofence_service
 from app.services.maintenance_service import maintenance_service
 from app.services.reconciliation_service import reconciliation_service
+from app.services.security_service import security_service
 
 # Upload Directories & Paths Setup (supports PyInstaller frozen mode)
 if getattr(sys, 'frozen', False):
@@ -155,6 +157,7 @@ try:
     seed_default_geofences(db)
     maintenance_service.seed_default_maintenance_data(db)
     reconciliation_service.seed_demo_reconciliation_data(db)
+    security_service.get_or_create_settings(db)
     logger.info("Initialisierungsprüfung erfolgreich beendet.")
 except Exception as e:
     logger.error(f"Fehler bei der Initialisierung beim Serverstart: {e}", exc_info=True)
@@ -162,18 +165,24 @@ finally:
     db.close()
 
 import asyncio
+from app.services.navkonzept_service import navkonzept_fleet_service
 
 async def geofence_background_worker():
     """
-    Background worker running every 60 seconds to evaluate vehicle positions against geofences.
+    Background worker running every 60 seconds to evaluate vehicle positions against geofences
+    and check security rules (yard speed & off-hours movement).
     """
-    logger.info("Geofence Background Worker gestartet (60s Intervall).")
+    logger.info("Geofence & Fleet Security Background Worker gestartet (60s Intervall).")
     while True:
         try:
             await asyncio.sleep(60)
             db_session = SessionLocal()
             try:
                 geofence_service.evaluate_fleet(db_session)
+                telemetry = navkonzept_fleet_service.get_vehicles()
+                vehicles = telemetry.get("vehicles", [])
+                if vehicles:
+                    security_service.evaluate_security_rules(db_session, vehicles)
             finally:
                 db_session.close()
         except asyncio.CancelledError:
@@ -197,8 +206,12 @@ async def startup_event():
     db_session = SessionLocal()
     try:
         geofence_service.evaluate_fleet(db_session)
+        telemetry = navkonzept_fleet_service.get_vehicles()
+        vehicles = telemetry.get("vehicles", [])
+        if vehicles:
+            security_service.evaluate_security_rules(db_session, vehicles)
     except Exception as e:
-        logger.warning(f"Erste Geofence-Evaluierung beim Serverstart: {e}")
+        logger.warning(f"Erste Geofence & Security-Evaluierung beim Serverstart: {e}")
     finally:
         db_session.close()
     

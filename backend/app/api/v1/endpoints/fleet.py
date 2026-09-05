@@ -40,6 +40,17 @@ from app.schemas.dispatch import (
     NearestVehicleRequest,
     NearestVehicleResponse
 )
+from app.models.security import FleetSecurityEvent, FleetSecuritySetting, FleetSecurityEventType
+from app.schemas.security import (
+    FleetSecurityEventResponse,
+    FleetSecurityLogsResponse,
+    FleetSecuritySettingUpdate,
+    FleetSecuritySettingResponse,
+    FleetSecurityAcknowledgeRequest,
+    FleetSecurityStatsResponse,
+    FleetSecurityEvaluateResponse
+)
+from app.services.security_service import security_service
 
 logger = logging.getLogger("fleet_endpoint")
 
@@ -62,18 +73,25 @@ def get_fleet_vehicles(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer, aktualisiert Laufleistungen
-    und berechnet die logistischen Disponenten-Status (LOADING_FACTORY, OUTBOUND_TRANSIT, etc.).
+    Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer, aktualisiert Laufleistungen,
+    prüft Sicherheitsregeln (Werkshof-Geschwindigkeit & Ruhezeiten) und berechnet Disponenten-Status.
     """
     data = navkonzept_fleet_service.get_vehicles(force_refresh=force_refresh)
+    vehicles = data.get("vehicles", [])
     
     # Automatische Aktualisierung der Gesamtkilometerstände in vehicles_meta
     try:
-        vehicles = data.get("vehicles", [])
         if vehicles:
             maintenance_service.sync_telemetry_mileage(db, vehicles)
     except Exception as e:
         logger.warning("Fehler beim automatischen Mileage-Sync: %s", e)
+
+    # Automatische Prüfung von Werksschutz- & Flottensicherheitsregeln
+    try:
+        if vehicles:
+            security_service.evaluate_security_rules(db, vehicles)
+    except Exception as e:
+        logger.error("Fehler bei der automatischen Sicherheitsüberwachung: %s", e)
 
     # Automatische Klassifizierung für Disponenten-Portal (5 logistische Zustände & Dispatch Summary)
     try:
@@ -765,6 +783,151 @@ def find_nearest_vehicle_get(
         only_available=only_available
     )
     return dispatch_service.find_nearest_vehicles(db, req)
+
+
+# =========================================================================
+# 7. WERKSSCHUTZ & FLOTTENSICHERHEIT (SPEED & OFF-HOURS AUDIT)
+# =========================================================================
+
+@router.get(
+    "/security/logs",
+    response_model=FleetSecurityLogsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Abfrage der Sicherheits- und Geschwindigkeitsverstöße für den Fuhrparkleiter",
+    description="Liefert protokollierte Geschwindigkeitsüberschreitungen auf dem Werksgelände sowie unbefugte Fahrten während der Ruhezeiten."
+)
+def get_security_logs(
+    type: Optional[str] = Query("ALL", description="Filter nach Typ: ALL, FACTORY_SPEED_VIOLATION, OFF_HOURS_MOVEMENT"),
+    plate: Optional[str] = Query(None, description="Filter nach Kfz-Kennzeichen"),
+    is_acknowledged: Optional[bool] = Query(None, description="Filter nach Quittierungsstatus"),
+    limit: int = Query(50, description="Maximale Anzahl Ergebnisse", ge=1, le=500),
+    offset: int = Query(0, description="Offset für Pagination", ge=0),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Audit-Endpunkt: Liefert protokollierte Sicherheitsvorfälle für den Fuhrparkleiter / Werksschutz.
+    """
+    return security_service.get_security_logs(
+        db=db,
+        event_type=type,
+        plate=plate,
+        is_acknowledged=is_acknowledged,
+        limit=limit,
+        offset=offset
+    )
+
+@router.get(
+    "/security/settings",
+    response_model=FleetSecuritySettingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Liefert die aktuellen Flottensicherheit- und Werksschutz-Einstellungen"
+)
+def get_security_settings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return security_service.get_settings_response(db)
+
+@router.put(
+    "/security/settings",
+    response_model=FleetSecuritySettingResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Aktualisiert die Flottensicherheit- und Werksschutz-Einstellungen",
+    description="Erlaubt dem Fuhrparkleiter oder Administrator die Konfiguration von Werkshof-Tempolimit, Ruhezeiten, Benachrichtigungskanälen und Webhooks."
+)
+def update_security_settings(
+    payload: FleetSecuritySettingUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    security_service.update_settings(db, payload)
+    return security_service.get_settings_response(db)
+
+@router.patch(
+    "/security/logs/{event_id}/acknowledge",
+    response_model=FleetSecurityEventResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Quittiert einen Sicherheitsvorfall",
+    description="Markiert einen Verstoß als geprüft/quittiert inklusive Zeitstempel, Prüfer und optionaler Begründung."
+)
+def acknowledge_security_event(
+    event_id: int = Path(..., description="ID des Sicherheitsereignisses"),
+    payload: Optional[FleetSecurityAcknowledgeRequest] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    note = payload.note if payload else None
+    try:
+        return security_service.acknowledge_event(
+            db=db,
+            event_id=event_id,
+            user_id=current_user.id,
+            note=note
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ve))
+
+@router.get(
+    "/security/stats",
+    response_model=FleetSecurityStatsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Statistische Übersicht für Werksschutz & Flottensicherheit"
+)
+def get_security_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return security_service.get_security_stats(db)
+
+@router.post(
+    "/security/evaluate",
+    response_model=FleetSecurityEvaluateResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Manuelle Prüfung der aktuellen Flottentelemetrie gegen alle Sicherheitsregeln"
+)
+def evaluate_security_now(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    telemetry = navkonzept_fleet_service.get_vehicles()
+    vehicles = telemetry.get("vehicles", [])
+    new_events = security_service.evaluate_security_rules(db, vehicles)
+    
+    event_responses = []
+    for e in new_events:
+        event_responses.append(FleetSecurityEventResponse(
+            id=e.id,
+            event_type=e.event_type,
+            vehicle_id=e.vehicle_id,
+            plate=e.plate,
+            speed=e.speed,
+            speed_limit=e.speed_limit,
+            location=e.location,
+            latitude=e.latitude,
+            longitude=e.longitude,
+            distance_moved_meters=e.distance_moved_meters or 0.0,
+            geofence_id=e.geofence_id,
+            geofence_name=e.geofence.name if e.geofence else None,
+            timestamp=e.timestamp,
+            details=e.details,
+            is_acknowledged=e.is_acknowledged,
+            acknowledged_at=e.acknowledged_at,
+            acknowledged_by_id=e.acknowledged_by_id,
+            acknowledged_by_name=None,
+            acknowledgement_note=e.acknowledgement_note,
+            action_taken=e.action_taken,
+            created_at=e.created_at
+        ))
+
+    return FleetSecurityEvaluateResponse(
+        success=True,
+        message=f"{len(vehicles)} Fahrzeuge geprüft. {len(new_events)} neue Verstöße erfasst.",
+        vehicles_checked=len(vehicles),
+        new_violations_detected=len(new_events),
+        detected_events=event_responses
+    )
+
 
 
 

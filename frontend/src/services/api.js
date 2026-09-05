@@ -1061,6 +1061,48 @@ class ApiService {
     });
   }
 
+  // Werksschutz & Flottensicherheit (Speed & Off-Hours Audit)
+  getFleetSecurityLogs(params = {}) {
+    const queryParams = new URLSearchParams();
+    if (params.type && params.type !== 'ALL') queryParams.append('type', params.type);
+    if (params.plate) queryParams.append('plate', params.plate);
+    if (params.is_acknowledged !== undefined && params.is_acknowledged !== null && params.is_acknowledged !== 'ALL') {
+      queryParams.append('is_acknowledged', params.is_acknowledged);
+    }
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.offset) queryParams.append('offset', params.offset);
+    const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+    return this.request(`/fleet/security/logs${queryString}`);
+  }
+
+  getFleetSecuritySettings() {
+    return this.request('/fleet/security/settings');
+  }
+
+  updateFleetSecuritySettings(payload) {
+    return this.request('/fleet/security/settings', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  acknowledgeFleetSecurityEvent(eventId, payload = {}) {
+    return this.request(`/fleet/security/logs/${eventId}/acknowledge`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  getFleetSecurityStats() {
+    return this.request('/fleet/security/stats');
+  }
+
+  evaluateFleetSecurity() {
+    return this.request('/fleet/security/evaluate', {
+      method: 'POST',
+    });
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();
@@ -1072,3 +1114,4 @@ class ApiService {
 }
 
 export const api = new ApiService();
+

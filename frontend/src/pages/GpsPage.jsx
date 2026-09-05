@@ -39,7 +39,15 @@ import {
   FileText,
   History,
   DollarSign,
-  Crosshair
+  Crosshair,
+  ShieldAlert,
+  Moon,
+  Bell,
+  Volume2,
+  Lock,
+  CheckSquare,
+  Sparkles,
+  Filter
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
@@ -319,6 +327,34 @@ export function GpsPage() {
     notes: ''
   });
 
+  // -------------------------------------------------------------
+  // Werksschutz & Flottensicherheit (Security, Speed & Off-Hours Audit)
+  // -------------------------------------------------------------
+  const [securityLogs, setSecurityLogs] = useState([]);
+  const [securityStats, setSecurityStats] = useState(null);
+  const [securitySettings, setSecuritySettings] = useState(null);
+  const [securityFilterType, setSecurityFilterType] = useState('ALL'); // 'ALL' | 'FACTORY_SPEED_VIOLATION' | 'OFF_HOURS_MOVEMENT'
+  const [securityFilterAck, setSecurityFilterAck] = useState('ALL'); // 'ALL' | 'UNACKNOWLEDGED' | 'ACKNOWLEDGED'
+  const [securitySearchPlate, setSecuritySearchPlate] = useState('');
+  const [isSecuritySettingsModalOpen, setIsSecuritySettingsModalOpen] = useState(false);
+  const [isSecurityAckModalOpen, setIsSecurityAckModalOpen] = useState(false);
+  const [selectedEventForAck, setSelectedEventForAck] = useState(null);
+  const [ackNote, setAckNote] = useState('');
+  const [isEvaluatingSecurity, setIsEvaluatingSecurity] = useState(false);
+  const [isSavingSecuritySettings, setIsSavingSecuritySettings] = useState(false);
+  const [securitySettingsForm, setSecuritySettingsForm] = useState({
+    max_yard_speed: 20.0,
+    quiet_hours_start: '20:00',
+    quiet_hours_end: '05:00',
+    weekend_quiet_all_day: true,
+    off_hours_speed_threshold: 5.0,
+    off_hours_distance_threshold_meters: 100.0,
+    alert_email: '',
+    webhook_url: '',
+    cooldown_minutes: 15,
+    is_active: true
+  });
+
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersGroupRef = useRef(null);
@@ -336,6 +372,8 @@ export function GpsPage() {
         api.getMaintenanceAlerts(),
         api.getMaintenanceIntervals('ALL')
       ]);
+
+      fetchSecurityData();
 
       if (vehiclesData && Array.isArray(vehiclesData.vehicles)) {
         setVehicles(vehiclesData.vehicles);
@@ -453,6 +491,132 @@ export function GpsPage() {
     }
   };
 
+  // Load Security & Speed Audit Data
+  const fetchSecurityData = async (type = securityFilterType, plate = securitySearchPlate, ack = securityFilterAck) => {
+    try {
+      const isAckParam = ack === 'ALL' ? undefined : (ack === 'ACKNOWLEDGED');
+      const [logsRes, statsRes, settingsRes] = await Promise.all([
+        api.getFleetSecurityLogs({
+          type: type,
+          plate: plate || undefined,
+          is_acknowledged: isAckParam,
+          limit: 100
+        }),
+        api.getFleetSecurityStats(),
+        api.getFleetSecuritySettings()
+      ]);
+
+      if (logsRes && Array.isArray(logsRes.items)) {
+        setSecurityLogs(logsRes.items);
+      }
+      if (statsRes) {
+        setSecurityStats(statsRes);
+      }
+      if (settingsRes) {
+        setSecuritySettings(settingsRes);
+        setSecuritySettingsForm({
+          max_yard_speed: settingsRes.max_yard_speed,
+          quiet_hours_start: settingsRes.quiet_hours_start,
+          quiet_hours_end: settingsRes.quiet_hours_end,
+          weekend_quiet_all_day: settingsRes.weekend_quiet_all_day,
+          off_hours_speed_threshold: settingsRes.off_hours_speed_threshold,
+          off_hours_distance_threshold_meters: settingsRes.off_hours_distance_threshold_meters,
+          alert_email: settingsRes.alert_email || '',
+          webhook_url: settingsRes.webhook_url || '',
+          cooldown_minutes: settingsRes.cooldown_minutes,
+          is_active: settingsRes.is_active
+        });
+      }
+    } catch (err) {
+      console.error('Fehler beim Laden der Sicherheitsdaten:', err);
+    }
+  };
+
+  const handleOpenSecuritySettings = () => {
+    if (securitySettings) {
+      setSecuritySettingsForm({
+        max_yard_speed: securitySettings.max_yard_speed,
+        quiet_hours_start: securitySettings.quiet_hours_start,
+        quiet_hours_end: securitySettings.quiet_hours_end,
+        weekend_quiet_all_day: securitySettings.weekend_quiet_all_day,
+        off_hours_speed_threshold: securitySettings.off_hours_speed_threshold,
+        off_hours_distance_threshold_meters: securitySettings.off_hours_distance_threshold_meters,
+        alert_email: securitySettings.alert_email || '',
+        webhook_url: securitySettings.webhook_url || '',
+        cooldown_minutes: securitySettings.cooldown_minutes,
+        is_active: securitySettings.is_active
+      });
+    }
+    setIsSecuritySettingsModalOpen(true);
+  };
+
+  const handleSaveSecuritySettings = async (e) => {
+    e.preventDefault();
+    setIsSavingSecuritySettings(true);
+    try {
+      const payload = {
+        max_yard_speed: parseFloat(securitySettingsForm.max_yard_speed) || 20.0,
+        quiet_hours_start: securitySettingsForm.quiet_hours_start,
+        quiet_hours_end: securitySettingsForm.quiet_hours_end,
+        weekend_quiet_all_day: Boolean(securitySettingsForm.weekend_quiet_all_day),
+        off_hours_speed_threshold: parseFloat(securitySettingsForm.off_hours_speed_threshold) || 5.0,
+        off_hours_distance_threshold_meters: parseFloat(securitySettingsForm.off_hours_distance_threshold_meters) || 100.0,
+        alert_email: securitySettingsForm.alert_email ? securitySettingsForm.alert_email.trim() : null,
+        webhook_url: securitySettingsForm.webhook_url ? securitySettingsForm.webhook_url.trim() : null,
+        cooldown_minutes: parseInt(securitySettingsForm.cooldown_minutes) || 15,
+        is_active: Boolean(securitySettingsForm.is_active)
+      };
+
+      const updated = await api.updateFleetSecuritySettings(payload);
+      setSecuritySettings(updated);
+      setIsSecuritySettingsModalOpen(false);
+      fetchSecurityData();
+      alert('Sicherheitsregeln & Werksschutz-Konfiguration erfolgreich gespeichert!');
+    } catch (err) {
+      alert('Fehler beim Speichern der Sicherheitsregeln: ' + err.message);
+    } finally {
+      setIsSavingSecuritySettings(false);
+    }
+  };
+
+  const handleOpenAckModal = (event) => {
+    setSelectedEventForAck(event);
+    setAckNote('');
+    setIsSecurityAckModalOpen(true);
+  };
+
+  const handleSaveAck = async (e) => {
+    e.preventDefault();
+    if (!selectedEventForAck) return;
+    try {
+      await api.acknowledgeFleetSecurityEvent(selectedEventForAck.id, {
+        note: ackNote.trim() || 'Vom Fuhrparkleiter geprüft und zur Kenntnis genommen.'
+      });
+      setIsSecurityAckModalOpen(false);
+      setSelectedEventForAck(null);
+      fetchSecurityData();
+    } catch (err) {
+      alert('Fehler beim Quittieren: ' + err.message);
+    }
+  };
+
+  const handleEvaluateSecurityNow = async () => {
+    setIsEvaluatingSecurity(true);
+    try {
+      const res = await api.evaluateFleetSecurity();
+      fetchSecurityData();
+      if (res && res.new_violations_detected > 0) {
+        alert(`Prüfung abgeschlossen: ${res.new_violations_detected} neue Sicherheitsvorfälle erfasst!`);
+      } else {
+        alert('Prüfung abgeschlossen: Keine neuen Verstöße auf dem Werksgelände festgestellt.');
+      }
+    } catch (err) {
+      alert('Fehler bei manueller Sicherheitsprüfung: ' + err.message);
+    } finally {
+      setIsEvaluatingSecurity(false);
+    }
+  };
+
   // Initial load
   useEffect(() => {
     fetchFleetTelemetry(false);
@@ -460,6 +624,7 @@ export function GpsPage() {
     fetchTrackingShares();
     fetchMaintenanceData();
     fetchReconciliationData();
+    fetchSecurityData();
   }, []);
 
   // When tab changes
@@ -472,8 +637,10 @@ export function GpsPage() {
       fetchMaintenanceData(maintenanceFilter, maintenanceVehicleFilter);
     } else if (activeTab === 'DEMURRAGE') {
       fetchReconciliationData(reconciliationMonth, reconciliationSiteFilter);
+    } else if (activeTab === 'SECURITY') {
+      fetchSecurityData(securityFilterType, securitySearchPlate, securityFilterAck);
     }
-  }, [selectedDate, activeTab, maintenanceFilter, maintenanceVehicleFilter, reconciliationMonth, reconciliationSiteFilter]);
+  }, [selectedDate, activeTab, maintenanceFilter, maintenanceVehicleFilter, reconciliationMonth, reconciliationSiteFilter, securityFilterType, securitySearchPlate, securityFilterAck]);
 
   // 45-Second Interval Countdown for Live Telemetry
   useEffect(() => {
@@ -489,6 +656,8 @@ export function GpsPage() {
             fetchMaintenanceData(maintenanceFilter, maintenanceVehicleFilter);
           } else if (activeTab === 'DEMURRAGE') {
             fetchReconciliationData(reconciliationMonth, reconciliationSiteFilter);
+          } else if (activeTab === 'SECURITY') {
+            fetchSecurityData(securityFilterType, securitySearchPlate, securityFilterAck);
           }
           return 45;
         }
@@ -497,7 +666,7 @@ export function GpsPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [activeTab, selectedDate, maintenanceFilter, maintenanceVehicleFilter, reconciliationMonth, reconciliationSiteFilter]);
+  }, [activeTab, selectedDate, maintenanceFilter, maintenanceVehicleFilter, reconciliationMonth, reconciliationSiteFilter, securityFilterType, securitySearchPlate, securityFilterAck]);
 
   // Filtered vehicles
   const filteredVehicles = useMemo(() => {
@@ -1221,6 +1390,23 @@ export function GpsPage() {
           {monthlyWaitingTimes?.total_exceeded_deliveries > 0 && (
             <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500 text-white font-mono font-bold">
               {monthlyWaitingTimes.total_exceeded_deliveries}
+            </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('SECURITY')}
+          className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
+            activeTab === 'SECURITY'
+              ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-md shadow-rose-600/25'
+              : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-100'
+          }`}
+        >
+          <ShieldAlert className={`w-4 h-4 ${activeTab === 'SECURITY' ? 'text-white' : 'text-rose-500'}`} />
+          <span>Werksschutz & Sicherheit</span>
+          {securityStats?.unacknowledged_events > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-rose-600 text-white font-mono font-bold animate-pulse shadow-sm">
+              {securityStats.unacknowledged_events}
             </span>
           )}
         </button>
@@ -2765,6 +2951,380 @@ export function GpsPage() {
         </div>
       )}
 
+      {/* 4. TAB CONTENT: FLEET SECURITY & YARD SAFETY AUDIT */}
+      {activeTab === 'SECURITY' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Top Banner / Hero Card */}
+          <div className="bg-gradient-to-r from-slate-900 via-rose-950 to-slate-900 rounded-3xl p-6 sm:p-8 border border-rose-900/50 shadow-2xl text-white relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+            
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              <div className="flex items-start sm:items-center space-x-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-600 to-red-500 text-white flex items-center justify-center shadow-lg shadow-rose-600/30 shrink-0">
+                  <ShieldAlert className="w-7 h-7" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+                      Werksschutz &amp; Flottensicherheit
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/30 text-rose-300 border border-rose-400/40 uppercase tracking-wide">
+                      Hof-Tempolimit &amp; Ruhezeiten-Audit
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl">
+                    Automatische Überwachung der Höchstgeschwindigkeit auf dem Werksgelände (&le; {securitySettings?.max_yard_speed || 20} km/h) 
+                    sowie Alarmierung bei unbefugten Flottenbewegungen außerhalb der Betriebszeiten.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleOpenSecuritySettings}
+                  className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs backdrop-blur-sm border border-white/20 transition-all shadow-sm active:scale-95"
+                >
+                  <Sliders className="w-3.5 h-3.5 text-rose-300" />
+                  <span>Sicherheitsregeln konfigurieren</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isEvaluatingSecurity}
+                  onClick={handleEvaluateSecurityNow}
+                  className="flex items-center space-x-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition-all active:scale-95 disabled:opacity-50"
+                >
+                  <RotateCw className={`w-3.5 h-3.5 ${isEvaluatingSecurity ? 'animate-spin' : ''}`} />
+                  <span>{isEvaluatingSecurity ? 'Wird geprüft...' : 'Jetzt prüfen'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 4 KPI Metrics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Offene Alarme */}
+            <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Unquittierte Alarme</p>
+                <div className="flex items-baseline space-x-2 mt-1">
+                  <span className="text-2xl sm:text-3xl font-black text-rose-700">
+                    {securityStats?.unacknowledged_events || 0}
+                  </span>
+                  <span className="text-xs text-slate-400 font-bold">offen</span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Erfordert Prüfung durch Werksschutz
+                </p>
+              </div>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${securityStats?.unacknowledged_events > 0 ? 'bg-rose-100 text-rose-600 animate-pulse' : 'bg-slate-100 text-slate-400'}`}>
+                <Bell className="w-6 h-6" />
+              </div>
+            </div>
+
+            {/* Card 2: Hof-Geschwindigkeitsverstöße */}
+            <div className="bg-white p-5 rounded-3xl border border-amber-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Hof-Tempolimit &gt; {securitySettings?.max_yard_speed || 20} km/h</p>
+                <div className="flex items-baseline space-x-2 mt-1">
+                  <span className="text-2xl sm:text-3xl font-black text-amber-700">
+                    {securityStats?.speed_violations_total || 0}
+                  </span>
+                  <span className="text-xs text-slate-400 font-bold">Verstöße</span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Arbeitsschutz im Werk Altlandsberg
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Gauge className="w-6 h-6" />
+              </div>
+            </div>
+
+            {/* Card 3: Ruhezeiten-Verstöße */}
+            <div className="bg-white p-5 rounded-3xl border border-purple-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-purple-600 uppercase tracking-wider">Ruhezeiten-Verstöße</p>
+                <div className="flex items-baseline space-x-2 mt-1">
+                  <span className="text-2xl sm:text-3xl font-black text-purple-700">
+                    {securityStats?.off_hours_total || 0}
+                  </span>
+                  <span className="text-xs text-slate-400 font-bold">Bewegungen</span>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Außerhalb der Betriebszeiten
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <Moon className="w-6 h-6" />
+              </div>
+            </div>
+
+            {/* Card 4: Überwachungs-Status & Ruhezeit */}
+            <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-card flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Werksschutz-Status</p>
+                <div className="flex items-center space-x-2 mt-1">
+                  <span className={`w-2.5 h-2.5 rounded-full ${securitySettings?.is_currently_quiet_hours ? 'bg-purple-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                  <span className="text-base sm:text-lg font-black text-slate-900">
+                    {securitySettings?.is_currently_quiet_hours ? '🌙 Ruhezeit aktiv' : '☀️ Betriebszeit'}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 mt-0.5 truncate max-w-[180px]">
+                  {securityStats?.quiet_hours_label || 'Mo-Fr 20:00-05:00 Uhr'}
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Shield className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-slate-400 mr-1 flex items-center space-x-1">
+                <Filter className="w-3.5 h-3.5" />
+                <span>Typ:</span>
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setSecurityFilterType('ALL')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  securityFilterType === 'ALL'
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                Alle Ereignisse
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSecurityFilterType('FACTORY_SPEED_VIOLATION')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                  securityFilterType === 'FACTORY_SPEED_VIOLATION'
+                    ? 'bg-amber-600 text-white shadow-sm'
+                    : 'bg-amber-50 text-amber-800 hover:bg-amber-100'
+                }`}
+              >
+                <span>⚡ Hof-Tempo (&gt;{securitySettings?.max_yard_speed || 20} km/h)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSecurityFilterType('OFF_HOURS_MOVEMENT')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                  securityFilterType === 'OFF_HOURS_MOVEMENT'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'bg-purple-50 text-purple-800 hover:bg-purple-100'
+                }`}
+              >
+                <span>🌙 Ruhezeiten-Verstöße</span>
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs font-bold text-slate-400">Status:</span>
+                <select
+                  value={securityFilterAck}
+                  onChange={(e) => setSecurityFilterAck(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none"
+                >
+                  <option value="ALL">Alle Status</option>
+                  <option value="UNACKNOWLEDGED">Nur Unquittiert</option>
+                  <option value="ACKNOWLEDGED">Bereits Quittiert</option>
+                </select>
+              </div>
+
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Kennzeichen filtern..."
+                  value={securitySearchPlate}
+                  onChange={(e) => setSecuritySearchPlate(e.target.value)}
+                  className="pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 w-44"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Audit Logs Table / Feed */}
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-card overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900">
+                  Sicherheits-Audit-Log &amp; Vorfallsprotokoll
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Vollständiger Nachweis aller Geschwindigkeits- und Bewegungsverstöße
+                </p>
+              </div>
+              <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 font-mono font-bold text-xs">
+                {securityLogs.length} Einträge
+              </span>
+            </div>
+
+            {securityLogs.length === 0 ? (
+              <div className="py-16 text-center text-slate-400 text-xs space-y-3">
+                <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-500" />
+                <div className="space-y-1">
+                  <p className="font-bold text-slate-800 text-sm">Keine Sicherheitsvorfälle vorhanden</p>
+                  <p className="text-slate-500">
+                    Es wurden keine Geschwindigkeits- oder Ruhezeiten-Verstöße für die aktuellen Filterkriterien erfasst.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] text-slate-400 uppercase tracking-wider font-bold">
+                      <th className="py-3.5 px-4">Zeitpunkt</th>
+                      <th className="py-3.5 px-4">Ereignis-Typ</th>
+                      <th className="py-3.5 px-4">Fahrzeug / Lkw</th>
+                      <th className="py-3.5 px-4">Geschwindigkeit / Limit</th>
+                      <th className="py-3.5 px-4">Standort / Geofence</th>
+                      <th className="py-3.5 px-4">Alarmierung</th>
+                      <th className="py-3.5 px-4">Status &amp; Prüfung</th>
+                      <th className="py-3.5 px-4 text-right">Aktion</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {securityLogs.map((item) => {
+                      const isSpeedViolation = item.event_type === 'FACTORY_SPEED_VIOLATION';
+                      const formattedDate = item.timestamp 
+                        ? new Date(item.timestamp).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) 
+                        : '-';
+                      const excessSpeed = (item.speed || 0) - (item.speed_limit || 0);
+
+                      return (
+                        <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3.5 px-4 font-mono text-slate-700 whitespace-nowrap">
+                            {formattedDate}
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            {isSpeedViolation ? (
+                              <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 font-bold text-[11px]">
+                                <span>⚡</span>
+                                <span>Werkshof-Tempo</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-xl bg-purple-50 text-purple-800 border border-purple-200 font-bold text-[11px]">
+                                <span>🌙</span>
+                                <span>Ruhezeit-Fahrt</span>
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <div className="flex items-center space-x-2">
+                              <span className="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs">
+                                {item.plate}
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono">ID: {item.vehicle_id}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <div className="space-y-0.5">
+                              <div className="flex items-baseline space-x-1">
+                                <span className={`font-mono font-black text-sm ${isSpeedViolation ? 'text-rose-600' : 'text-purple-600'}`}>
+                                  {item.speed?.toFixed(1) || '0.0'} km/h
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-medium">
+                                  (Limit: {item.speed_limit || 20} km/h)
+                                </span>
+                              </div>
+                              {excessSpeed > 0 && (
+                                <span className="text-[10px] text-rose-600 font-bold block">
+                                  +{excessSpeed.toFixed(1)} km/h Überschreitung
+                                </span>
+                              )}
+                              {item.distance_moved_meters > 0 && (
+                                <span className="text-[10px] text-purple-600 font-bold block">
+                                  +{Math.round(item.distance_moved_meters)} m Positionswechsel
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="text-slate-800 font-bold text-xs truncate max-w-xs" title={item.location}>
+                              {item.location || 'Werksgelände'}
+                            </div>
+                            {item.latitude && item.longitude && (
+                              <span className="text-[10px] text-slate-400 font-mono">
+                                {item.latitude.toFixed(4)}, {item.longitude.toFixed(4)}
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-mono font-bold">
+                              {item.action_taken || 'LOGGED'}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            {item.is_acknowledged ? (
+                              <div className="space-y-0.5">
+                                <span className="inline-flex items-center space-x-1 text-emerald-700 font-bold text-xs">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                  <span>Quittiert</span>
+                                </span>
+                                <p className="text-[10px] text-slate-400">
+                                  {item.acknowledged_by_name || 'Admin'} • {item.acknowledged_at ? new Date(item.acknowledged_at).toLocaleDateString('de-DE') : ''}
+                                </p>
+                                {item.acknowledgement_note && (
+                                  <p className="text-[10px] text-slate-500 italic max-w-xs truncate" title={item.acknowledgement_note}>
+                                    „{item.acknowledgement_note}“
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold">
+                                <AlertTriangle className="w-3 h-3 text-rose-500" />
+                                <span>Unquittiert</span>
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                            {!item.is_acknowledged ? (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenAckModal(item)}
+                                className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm transition-all"
+                              >
+                                Quittieren
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleOpenAckModal(item)}
+                                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all"
+                              >
+                                Details
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* GEOFENCE CREATE / EDIT MODAL */}
       {isGeofenceModalOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
@@ -4159,6 +4719,336 @@ export function GpsPage() {
                 Schließen
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SECURITY SETTINGS MODAL */}
+      {isSecuritySettingsModalOpen && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-slate-100 shadow-2xl space-y-6 my-8">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                  <Sliders className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">
+                    Sicherheitsregeln &amp; Werksschutz-Konfiguration
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Grenzwerte für Hof-Geschwindigkeit, Ruhezeiten &amp; Benachrichtigungen
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsSecuritySettingsModalOpen(false)}
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveSecuritySettings} className="space-y-4 text-xs">
+              {/* Yard Speed Limit */}
+              <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-200/60 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-amber-950 flex items-center space-x-1.5">
+                    <span>⚡ Höchstgeschwindigkeit Werkshof Altlandsberg:</span>
+                  </label>
+                  <span className="font-mono font-black text-amber-700 text-sm">
+                    {securitySettingsForm.max_yard_speed} km/h
+                  </span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="number"
+                    required
+                    min="5"
+                    max="60"
+                    step="1"
+                    value={securitySettingsForm.max_yard_speed}
+                    onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, max_yard_speed: parseFloat(e.target.value) || 20 })}
+                    className="w-32 px-3 py-2 rounded-xl border border-amber-300 bg-white font-mono font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                  <span className="text-[11px] text-slate-600">
+                    Geschwindigkeiten darüber lösen einen <code>FACTORY_SPEED_VIOLATION</code> Eintrag aus.
+                  </span>
+                </div>
+              </div>
+
+              {/* Quiet Hours Configuration */}
+              <div className="bg-purple-50/50 p-4 rounded-2xl border border-purple-200/60 space-y-3">
+                <label className="font-bold text-purple-950 block">
+                  🌙 Betriebsfreie Ruhezeiten (Mo–Fr) &amp; Wochenende
+                </label>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Startzeit (Abends):</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="20:00"
+                      pattern="[0-2][0-9]:[0-5][0-9]"
+                      value={securitySettingsForm.quiet_hours_start}
+                      onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, quiet_hours_start: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-purple-200 bg-white font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Endzeit (Morgens):</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="05:00"
+                      pattern="[0-2][0-9]:[0-5][0-9]"
+                      value={securitySettingsForm.quiet_hours_end}
+                      onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, quiet_hours_end: e.target.value })}
+                      className="w-full px-3 py-2 rounded-xl border border-purple-200 bg-white font-mono font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                </div>
+
+                <label className="flex items-center space-x-2.5 cursor-pointer bg-white p-2.5 rounded-xl border border-purple-200/80">
+                  <input
+                    type="checkbox"
+                    checked={securitySettingsForm.weekend_quiet_all_day}
+                    onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, weekend_quiet_all_day: e.target.checked })}
+                    className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500 border-slate-300"
+                  />
+                  <span className="text-xs font-bold text-purple-900">
+                    Samstag &amp; Sonntag ganztägig als Ruhezeit überwachen
+                  </span>
+                </label>
+              </div>
+
+              {/* Thresholds for Off-Hours Movement */}
+              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/70">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Bewegungsschwelle:</label>
+                  <div className="flex items-center space-x-1">
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      max="50"
+                      step="0.5"
+                      value={securitySettingsForm.off_hours_speed_threshold}
+                      onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, off_hours_speed_threshold: parseFloat(e.target.value) || 5.0 })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono font-bold text-slate-800 focus:outline-none"
+                    />
+                    <span className="text-slate-500 font-bold">km/h</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Positionsverschiebung:</label>
+                  <div className="flex items-center space-x-1">
+                    <input
+                      type="number"
+                      required
+                      min="10"
+                      max="5000"
+                      step="10"
+                      value={securitySettingsForm.off_hours_distance_threshold_meters}
+                      onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, off_hours_distance_threshold_meters: parseFloat(e.target.value) || 100.0 })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono font-bold text-slate-800 focus:outline-none"
+                    />
+                    <span className="text-slate-500 font-bold">Meter</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Notification Channels */}
+              <div className="space-y-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Alarm-E-Mail Empfänger (Werksschutz &amp; IT):</label>
+                  <input
+                    type="text"
+                    placeholder="werksschutz@tinglev-elementfabrik.de, it-leitung@tinglev-elementfabrik.de"
+                    value={securitySettingsForm.alert_email}
+                    onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, alert_email: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">MS Teams / Slack Webhook URL (Optional):</label>
+                  <input
+                    type="url"
+                    placeholder="https://outlook.office.com/webhook/..."
+                    value={securitySettingsForm.webhook_url}
+                    onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, webhook_url: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                  />
+                </div>
+              </div>
+
+              {/* Anti-Spam Cooldown & Active Checkbox */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Anti-Spam Cooldown:</label>
+                  <div className="flex items-center space-x-1">
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      max="1440"
+                      value={securitySettingsForm.cooldown_minutes}
+                      onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, cooldown_minutes: parseInt(e.target.value) || 15 })}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono font-bold text-slate-800 focus:outline-none"
+                    />
+                    <span className="text-slate-500 font-bold">Min.</span>
+                  </div>
+                </div>
+
+                <div className="flex items-end">
+                  <label className="flex items-center space-x-2.5 cursor-pointer bg-slate-50 p-2 rounded-xl border border-slate-200 w-full">
+                    <input
+                      type="checkbox"
+                      checked={securitySettingsForm.is_active}
+                      onChange={(e) => setSecuritySettingsForm({ ...securitySettingsForm, is_active: e.target.checked })}
+                      className="w-4 h-4 text-rose-600 rounded focus:ring-rose-500 border-slate-300"
+                    />
+                    <span className="text-xs font-bold text-slate-800">Überwachung aktiv</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Modal Buttons */}
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsSecuritySettingsModalOpen(false)}
+                  className="px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingSecuritySettings}
+                  className="px-5 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50"
+                >
+                  {isSavingSecuritySettings ? 'Speichern...' : 'Regeln speichern'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EVENT ACKNOWLEDGEMENT MODAL */}
+      {isSecurityAckModalOpen && selectedEventForAck && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-slate-100 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div className="flex items-center space-x-3">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${selectedEventForAck.event_type === 'FACTORY_SPEED_VIOLATION' ? 'bg-amber-50 text-amber-600' : 'bg-purple-50 text-purple-600'}`}>
+                  <CheckSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg text-slate-900">
+                    Sicherheitsvorfall quittieren
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Audit-Prüfung &amp; Dokumentation für den Fuhrparkleiter
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSecurityAckModalOpen(false);
+                  setSelectedEventForAck(null);
+                }}
+                className="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Event Summary Card */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-slate-900 font-mono text-sm px-2.5 py-0.5 rounded-lg bg-slate-900 text-white">
+                  {selectedEventForAck.plate}
+                </span>
+                <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${selectedEventForAck.event_type === 'FACTORY_SPEED_VIOLATION' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800'}`}>
+                  {selectedEventForAck.event_type === 'FACTORY_SPEED_VIOLATION' ? '⚡ Hof-Geschwindigkeit' : '🌙 Ruhezeiten-Bewegung'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 pt-2 text-slate-600">
+                <div>
+                  <span className="text-slate-400 block text-[10px]">Geschwindigkeit:</span>
+                  <span className="font-mono font-bold text-slate-800">{selectedEventForAck.speed} km/h (Limit: {selectedEventForAck.speed_limit} km/h)</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">Zeitpunkt:</span>
+                  <span className="font-mono text-slate-800">{selectedEventForAck.timestamp ? new Date(selectedEventForAck.timestamp).toLocaleString('de-DE') : ''}</span>
+                </div>
+              </div>
+
+              <div className="pt-1 text-slate-600">
+                <span className="text-slate-400 block text-[10px]">Standort:</span>
+                <span className="font-semibold text-slate-800">{selectedEventForAck.location}</span>
+              </div>
+            </div>
+
+            {selectedEventForAck.is_acknowledged ? (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-2">
+                <div className="flex items-center space-x-2 text-emerald-800 font-bold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Bereits quittiert</span>
+                </div>
+                <p className="text-emerald-700">
+                  Prüfer: <strong>{selectedEventForAck.acknowledged_by_name || 'Admin'}</strong> am {selectedEventForAck.acknowledged_at ? new Date(selectedEventForAck.acknowledged_at).toLocaleString('de-DE') : ''}
+                </p>
+                {selectedEventForAck.acknowledgement_note && (
+                  <p className="text-slate-700 bg-white p-2.5 rounded-xl border border-emerald-100 italic">
+                    „{selectedEventForAck.acknowledgement_note}“
+                  </p>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={handleSaveAck} className="space-y-4 text-xs">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1.5">
+                    Prüfvermerk / Begründung (Optional):
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="z. B. Fahrer mündlich belehrt gem. UVV / Genehmigte Ausnahmefahrt..."
+                    value={ackNote}
+                    onChange={(e) => setAckNote(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-800 font-medium"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSecurityAckModalOpen(false);
+                      setSelectedEventForAck(null);
+                    }}
+                    className="px-4 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all flex items-center space-x-1.5"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Als geprüft quittieren</span>
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
