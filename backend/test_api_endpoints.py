@@ -1,6 +1,12 @@
 import requests
 from app.core.database import SessionLocal
+from app.models.role import Role
 from app.models.user import User
+from app.models.geofence import Geofence
+from app.models.delivery_tracking import DeliveryTrackingShare
+from app.models.maintenance import VehicleMeta, MaintenanceInterval
+from app.models.reconciliation import TripReconciliation
+from app.models.security import FleetSecurityEvent, FleetSecuritySetting
 from app.core.security import create_access_token
 
 def test_api():
