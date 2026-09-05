@@ -85,17 +85,16 @@ def seed_default_geofences(db: Session) -> None:
             db.add(new_g)
         db.commit()
         logger.info("4 Standard-Geofences erfolgreich angelegt.")
-    else:
-        # Bestehenden Factory Geofence auf die offizielle Bezeichnung und Adresse aktualisieren
-        factory_geo = db.query(Geofence).filter(
+        # Bestehende Factory Geofences auf die offizielle Bezeichnung und Adresse aktualisieren
+        factory_geos = db.query(Geofence).filter(
             (Geofence.type == GeofenceType.FACTORY) | (Geofence.name.ilike("%Altlandsberg%"))
-        ).first()
-        if factory_geo:
-            factory_geo.name = "Werk Altlandsberg (Zentrale)"
-            factory_geo.description = "Hauptwerk & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
-            factory_geo.latitude = 52.5272
-            factory_geo.longitude = 13.8052
-            db.commit()
+        ).all()
+        for f_geo in factory_geos:
+            f_geo.name = "Werk Altlandsberg (Zentrale)"
+            f_geo.description = "Hauptwerk & Fertigung: Am Gewerbepark 8A, 15345 Altlandsberg-Bruchmühle"
+            f_geo.latitude = 52.5272
+            f_geo.longitude = 13.8052
+        db.commit()
 
 class GeofenceMonitorService:
     """
