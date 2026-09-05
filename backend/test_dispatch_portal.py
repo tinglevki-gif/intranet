@@ -110,13 +110,11 @@ def test_dispatch_classification():
         # 4. Test OUTBOUND_TRANSIT / INBOUND_RETURN: In motion (speed > 0)
         # Create an exit event from factory for vehicle 904
         ev_exit_factory = VehicleGeofenceEvent(
-            vehicle_id=904,
+            vehicle_id="904",
             plate="MOL-TE 104",
             geofence_id=factory.id,
             event_type="EXIT",
             timestamp=datetime.now(timezone.utc) - timedelta(minutes=45),
-            latitude=factory.latitude,
-            longitude=factory.longitude,
             speed=35
         )
         db.add(ev_exit_factory)
@@ -136,13 +134,11 @@ def test_dispatch_classification():
 
         # Create an exit event from site for vehicle 905 (now returning empty)
         ev_exit_site = VehicleGeofenceEvent(
-            vehicle_id=905,
+            vehicle_id="905",
             plate="MOL-TE 105",
             geofence_id=site.id,
             event_type="EXIT",
             timestamp=datetime.now(timezone.utc) - timedelta(minutes=20),
-            latitude=site.latitude,
-            longitude=site.longitude,
             speed=40
         )
         db.add(ev_exit_site)
