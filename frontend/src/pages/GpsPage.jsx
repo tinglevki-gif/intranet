@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { 
@@ -51,6 +52,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
+import { VehicleBottomSheet } from '../components/common/VehicleBottomSheet';
 
 // Company HQ Coordinates (Tinglev Elementfabrik GmbH - Werk Altlandsberg (Zentrale))
 const TINGLEV_HQ = {
@@ -209,7 +211,16 @@ function createHqDivIcon() {
 
 export function GpsPage() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState('MAP'); // 'MAP' | 'STAYS' | 'GEOFENCES' | 'TRACKING_SHARES' | 'MAINTENANCE' | 'DEMURRAGE'
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(urlTab || 'MAP');
+
+  useEffect(() => {
+    if (urlTab && urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+  }, [urlTab]);
+
   const [vehicles, setVehicles] = useState([]);
   const [geofences, setGeofences] = useState([]);
   const [trackingShares, setTrackingShares] = useState([]);
@@ -230,6 +241,12 @@ export function GpsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [copiedTokenId, setCopiedTokenId] = useState(null);
+
+  // Mobile Bottom Sheet & Geolocation States
+  const [isMobileBottomSheetOpen, setIsMobileBottomSheetOpen] = useState(false);
+  const [isLocatingUser, setIsLocatingUser] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const userLocationMarkerRef = useRef(null);
 
   // Nearest Vehicle (Umkreissuche) Modal State
   const [isNearestModalOpen, setIsNearestModalOpen] = useState(false);
@@ -717,8 +734,10 @@ export function GpsPage() {
     const map = L.map(mapContainerRef.current, {
       center: [TINGLEV_HQ.lat, TINGLEV_HQ.lon],
       zoom: 10,
-      zoomControl: true,
-      attributionControl: false
+      zoomControl: false,
+      attributionControl: false,
+      touchZoom: true,
+      tap: false
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -901,6 +920,7 @@ export function GpsPage() {
       marker.bindPopup(popupHtml);
       marker.on('click', () => {
         setSelectedVehicle(veh);
+        setIsMobileBottomSheetOpen(true);
       });
 
       markersGroup.addLayer(marker);
@@ -916,16 +936,58 @@ export function GpsPage() {
   // Focus on vehicle from list
   const handleSelectVehicle = (veh) => {
     setSelectedVehicle(veh);
+    setIsMobileBottomSheetOpen(true);
     const map = mapInstanceRef.current;
     if (!map || typeof veh.lat !== 'number' || typeof veh.lon !== 'number') return;
 
     map.flyTo([veh.lat, veh.lon], 14, { duration: 1.2 });
     const marker = markersMapRef.current.get(veh.id);
-    if (marker) {
+    if (marker && window.innerWidth >= 768) {
       setTimeout(() => {
         marker.openPopup();
       }, 600);
     }
+  };
+
+  const handleCenterUserLocation = () => {
+    if (!navigator.geolocation) {
+      alert('GPS-Standorterfassung wird von Ihrem Browser nicht unterstützt.');
+      return;
+    }
+    setIsLocatingUser(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setIsLocatingUser(false);
+        const { latitude, longitude, accuracy } = pos.coords;
+        setUserLocation({ lat: latitude, lon: longitude, accuracy });
+        const map = mapInstanceRef.current;
+        if (map) {
+          map.flyTo([latitude, longitude], 15, { duration: 1.2 });
+          if (userLocationMarkerRef.current) {
+            userLocationMarkerRef.current.setLatLng([latitude, longitude]);
+          } else {
+            const userIcon = L.divIcon({
+              html: `
+                <div class="relative flex items-center justify-center w-8 h-8">
+                  <div class="absolute w-8 h-8 rounded-full bg-blue-500/30 animate-ping"></div>
+                  <div class="w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-lg"></div>
+                </div>
+              `,
+              className: 'custom-user-location-marker',
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+            });
+            userLocationMarkerRef.current = L.marker([latitude, longitude], { icon: userIcon }).addTo(map);
+          }
+        }
+      },
+      (err) => {
+        setIsLocatingUser(false);
+        console.warn('Geolocation error:', err);
+        alert('Standort konnte nicht ermittelt werden. Bitte erlauben Sie den GPS-Zugriff in den Geräteeinstellungen.');
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    );
   };
 
   const handleCenterHQ = () => {
@@ -1592,11 +1654,46 @@ export function GpsPage() {
               </div>
 
               {/* Map Canvas */}
-              <div className="relative w-full h-[520px] rounded-2xl overflow-hidden border border-slate-200/80 shadow-inner">
+              <div className="relative w-full h-[520px] md:h-[540px] max-md:h-[calc(100dvh-200px)] rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-800 shadow-inner">
                 <div ref={mapContainerRef} className="w-full h-full" />
                 
+                {/* Floating Action Buttons (FAB) on Map */}
+                <div className="absolute top-4 right-4 z-[400] flex flex-col space-y-2">
+                  {/* GPS User Geolocation FAB */}
+                  <button
+                    onClick={handleCenterUserLocation}
+                    disabled={isLocatingUser}
+                    className="w-10 h-10 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-slate-200/80 dark:border-slate-800 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all active:scale-90"
+                    title="Meinen Standort zentrieren (GPS)"
+                  >
+                    {isLocatingUser ? (
+                      <RotateCw className="w-4 h-4 animate-spin text-blue-500" />
+                    ) : (
+                      <Crosshair className="w-4 h-4" />
+                    )}
+                  </button>
+
+                  {/* Center HQ FAB */}
+                  <button
+                    onClick={handleCenterHQ}
+                    className="w-10 h-10 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-slate-200/80 dark:border-slate-800 flex items-center justify-center text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-slate-800 transition-all active:scale-90"
+                    title="Werk Altlandsberg (Zentrale) zentrieren"
+                  >
+                    <Building2 className="w-4 h-4" />
+                  </button>
+
+                  {/* Fit All Fleet FAB */}
+                  <button
+                    onClick={handleFitAll}
+                    className="w-10 h-10 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg border border-slate-200/80 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-90"
+                    title="Gesamtflotte einpassen"
+                  >
+                    <Maximize2 className="w-4 h-4" />
+                  </button>
+                </div>
+
                 {/* Legend Overlay */}
-                <div className="absolute bottom-4 left-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-lg border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1.5">
+                <div className="absolute bottom-4 left-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl shadow-lg border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1.5 hidden sm:block">
                   <div className="flex items-center space-x-2">
                     <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block ring-2 ring-emerald-300"></span>
                     <span className="font-bold text-slate-800 dark:text-slate-200">In Fahrt (speed &gt; 0)</span>
@@ -5052,6 +5149,19 @@ export function GpsPage() {
           </div>
         </div>
       )}
+
+      {/* Mobile Touch Drawer / Bottom Sheet for Vehicles */}
+      <VehicleBottomSheet
+        vehicle={selectedVehicle}
+        isOpen={isMobileBottomSheetOpen && Boolean(selectedVehicle)}
+        onClose={() => setIsMobileBottomSheetOpen(false)}
+        onOpenTracking={(id) => handleOpenCreateTracking(id)}
+        onPlanMaintenance={(veh) => {
+          setActiveTab('MAINTENANCE');
+          setMaintenanceVehicleFilter(veh.plate);
+          setIsMobileBottomSheetOpen(false);
+        }}
+      />
     </div>
   );
 }
