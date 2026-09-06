@@ -31,6 +31,14 @@ function registerValidSW(swUrl, config) {
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
+      // Check if there's already a waiting worker
+      if (registration.waiting) {
+        window.dispatchEvent(new CustomEvent('swUpdated', { detail: { registration } }));
+        if (config && config.onUpdate) {
+          config.onUpdate(registration);
+        }
+      }
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -39,8 +47,9 @@ function registerValidSW(swUrl, config) {
         installingWorker.onstatechange = () => {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
-              // New content is available; execute onUpdate callback
+              // New content is available; execute onUpdate callback & dispatch custom event
               console.log('[PWA] Neue Intranet-Version verfügbar! Aktualisierung empfohlen.');
+              window.dispatchEvent(new CustomEvent('swUpdated', { detail: { registration } }));
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
@@ -58,6 +67,14 @@ function registerValidSW(swUrl, config) {
     .catch((error) => {
       console.error('[PWA] Fehler bei der Service Worker-Registrierung:', error);
     });
+
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
 }
 
 function checkValidServiceWorker(swUrl, config) {

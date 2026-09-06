@@ -7,7 +7,8 @@ import { BrandingProvider } from './context/BrandingContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
-import { PWAInstallBanner } from './components/common/PWAInstallBanner';
+import { InstallPromptBanner } from './components/common/InstallPromptBanner';
+import { PWAUpdateToast } from './components/common/PWAUpdateToast';
 
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -303,7 +304,8 @@ export function App() {
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          <PWAInstallBanner />
+          <InstallPromptBanner />
+          <PWAUpdateToast />
         </BrowserRouter>
         </NewsProvider>
       </AuthProvider>
