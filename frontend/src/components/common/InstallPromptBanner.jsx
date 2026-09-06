@@ -41,6 +41,7 @@ export function InstallPromptBanner() {
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
+      window.__pwaDeferredPrompt = e;
       setShowBanner(true);
     };
 

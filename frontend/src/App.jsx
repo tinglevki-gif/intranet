@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { InstallPromptBanner } from './components/common/InstallPromptBanner';
 import { PWAUpdateToast } from './components/common/PWAUpdateToast';
+import { PWAInstallModal } from './components/common/PWAInstallModal';
 
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -306,6 +307,7 @@ export function App() {
           </Routes>
           <InstallPromptBanner />
           <PWAUpdateToast />
+          <PWAInstallModal />
         </BrowserRouter>
         </NewsProvider>
       </AuthProvider>

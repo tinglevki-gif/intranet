@@ -7,7 +7,9 @@ import {
   ChevronDown,
   Sparkles,
   CheckCheck,
-  Check
+  Check,
+  Smartphone,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -232,17 +234,49 @@ export function Navbar({ onToggleSidebar }) {
               </div>
 
               {/* Theme Preference in User Drawer */}
-              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40">
+              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40 dark:border-[#002B49] dark:bg-[#00223D]/40">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{t('theme.label', 'Erscheinungsbild')}</span>
                 </div>
                 <ThemeSelector variant="pills" className="w-full flex justify-between" />
               </div>
 
-              <div className="pt-2 border-t border-slate-100">
+              {/* Mobile / PWA App Install Direct Access */}
+              <div className="px-3 py-2 border-t border-slate-100 dark:border-[#002B49] bg-gradient-to-br from-sky-50/70 to-blue-50/40 dark:from-[#00223D] dark:to-[#001E36]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    window.dispatchEvent(new CustomEvent('open-pwa-install-modal'));
+                  }}
+                  className="w-full flex items-center justify-between p-2 rounded-2xl bg-white dark:bg-[#002B49] border border-sky-200/80 dark:border-sky-500/30 hover:border-sky-400 dark:hover:border-sky-400 text-slate-800 dark:text-slate-100 shadow-xs hover:shadow-md transition-all text-left group cursor-pointer"
+                >
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform shrink-0">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-xs font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                          App installieren
+                        </span>
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300">
+                          iOS / Android
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">
+                        Direktzugriff & Vollbildmodus
+                      </p>
+                    </div>
+                  </div>
+                  <Download className="w-4 h-4 text-sky-500 group-hover:translate-y-0.5 transition-transform shrink-0 ml-1" />
+                </button>
+              </div>
+
+              <div className="pt-2 border-t border-slate-100 dark:border-[#002B49]">
                 <button
                   onClick={logout}
-                  className="w-full flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors text-left rounded-b-3xl"
+                  className="w-full flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left rounded-b-3xl"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>{t('navbar.logout')}</span>
