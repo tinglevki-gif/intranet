@@ -495,10 +495,19 @@ export function ElementUebersichtWidget() {
       </div>
 
       {/* 2. DEDICATED PRINT TEMPLATE SHEET (Matching User's Screenshot Exactly) */}
-      <div className="hidden print:block font-sans text-slate-900 bg-white p-4 space-y-4 leading-relaxed text-xs">
+      <div className="hidden print:block font-sans text-slate-900 bg-white p-2 space-y-3 leading-relaxed text-xs">
+        <style>{`
+          @media print {
+            @page {
+              size: A4 portrait !important;
+              margin: 10mm 12mm 10mm 12mm !important;
+            }
+          }
+        `}</style>
         
         {/* Top Header Block */}
         <div className="flex justify-between items-start text-xs border-b-2 border-black pb-3">
+
           <div className="space-y-0.5">
             <div className="flex space-x-2">
               <span className="font-bold w-28">Projektnummer:</span>
