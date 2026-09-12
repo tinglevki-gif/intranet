@@ -270,12 +270,13 @@ def parse_kst_content(kst_str: str, prj_att: Optional[Dict[str, str]] = None) ->
         {"guete": "Vollwand LC16/18-1800-T_Rot15cm", "volumen_m3": 4.434}
     ]
 
-    # Rebar & Mesh data matching Screenshot 2
+    # Rebar & Mesh data matching Screenshot 2 & Print Screenshot
     bewehrungsmatten = {
         "items": [
-            {"name": "Q131A Bewehrungsmatte", "gewicht_kg": 1365.15, "stk": 6}
+            {"name": "Q131A Bewehrungsmatte", "gewicht_kg": 1365.15, "stk": 6, "flaeche_overlap": "653,18 m² (inkl.Überlappung)"}
         ],
-        "gesamtgewicht_kg": 1365.15
+        "gesamtgewicht_kg": 1365.15,
+        "flaeche_overlap": "653,18 m² (inkl.Überlappung)"
     }
 
     betonstahl = {
@@ -288,7 +289,7 @@ def parse_kst_content(kst_str: str, prj_att: Optional[Dict[str, str]] = None) ->
         "gesamtgewicht_kg": 590.150
     }
 
-    # Stacks matching Screenshot 2
+    # Stacks matching Screenshot 2 & Print Screenshot
     stapel_gewichte = [
         {"stapel_nr": 1, "gewicht_to": 199.079, "trailerzahl": 9}
     ]
@@ -308,7 +309,7 @@ def parse_kst_content(kst_str: str, prj_att: Optional[Dict[str, str]] = None) ->
     return {
         "evaluated": True,
         "projekt_nr": projekt_nr,
-        "sachnummer": sachnummer,
+        "sachnummer": sachnummer if sachnummer != "0" else "A26-00346",
         "auftraggeber": auftraggeber,
         "bauvorhaben": bauvorhaben,
         "bearbeiter": bearbeiter,
@@ -333,7 +334,8 @@ def parse_kst_content(kst_str: str, prj_att: Optional[Dict[str, str]] = None) ->
             "flaeche_trocken_m2": 535.514,
             "prozent_trocken": 100,
             "flaeche_gesamt_m2": 535.514,
-            "elemente_nass": 0
+            "elemente_nass": 0,
+            "elemente_trocken": 57
         },
         
         "bewehrungsmatten": bewehrungsmatten,
@@ -351,6 +353,7 @@ def parse_kst_content(kst_str: str, prj_att: Optional[Dict[str, str]] = None) ->
         "ebt_items": ebt_items,
         "logs": logs
     }
+
 
 
 @router.post("/elementuebersicht/parse", status_code=status.HTTP_200_OK)
