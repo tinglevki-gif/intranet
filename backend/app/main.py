@@ -275,6 +275,9 @@ if os.path.exists(FRONTEND_DIST) and os.path.isfile(os.path.join(FRONTEND_DIST, 
 
     @app.get("/{full_path:path}", tags=["Frontend"])
     async def serve_spa(full_path: str):
+        if full_path.startswith("api/") or full_path.startswith("uploads/") or full_path in ("docs", "redoc", "openapi.json"):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="Not Found")
         # Serve static file if exists in frontend dist
         if full_path:
             file_path = os.path.join(FRONTEND_DIST, full_path)
