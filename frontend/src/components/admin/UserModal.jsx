@@ -52,6 +52,7 @@ export function UserModal({
 
   const [manageCanteen, setManageCanteen] = useState(false);
   const [supervisorIds, setSupervisorIds] = useState([]);
+  const [departmentsList, setDepartmentsList] = useState([]);
 
   // Avatar file state
   const [avatarFile, setAvatarFile] = useState(null);
@@ -109,6 +110,16 @@ export function UserModal({
         sups = [Number(userToEdit.supervisor_id)];
       }
       setSupervisorIds(sups);
+
+      let depts = [];
+      if (Array.isArray(userToEdit.departments) && userToEdit.departments.length > 0) {
+        depts = userToEdit.departments.map(String);
+      } else if (userToEdit.department) {
+        depts = [String(userToEdit.department)];
+      } else {
+        depts = ['Geschäftsentwicklung'];
+      }
+      setDepartmentsList(depts);
     } else {
       setFormData({
         first_name: '',
@@ -118,7 +129,7 @@ export function UserModal({
         role: 'EMPLOYEE',
         department: 'Softwareentwicklung',
         position: 'Entwickler',
-        location: 'Tinglev Headquarter',
+        location: 'Tinglev HQ Brandenburg',
         phone: '',
         mobile: '',
         supervisor_id: '',
@@ -129,6 +140,7 @@ export function UserModal({
       setAvatarPreview(null);
       setManageCanteen(false);
       setSupervisorIds([]);
+      setDepartmentsList(['Softwareentwicklung']);
     }
     setAvatarFile(null);
     setAvatarRemoved(false);
@@ -223,6 +235,18 @@ export function UserModal({
     setSupervisorIds(supervisorIds.filter((id) => id !== idToRemove));
   };
 
+  const handleAddDepartment = (deptName) => {
+    if (!deptName) return;
+    if (!departmentsList.includes(deptName)) {
+      setDepartmentsList([...departmentsList, deptName]);
+    }
+  };
+
+  const handleRemoveDepartment = (deptToRemove) => {
+    if (departmentsList.length <= 1) return; // Keep at least one department
+    setDepartmentsList(departmentsList.filter((d) => d !== deptToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -260,6 +284,8 @@ export function UserModal({
 
       const payload = {
         ...formData,
+        department: departmentsList[0] || formData.department || 'General',
+        departments: departmentsList,
         avatar_url: finalAvatarUrl,
         supervisor_ids: supervisorIds,
         supervisor_id: supervisorIds.length > 0 ? supervisorIds[0] : null,
@@ -494,16 +520,51 @@ export function UserModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Building className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.department')} *</span>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span className="flex items-center space-x-1">
+                  <Building className="w-3 h-3 text-slate-400" />
+                  <span>{t('admin_users.department')} (Multi-Abteilung) *</span>
+                </span>
+                {departmentsList.length > 1 && (
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    {departmentsList.length} Abteilungen
+                  </span>
+                )}
               </label>
+
+              {/* Department Badge Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 mb-2 min-h-[34px] p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
+                {departmentsList.map((dept) => (
+                  <span
+                    key={dept}
+                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 shadow-xs"
+                  >
+                    <span>{dept}</span>
+                    {departmentsList.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDepartment(dept)}
+                        className="text-slate-400 hover:text-rose-600 rounded-full p-0.5 transition-colors ml-1"
+                        title="Abteilung entfernen"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </span>
+                ))}
+              </div>
+
+              {/* Add Department Dropdown */}
               <select
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleAddDepartment(e.target.value);
+                    e.target.value = '';
+                  }
+                }}
                 className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
               >
+                <option value="">+ weitere Abteilung hinzufügen...</option>
                 <option value="Geschäftsführung">Geschäftsführung</option>
                 <option value="Geschäftsentwicklung">Geschäftsentwicklung</option>
                 <option value="Rezeption">Rezeption & Empfang</option>

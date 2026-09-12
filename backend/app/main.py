@@ -42,6 +42,7 @@ with engine.connect() as conn:
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_permissions JSON DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_role_id INTEGER DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS supervisor_ids JSON DEFAULT '[]';"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS departments JSON DEFAULT '[]';"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS views_count INTEGER DEFAULT 0;"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_id INTEGER DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_name VARCHAR DEFAULT 'Geschäftsleitung';"))
@@ -68,6 +69,10 @@ with engine.connect() as conn:
                 conn.execute(text("ALTER TABLE users ADD COLUMN custom_permissions JSON DEFAULT NULL;"))
             if "custom_role_id" not in cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
+            if "supervisor_ids" not in cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN supervisor_ids JSON DEFAULT '[]';"))
+            if "departments" not in cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN departments JSON DEFAULT '[]';"))
             conn.commit()
 
             # Announcements migrations

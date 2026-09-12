@@ -75,6 +75,7 @@ def map_user_to_admin_response(u: User, db: Session) -> UserAdminResponse:
         supervisor_id=u.supervisor_id,
         supervisor_ids=sup_ids,
         supervisor_name=supervisor_name,
+        departments=u.get_departments(),
         subordinates_count=sub_count,
         allowed_modules=u.allowed_modules,
         custom_permissions=u.custom_permissions or {},
@@ -384,6 +385,14 @@ def create_admin_user(
         if r:
             custom_role_id = r.id
 
+    departments = []
+    if user_in.departments is not None and isinstance(user_in.departments, list):
+        departments = [str(d).strip() for d in user_in.departments if d]
+    elif user_in.department:
+        departments = [user_in.department.strip()]
+
+    primary_dept = departments[0] if departments else (user_in.department.strip() if user_in.department else "General")
+
     user = User(
         email=clean_email,
         first_name=user_in.first_name.strip() if user_in.first_name else None,
@@ -392,12 +401,13 @@ def create_admin_user(
         hashed_password=get_password_hash(user_in.password),
         role=user_in.role,
         custom_role_id=custom_role_id,
-        department=user_in.department.strip() if user_in.department else "General",
+        department=primary_dept,
+        departments=departments,
         position=user_in.position.strip() if user_in.position else "Mitarbeiter",
         avatar_url=user_in.avatar_url.strip() if user_in.avatar_url else None,
         phone=user_in.phone.strip() if user_in.phone else None,
         mobile=user_in.mobile.strip() if user_in.mobile else None,
-        location=user_in.location.strip() if user_in.location else "Tinglev Headquarter",
+        location=user_in.location.strip() if user_in.location else "Tinglev HQ Brandenburg",
         supervisor_id=primary_sup_id,
         supervisor_ids=supervisor_ids,
         allowed_modules=user_in.allowed_modules,
@@ -489,8 +499,16 @@ def update_admin_user(
     elif user_in.first_name or user_in.last_name:
         user.full_name = f"{user.first_name or ''} {user.last_name or ''}".strip()
 
-    if user_in.department is not None:
+    if user_in.departments is not None:
+        raw_depts = [str(d).strip() for d in user_in.departments if d]
+        user.departments = raw_depts
+        if raw_depts:
+            user.department = raw_depts[0]
+    elif user_in.department is not None:
         user.department = user_in.department.strip()
+        if not user.departments:
+            user.departments = [user_in.department.strip()]
+
     if user_in.position is not None:
         user.position = user_in.position.strip()
     if user_in.avatar_url is not None:

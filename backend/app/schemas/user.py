@@ -9,6 +9,7 @@ class UserBase(BaseModel):
     last_name: Optional[str] = None
     full_name: str
     department: str = "General"
+    departments: Optional[List[str]] = []
     position: str = "Mitarbeiter"
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
@@ -32,6 +33,7 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[str] = None
     department: Optional[str] = None
+    departments: Optional[List[str]] = None
     position: Optional[str] = None
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
@@ -112,6 +114,7 @@ class OrgChartNodeResponse(BaseModel):
     full_name: str
     position: str
     department: str
+    departments: Optional[List[str]] = []
     email: str
     phone: Optional[str] = None
     mobile: Optional[str] = None
@@ -133,6 +136,7 @@ class UserImportRow(BaseModel):
     last_name: Optional[str] = None
     full_name: Optional[str] = None
     department: str = "General"
+    departments: Optional[List[str]] = []
     position: str = "Mitarbeiter"
     phone: Optional[str] = None
     mobile: Optional[str] = None

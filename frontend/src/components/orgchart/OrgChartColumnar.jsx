@@ -118,10 +118,18 @@ export function OrgCard({
     >
       {/* Top Header: Department badge & Extension */}
       <div className="flex items-center justify-between mb-3 gap-1">
-        <div className="flex items-center space-x-1 min-w-0">
-          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${style.badge} truncate max-w-[130px]`}>
-            {node.department}
+        <div className="flex flex-wrap items-center gap-1 min-w-0">
+          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${style.badge} truncate max-w-[150px]`}>
+            {node.departments && node.departments.length > 0 ? node.departments.join(' / ') : node.department}
           </span>
+          {node.departments && node.departments.length > 1 && (
+            <span 
+              className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0"
+              title={`Zugeordnete Abteilungen: ${node.departments.join(', ')}`}
+            >
+              🏢 Multi-Dept
+            </span>
+          )}
           {node.supervisor_ids && node.supervisor_ids.length > 1 && (
             <span 
               className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0"

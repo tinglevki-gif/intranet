@@ -68,7 +68,11 @@ export function OrgChartPage() {
   const departmentList = useMemo(() => {
     const set = new Set();
     function traverse(node) {
-      if (node.department) set.add(node.department);
+      if (node.departments && Array.isArray(node.departments) && node.departments.length > 0) {
+        node.departments.forEach((d) => d && set.add(d));
+      } else if (node.department) {
+        set.add(node.department);
+      }
       if (node.children) node.children.forEach(traverse);
     }
     treeData.forEach(traverse);
@@ -100,7 +104,10 @@ export function OrgChartPage() {
 
     // Helper: returns cloned node if it or any child matches department
     function filterNode(node) {
-      const selfMatches = node.department === selectedDepartment;
+      const depts = node.departments && Array.isArray(node.departments) && node.departments.length > 0
+        ? node.departments
+        : [node.department];
+      const selfMatches = depts.includes(selectedDepartment);
       let matchedChildren = [];
       if (node.children) {
         matchedChildren = node.children

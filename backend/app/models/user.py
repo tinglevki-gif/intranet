@@ -55,6 +55,18 @@ class User(Base):
         backref=backref("supervisor", remote_side=[id])
     )
 
+    # Multi-Department Support (JSON list of department strings)
+    departments = Column(JSON, nullable=True, default=list)
+
+    def get_departments(self) -> list[str]:
+        """Returns a unique list of all departments assigned to this user."""
+        res = []
+        if self.departments and isinstance(self.departments, list):
+            res.extend([str(x).strip() for x in self.departments if x])
+        if self.department and str(self.department).strip() not in res:
+            res.insert(0, str(self.department).strip())
+        return res if res else ["General"]
+
     def get_supervisor_ids(self) -> list[int]:
         """Returns a unique list of all supervisor IDs assigned to this user."""
         res = []
