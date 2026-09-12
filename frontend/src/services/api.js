@@ -1210,6 +1210,43 @@ class ApiService {
     }
     return await response.json();
   }
+
+  // TransportMatrix & Logistiksteuerung
+  getTransportOrders(params = {}) {
+    const query = new URLSearchParams();
+    if (params.kw) query.append('kw', params.kw);
+    if (params.carrier_id) query.append('carrier_id', params.carrier_id);
+    if (params.project_id) query.append('project_id', params.project_id);
+    if (params.status) query.append('status', params.status);
+    const queryString = query.toString() ? `?${query.toString()}` : '';
+    return this.request(`/transportmatrix/orders${queryString}`);
+  }
+
+  getTransportKpis() {
+    return this.request('/transportmatrix/kpis');
+  }
+
+  getTransportProjects() {
+    return this.request('/transportmatrix/projects');
+  }
+
+  getTransportCarriers() {
+    return this.request('/transportmatrix/carriers');
+  }
+
+  createTransportOrder(orderData) {
+    return this.request('/transportmatrix/orders', {
+      method: 'POST',
+      body: JSON.stringify(orderData),
+    });
+  }
+
+  updateTransportOrder(orderId, orderData) {
+    return this.request(`/transportmatrix/orders/${orderId}`, {
+      method: 'PUT',
+      body: JSON.stringify(orderData),
+    });
+  }
 }
 
 export const api = new ApiService();

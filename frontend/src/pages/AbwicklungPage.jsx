@@ -10,14 +10,18 @@ import {
   Building, 
   Search, 
   AlertCircle, 
-  ArrowRight 
+  ArrowRight,
+  Grid
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { TransportMatrixWidget } from '../components/transportmatrix/TransportMatrixWidget';
 
 export function AbwicklungPage() {
   const { t } = useLanguage();
+  const [mainTab, setMainTab] = useState('transportmatrix'); // 'overview' | 'transportmatrix'
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+
 
   const orders = [
     {
@@ -107,19 +111,47 @@ export function AbwicklungPage() {
             <ClipboardCheck className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Auftragsabwicklung & Prozessübersicht</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Auftragsabwicklung & Logistik</h1>
             <p className="text-xs sm:text-sm text-slate-500">
-              Prozesskette von der statischen Freigabe, Fertigung und Qualitätssicherung bis zur Baustellenlogistik
+              Auftragsprozesskette, Statikfreigaben und integrierte TransportMatrix Logistiksteuerung
             </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs font-semibold">
-          <span className="px-3 py-1.5 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 font-bold">
-            {orders.length} laufende Aufträge
-          </span>
+        {/* Main Section Navigation Tabs */}
+        <div className="flex items-center space-x-2 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/60">
+          <button
+            onClick={() => setMainTab('transportmatrix')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              mainTab === 'transportmatrix'
+                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Truck className="w-4 h-4" />
+            <span>🚚 TransportMatrix & Disposition</span>
+          </button>
+
+          <button
+            onClick={() => setMainTab('overview')}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              mainTab === 'overview'
+                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/20'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span>📋 Auftrags-Prozessübersicht</span>
+          </button>
         </div>
       </div>
+
+      {/* Conditional Content rendering */}
+      {mainTab === 'transportmatrix' ? (
+        <TransportMatrixWidget />
+      ) : (
+        <>
+
 
       {/* Process Flow Diagram / Overview */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card">
@@ -232,6 +264,9 @@ export function AbwicklungPage() {
           </div>
         ))}
       </div>
+        </>
+      )}
     </div>
   );
 }
+
