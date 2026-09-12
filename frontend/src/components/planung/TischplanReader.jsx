@@ -11,6 +11,24 @@ export function TischplanReader() {
   const [tableNotes, setTableNotes] = useState({});
   const fileInputRef = useRef(null);
 
+  const [protocol, setProtocol] = useState({
+    h1Temp9: '',
+    h1Temp15: '',
+    h1Proben: '',
+    h1Unterschrift: '',
+    h2Temp9: '',
+    h2Temp15: '',
+    h2Proben: '',
+    h2Unterschrift: ''
+  });
+
+  const handleProtocolChange = (field, value) => {
+    setProtocol(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const handleFileUpload = (file) => {
     if (!file) return;
     setInputFilePath(`p:\\Tisch_Planung\\${file.name}`);
@@ -122,6 +140,9 @@ export function TischplanReader() {
             </div>
           </div>
         </div>
+
+        {/* MISCHMEISTER PROTOCOL (TOP EDITABLE BLOCK) */}
+        <ProtocolBlock protocol={protocol} onChange={handleProtocolChange} />
 
         {/* 3. HALLE 1 CONTAINER */}
         <div className="p-3 rounded-[3px] border-[1.5px] border-[#F5C2C7] bg-[#FFF5F5] print:p-1.5">
@@ -269,48 +290,7 @@ export function TischplanReader() {
         </div>
 
         {/* 6. MISCHMEISTER PROTOCOL & SIGNATURE BLOCK */}
-        <div className="p-3 rounded-[3px] border-[1.5px] border-[#B6D4FE] bg-[#F8FAFF] space-y-2.5 print:p-1.5 print:space-y-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[10.5px] print:grid-cols-2 print:gap-3 print:text-[9.5px]">
-            {/* Halle 1 Protocol */}
-            <div className="space-y-1.5 print:space-y-0.5">
-              <div className="font-bold text-slate-900">Halle 1</div>
-              <div className="text-slate-700">
-                <span className="font-medium">Temperatur:</span> &nbsp;&nbsp; 
-                9:00 Uhr: <span className="inline-block w-28 border-b border-slate-600"></span> &nbsp;&nbsp;&nbsp;&nbsp; 
-                15:00 Uhr: <span className="inline-block w-28 border-b border-slate-600"></span>
-              </div>
-              <div className="text-slate-700">
-                <span className="font-medium">Probenanzahl Halle 1:</span> <span className="inline-block w-44 border-b border-slate-600"></span>
-              </div>
-              <div className="pt-1 text-slate-700">
-                <span className="font-medium">Datum/Unterschrift:</span> <span className="inline-block w-52 border-b border-slate-600"></span>
-                <span className="block text-[9px] text-slate-500 mt-0.5">Mischmeister</span>
-              </div>
-            </div>
-
-            {/* Halle 2 Protocol */}
-            <div className="space-y-1.5 print:space-y-0.5">
-              <div className="font-bold text-slate-900">Halle 2</div>
-              <div className="text-slate-700">
-                <span className="font-medium">Temperatur:</span> &nbsp;&nbsp; 
-                9:00 Uhr: <span className="inline-block w-28 border-b border-slate-600"></span> &nbsp;&nbsp;&nbsp;&nbsp; 
-                15:00 Uhr: <span className="inline-block w-28 border-b border-slate-600"></span>
-              </div>
-              <div className="text-slate-700">
-                <span className="font-medium">Probenanzahl Halle 2:</span> <span className="inline-block w-44 border-b border-slate-600"></span>
-              </div>
-              <div className="pt-1 text-slate-700">
-                <span className="font-medium">Datum/Unterschrift:</span> <span className="inline-block w-52 border-b border-slate-600"></span>
-                <span className="block text-[9px] text-slate-500 mt-0.5">Mischmeister</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Official Mischmeister Small Note */}
-          <div className="pt-1.5 border-t border-blue-200/60 text-[8.5px] print:text-[7.5px] italic text-slate-500 leading-tight">
-            Hinweis für Mischmeister: Temperaturen eintragen - produzierte Tische wird mit Unterschrift quittiert - Rezeptabweichungen werden auf den Tischen markiert - Nicht produzierte Tische/Elemente werden markiert
-          </div>
-        </div>
+        <ProtocolBlock protocol={protocol} onChange={handleProtocolChange} />
 
       </div>
     </div>
@@ -393,3 +373,108 @@ function TableGridBox({ table, tableId, note, onNoteChange }) {
     </div>
   );
 }
+
+/**
+ * Interactive Mischmeister Protocol & Signature Block
+ */
+function ProtocolBlock({ protocol, onChange }) {
+  return (
+    <div className="p-3 rounded-[3px] border-[1.5px] border-[#B6D4FE] bg-[#F8FAFF] space-y-2.5 print:p-1.5 print:space-y-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[10.5px] print:grid-cols-2 print:gap-3 print:text-[9.5px]">
+        {/* Halle 1 Protocol */}
+        <div className="space-y-1.5 print:space-y-0.5">
+          <div className="font-bold text-slate-900">Halle 1</div>
+          <div className="text-slate-700 flex flex-wrap items-center gap-x-1.5">
+            <span className="font-medium">Temperatur:</span> &nbsp;
+            <span>9:00 Uhr:</span>
+            <input
+              type="text"
+              value={protocol?.h1Temp9 || ''}
+              onChange={(e) => onChange('h1Temp9', e.target.value)}
+              className="w-24 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+            />
+            &nbsp;&nbsp;
+            <span>15:00 Uhr:</span>
+            <input
+              type="text"
+              value={protocol?.h1Temp15 || ''}
+              onChange={(e) => onChange('h1Temp15', e.target.value)}
+              className="w-24 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+            />
+          </div>
+          <div className="text-slate-700 flex items-center gap-x-2">
+            <span className="font-medium">Probenanzahl Halle 1:</span>
+            <input
+              type="text"
+              value={protocol?.h1Proben || ''}
+              onChange={(e) => onChange('h1Proben', e.target.value)}
+              className="w-44 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+            />
+          </div>
+          <div className="pt-1 text-slate-700 flex flex-col">
+            <div className="flex items-center gap-x-2">
+              <span className="font-medium">Datum/Unterschrift:</span>
+              <input
+                type="text"
+                value={protocol?.h1Unterschrift || ''}
+                onChange={(e) => onChange('h1Unterschrift', e.target.value)}
+                className="w-52 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+              />
+            </div>
+            <span className="block text-[9px] text-slate-500 mt-0.5">Mischmeister</span>
+          </div>
+        </div>
+
+        {/* Halle 2 Protocol */}
+        <div className="space-y-1.5 print:space-y-0.5">
+          <div className="font-bold text-slate-900">Halle 2</div>
+          <div className="text-slate-700 flex flex-wrap items-center gap-x-1.5">
+            <span className="font-medium">Temperatur:</span> &nbsp;
+            <span>9:00 Uhr:</span>
+            <input
+              type="text"
+              value={protocol?.h2Temp9 || ''}
+              onChange={(e) => onChange('h2Temp9', e.target.value)}
+              className="w-24 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+            />
+            &nbsp;&nbsp;
+            <span>15:00 Uhr:</span>
+            <input
+              type="text"
+              value={protocol?.h2Temp15 || ''}
+              onChange={(e) => onChange('h2Temp15', e.target.value)}
+              className="w-24 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+            />
+          </div>
+          <div className="text-slate-700 flex items-center gap-x-2">
+            <span className="font-medium">Probenanzahl Halle 2:</span>
+            <input
+              type="text"
+              value={protocol?.h2Proben || ''}
+              onChange={(e) => onChange('h2Proben', e.target.value)}
+              className="w-44 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+            />
+          </div>
+          <div className="pt-1 text-slate-700 flex flex-col">
+            <div className="flex items-center gap-x-2">
+              <span className="font-medium">Datum/Unterschrift:</span>
+              <input
+                type="text"
+                value={protocol?.h2Unterschrift || ''}
+                onChange={(e) => onChange('h2Unterschrift', e.target.value)}
+                className="w-52 border-b border-slate-600 bg-transparent text-slate-900 font-mono text-[11px] px-1 focus:outline-none focus:border-blue-600 focus:bg-amber-50/70 transition-colors"
+              />
+            </div>
+            <span className="block text-[9px] text-slate-500 mt-0.5">Mischmeister</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Official Mischmeister Small Note */}
+      <div className="pt-1.5 border-t border-blue-200/60 text-[8.5px] print:text-[7.5px] italic text-slate-500 leading-tight">
+        Hinweis für Mischmeister: Temperaturen eintragen - produzierte Tische wird mit Unterschrift quittiert - Rezeptabweichungen werden auf den Tischen markiert - Nicht produzierte Tische/Elemente werden markiert
+      </div>
+    </div>
+  );
+}
+
