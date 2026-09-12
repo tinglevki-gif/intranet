@@ -34,44 +34,54 @@ export function TischplanReader() {
   return (
     <div className="tischplan-container w-full bg-white text-slate-900 font-sans text-xs select-none">
       
-      {/* 1. TOP CONTROLS BAR (Exact Desktop Style) */}
-      <div className="flex items-center space-x-2 p-3 bg-[#f8f9fa] border border-slate-300 rounded-t-xl print:hidden">
-        {/* Datei laden button */}
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="px-3.5 py-1.5 bg-[#f0f0f0] hover:bg-[#e4e4e4] active:bg-[#d8d8d8] text-slate-800 font-normal border border-[#999999] rounded-[3px] text-xs shadow-2xs transition-colors cursor-pointer"
-        >
-          Datei laden
-        </button>
+      {/* 1. TOP CONTROLS BAR (Exact Desktop Style - Tischantigravity28 v2.8.0.0) */}
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-[#f8f9fa] border border-slate-300 rounded-t-xl print:hidden">
+        <div className="flex items-center space-x-2">
+          {/* Datei laden button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-3.5 py-1.5 bg-[#f0f0f0] hover:bg-[#e4e4e4] active:bg-[#d8d8d8] text-slate-800 font-normal border border-[#999999] rounded-[3px] text-xs shadow-2xs transition-colors cursor-pointer"
+          >
+            📁 Datei laden
+          </button>
 
-        {/* Hidden file input */}
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept=".txt,.csv"
-          className="hidden"
-          onChange={(e) => handleFileUpload(e.target.files[0])}
-        />
-
-        {/* Drucken button */}
-        <button
-          onClick={handlePrint}
-          className="px-3.5 py-1.5 bg-[#f0f0f0] hover:bg-[#e4e4e4] active:bg-[#d8d8d8] text-slate-800 font-normal border border-[#999999] rounded-[3px] text-xs shadow-2xs transition-colors cursor-pointer"
-        >
-          Drucken
-        </button>
-
-        {/* Filepath input text box */}
-        <div className="flex-1 max-w-md">
+          {/* Hidden file input */}
           <input
-            type="text"
-            value={inputFilePath}
-            onChange={(e) => setInputFilePath(e.target.value)}
-            className="w-full px-2.5 py-1 bg-white border border-[#999999] rounded-[3px] font-mono text-[11px] text-slate-800 focus:outline-none focus:border-blue-500"
-            placeholder="p:\Tisch_Planung\..."
+            type="file"
+            ref={fileInputRef}
+            accept=".txt,.csv"
+            className="hidden"
+            onChange={(e) => handleFileUpload(e.target.files[0])}
           />
+
+          {/* Drucken button */}
+          <button
+            onClick={handlePrint}
+            className="px-3.5 py-1.5 bg-[#f0f0f0] hover:bg-[#e4e4e4] active:bg-[#d8d8d8] text-slate-800 font-normal border border-[#999999] rounded-[3px] text-xs shadow-2xs transition-colors cursor-pointer"
+          >
+            🖨️ Drucken
+          </button>
+
+          {/* Filepath input text box */}
+          <div className="w-64 sm:w-80">
+            <input
+              type="text"
+              value={inputFilePath}
+              onChange={(e) => setInputFilePath(e.target.value)}
+              className="w-full px-2.5 py-1 bg-white border border-[#999999] rounded-[3px] font-mono text-[11px] text-slate-800 focus:outline-none focus:border-blue-500"
+              placeholder="p:\Tisch_Planung\..."
+            />
+          </div>
+        </div>
+
+        {/* Version 2.8 Badge */}
+        <div className="flex items-center space-x-2">
+          <span className="px-2.5 py-0.5 rounded bg-blue-100 text-blue-900 font-mono text-[10px] font-bold border border-blue-200">
+            Tischantigravity28 v2.8.0.0
+          </span>
         </div>
       </div>
+
 
       {/* 2. PRINTABLE MAIN CANVAS CONTAINER */}
       <div className="p-4 sm:p-5 bg-white border border-slate-300 border-t-0 rounded-b-xl shadow-xs space-y-4 print:p-0 print:border-none print:shadow-none print:space-y-2">

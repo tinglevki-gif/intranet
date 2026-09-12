@@ -94,7 +94,7 @@ export function PlanungPage() {
 
         <div className="flex items-center space-x-2 text-xs font-semibold">
           <span className="px-3.5 py-1.5 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 font-bold">
-            Testversion • Demo-Planungsdaten
+            Tischantigravity28 v2.8
           </span>
           <span className="px-3.5 py-1.5 rounded-2xl bg-[#eef8fd] text-[#0070A8] border border-[#bce4f7] font-bold">
             36 Kipptische • 4 Fertigungslinien
@@ -113,8 +113,9 @@ export function PlanungPage() {
           }`}
         >
           <LayoutGrid className="w-4 h-4 text-[#009FE3]" />
-          <span>Tischplan-Export-Reader (Halle 1 & 2)</span>
+          <span>Tischplan-Export-Reader v2.8 (Halle 1 & 2)</span>
         </button>
+
 
         <button
           onClick={() => setActiveTab('KAPAZITAET')}

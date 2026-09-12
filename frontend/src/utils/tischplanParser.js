@@ -1,7 +1,8 @@
 /**
  * Exact Parser & Calculator for Tinglev Tischplan Export files (.txt, .csv)
- * Matches Tischantigravity21 / Tischplan-Export-Reader official production specifications
+ * Matches Tischantigravity28 / Tischplan-Export-Reader v2.8 official production specifications
  */
+
 
 export const RAW_SAMPLE_DATA_24_08 = `Pos.  ;Projekt Nr..  ;Prod. GUID          ;Hall. Nr.  ;Prod. Datum  ;Stapel  ;Pal Nr..  ;Länge  ;Höhe  ;Breite  ;Fläche  ;Volumen  ;Betongüte           
 22    ;A26-00293     ;d8a10519-692e-4f48-b;1          ;2026-08-24   ;3       ;1         ;1.570  ;2.975 ;24.00   ;4.671   ;1.121    ;LC16/18-2000-ROT    
