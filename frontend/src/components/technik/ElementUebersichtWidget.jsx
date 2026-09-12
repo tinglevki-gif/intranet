@@ -1,52 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import {
-  FileText,
-  Upload,
-  Layers,
-  Box,
-  Scale,
-  Maximize2,
-  Download,
-  Printer,
-  Sparkles,
-  CheckCircle2,
-  AlertCircle,
-  Building,
-  User,
-  MapPin,
-  ListFilter,
-  Cpu,
-  RefreshCw
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { Upload, Download, Printer, RefreshCw, Layers } from 'lucide-react';
 import { api } from '../../services/api';
 
 export function ElementUebersichtWidget() {
   const [kstFile, setKstFile] = useState(null);
   const [prjattFile, setPrjattFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [isEvaluated, setIsEvaluated] = useState(false);
   const [data, setData] = useState(null);
-  const [activeTab, setActiveTab] = useState('ELEMENTS'); // 'ELEMENTS' | 'REBAR' | 'EBT'
 
-  const loadData = async (kst = null, prjatt = null) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.parseElementUebersicht(kst, prjatt);
-      setData(res);
-    } catch (err) {
-      setError(err.message || 'Fehler beim Analysieren der CAD-Dateien.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // Initial load with built-in demo dataset for seamless experience
-    loadData();
-  }, []);
-
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     let kst = null;
     let prjatt = null;
@@ -61,16 +24,35 @@ export function ElementUebersichtWidget() {
     if (prjatt) setPrjattFile(prjatt);
 
     if (kst || prjatt) {
-      loadData(kst || kstFile, prjatt || prjattFile);
+      await runEvaluation(kst || kstFile, prjatt || prjattFile);
     }
   };
 
-  const handleExportCsv = () => {
-    if (!data || !data.elements || data.elements.length === 0) return;
+  const runEvaluation = async (kst = kstFile, prjatt = prjattFile) => {
+    setLoading(true);
+    try {
+      const res = await api.parseElementUebersicht(kst, prjatt);
+      setData(res);
+      setIsEvaluated(true);
+    } catch (err) {
+      console.error('Fehler bei Auswertung:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const headers = 'Element-Nr;Laenge (mm);Breite (mm);Dicke (m);Volumen (m3);Gewicht (t);Flaeche (m2);Stapel-Nr\n';
+  const handleClear = () => {
+    setIsEvaluated(false);
+    setData(null);
+    setKstFile(null);
+    setPrjattFile(null);
+  };
+
+  const handleExportCsv = () => {
+    if (!data || !data.elements) return;
+    const headers = 'Element-Nr;Laenge (m);Hoehe (m);Dicke (cm);Flaeche (m2);Gewicht (kg);Betonguete\n';
     const rows = data.elements.map((el) => 
-      `${el.element_nummer};${el.laenge_mm};${el.breite_mm};${el.dicke_m};${el.volumen_m3};${el.gewicht_t};${el.flaeche_m2};${el.stapel_nr}`
+      `${el.element_nummer};${el.laenge_m || ''};${el.hoehe_m || ''};${el.dicke_cm || ''};${el.flaeche_m2 || ''};${el.gewicht_kg || ''};${el.betonguete || ''}`
     ).join('\n');
 
     const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
@@ -87,328 +69,458 @@ export function ElementUebersichtWidget() {
     window.print();
   };
 
-  const kpis = data?.kpi_stats || {};
-  const elements = data?.elements || [];
-  const rebar = data?.rebar_counts || {};
-  const fittings = data?.fittings_counts || {};
-  const ebtItems = data?.ebt_items || [];
+  const projektNr = isEvaluated && data ? data.projekt_nr : '0';
+  const sachnummer = isEvaluated && data ? data.sachnummer : '0';
 
   return (
-    <div className="space-y-6 animate-fade-in print:p-0 print:m-0">
-      {/* File Upload & Demo Loader Controls */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold shrink-0">
-            <Layers className="w-5 h-5" />
+    <div className="bg-[#F8FAFC] p-4 sm:p-6 rounded-xl border border-slate-200 shadow-md font-sans text-slate-800 space-y-4 print:p-0 print:bg-white print:border-none print:shadow-none">
+      
+      {/* HEADER CONTROL BAR (Matching WPF Desktop Toolbar) */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        
+        {/* Left Toolbar Inputs & Buttons */}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          
+          {/* Projektnummer Box */}
+          <div className="flex items-center space-x-2">
+            <span className="font-semibold text-slate-700 w-24">Projektnummer</span>
+            <input
+              type="text"
+              readOnly
+              value={projektNr}
+              className="w-20 px-2 py-1 bg-[#FFFDE7] border border-slate-300 font-bold text-center text-slate-900 rounded shadow-inner"
+            />
           </div>
-          <div>
-            <h3 className="font-bold text-slate-900 text-sm sm:text-base">
-              Allplan CAD / Nemetschek Export Import (.KST &amp; PrjAtt.dat)
-            </h3>
-            <p className="text-xs text-slate-400">
-              Automatische Analyse von Betonfertigteilen, Kubatur ($m^3$), Tonnagen ($t$), Flächen ($m^2$) und Armierung
-            </p>
+
+          {/* Sachnummer Box */}
+          <div className="flex items-center space-x-2">
+            <span className="font-semibold text-slate-700 w-24 sm:w-auto">Sachnummer</span>
+            <input
+              type="text"
+              readOnly
+              value={sachnummer}
+              className="w-20 px-2 py-1 bg-[#FFFDE7] border border-slate-300 font-bold text-center text-slate-900 rounded shadow-inner"
+            />
+          </div>
+
+          {/* Action Buttons Group (Replicating Windows Desktop Buttons) */}
+          <div className="flex items-center space-x-1.5 pl-2">
+            <button
+              disabled={!isEvaluated}
+              className="px-3 py-1 bg-[#F1F5F9] border border-slate-300 rounded text-slate-700 font-medium hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
+            >
+              Letzte KST
+            </button>
+
+            {/* Hidden File Picker triggered by Browse */}
+            <label className="cursor-pointer px-3 py-1 bg-[#F1F5F9] border border-slate-300 rounded text-slate-700 font-medium hover:bg-slate-200 shadow-sm transition-all">
+              Browse
+              <input
+                type="file"
+                multiple
+                accept=".kst,.dat,.KST,.DAT"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+
+            {/* Auswerten Button */}
+            <button
+              onClick={() => runEvaluation()}
+              disabled={loading}
+              className="px-3 py-1 bg-[#E2F0D9] hover:bg-[#C8E6C9] border border-[#A2D193] text-emerald-950 font-bold rounded shadow-sm transition-all flex items-center space-x-1"
+            >
+              {loading && <RefreshCw className="w-3 h-3 animate-spin mr-1" />}
+              <span>Auswerten</span>
+            </button>
+
+            {/* Clear Button */}
+            <button
+              onClick={handleClear}
+              className="px-3 py-1 bg-[#E2F0D9] hover:bg-[#C8E6C9] border border-[#A2D193] text-emerald-950 font-bold rounded shadow-sm transition-all"
+            >
+              Clear
+            </button>
+
+            {/* CSV Button */}
+            <button
+              onClick={handleExportCsv}
+              disabled={!isEvaluated}
+              className="px-3 py-1 bg-[#F1F5F9] border border-slate-300 rounded text-slate-700 font-medium hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
+            >
+              -&gt; CSV
+            </button>
+
+            {/* Print Button */}
+            <button
+              onClick={handlePrint}
+              disabled={!isEvaluated}
+              className="px-3 py-1 bg-[#F1F5F9] border border-slate-300 rounded text-slate-700 font-medium hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all"
+            >
+              Print
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 shrink-0">
-          <label className="cursor-pointer inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all border border-indigo-200">
-            <Upload className="w-4 h-4 text-indigo-600" />
-            <span>Dateien wählen (.KST / PrjAtt)</span>
-            <input
-              type="file"
-              multiple
-              accept=".kst,.dat,.KST,.DAT"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </label>
-
-          <button
-            onClick={() => loadData(null, null)}
-            disabled={loading}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all disabled:opacity-50"
-            title="Demo-Datensatz neu laden"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Demo laden</span>
-          </button>
+        {/* Right Title Header (ELEMENT - PREVIEW 1.2) */}
+        <div className="text-right shrink-0">
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-serif tracking-wider text-[#475569] uppercase">
+            ELEMENT - PREVIEW 1.2
+          </h2>
+          <p className="text-[10px] tracking-widest text-slate-500 font-bold uppercase">
+            SETZT EINE VORHANDENE KST-DATEI VORAUS
+          </p>
+          <p className="text-[9px] tracking-wider text-slate-400 font-mono">
+            VERSION - 1.2.0.6
+          </p>
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs font-bold flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{error}</span>
+      {/* MAIN SCREEN BODY */}
+      {!isEvaluated ? (
+        /* INITIAL STATE BEFORE FILE LOAD (Matching Screenshot 1) */
+        <div className="py-32 flex flex-col items-center justify-center text-center space-y-4">
+          <p className="text-slate-700 text-lg sm:text-xl font-normal font-sans">
+            Anzeige erst nach erfolgreicher Auswertung sichtbar
+          </p>
         </div>
-      )}
-
-      {/* Project Metadata Card */}
-      {data && (
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-800 space-y-6 print:bg-none print:text-slate-900 print:p-4 print:border-b print:border-slate-300">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                <Building className="w-3.5 h-3.5" />
-                <span>Projekt-Nr: <strong className="font-mono text-white">{data.projekt_nr}</strong></span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                {data.bauvorhaben}
-              </h2>
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
-                <span className="flex items-center space-x-1.5">
-                  <User className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Auftraggeber: <strong>{data.auftraggeber}</strong></span>
-                </span>
-                <span className="flex items-center space-x-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Ort: <strong>{data.plz_ort} {data.strasse}</strong></span>
-                </span>
-                {data.bearbeiter && (
-                  <span className="text-slate-400 font-mono">
-                    Bearbeiter: {data.bearbeiter}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-2 shrink-0 print:hidden">
-              <button
-                onClick={handlePrint}
-                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-all border border-white/15 backdrop-blur-sm"
-              >
-                <Printer className="w-4 h-4 text-indigo-300" />
-                <span>Drucken</span>
-              </button>
-              <button
-                onClick={handleExportCsv}
-                className="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/30"
-              >
-                <Download className="w-4 h-4" />
-                <span>CSV-Export</span>
-              </button>
-            </div>
-          </div>
-
-          {/* KPI Summary Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Elemente Gesamt</span>
-              <span className="text-xl sm:text-2xl font-black text-white font-mono mt-0.5 block">{kpis.gesamt_elemente || 0}</span>
-              <span className="text-[10px] text-indigo-300 font-semibold">{kpis.v_elemente_anzahl || 0} Wand-Elemente</span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Gesamtfläche</span>
-              <span className="text-xl sm:text-2xl font-black text-emerald-400 font-mono mt-0.5 block">{kpis.gesamt_flaeche_m2 || 0} $m^2$</span>
-              <span className="text-[10px] text-slate-400">Schalungsfläche</span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Gesamtvolumen</span>
-              <span className="text-xl sm:text-2xl font-black text-cyan-400 font-mono mt-0.5 block">{kpis.gesamt_volumen_m3 || 0} $m^3$</span>
-              <span className="text-[10px] text-slate-400">Betonkubatur</span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Gesamtgewicht</span>
-              <span className="text-xl sm:text-2xl font-black text-amber-400 font-mono mt-0.5 block">{kpis.gesamt_gewicht_t || 0} t</span>
-              <span className="text-[10px] text-slate-400">Fertigteiltonnage</span>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Transport-Stapel</span>
-              <span className="text-xl sm:text-2xl font-black text-purple-300 font-mono mt-0.5 block">{kpis.stapel_anzahl || 0}</span>
-              <span className="text-[10px] text-purple-300 font-semibold">SLBSTACK Einheiten</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Tabbed Data Section */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-card overflow-hidden">
-        {/* Internal Sub-Nav Tabs */}
-        <div className="flex items-center space-x-2 px-6 pt-5 border-b border-slate-100 overflow-x-auto print:hidden">
-          <button
-            onClick={() => setActiveTab('ELEMENTS')}
-            className={`pb-3.5 px-3 text-xs font-bold border-b-2 transition-all flex items-center space-x-2 shrink-0 ${
-              activeTab === 'ELEMENTS'
-                ? 'border-indigo-600 text-indigo-600 font-extrabold'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <Box className="w-4 h-4" />
-            <span>Betonfertigteile ({elements.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('REBAR')}
-            className={`pb-3.5 px-3 text-xs font-bold border-b-2 transition-all flex items-center space-x-2 shrink-0 ${
-              activeTab === 'REBAR'
-                ? 'border-indigo-600 text-indigo-600 font-extrabold'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <Cpu className="w-4 h-4" />
-            <span>Bewehrung &amp; Einbauteile</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('EBT')}
-            className={`pb-3.5 px-3 text-xs font-bold border-b-2 transition-all flex items-center space-x-2 shrink-0 ${
-              activeTab === 'EBT'
-                ? 'border-indigo-600 text-indigo-600 font-extrabold'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
-            }`}
-          >
-            <ListFilter className="w-4 h-4" />
-            <span>EBT-Stückliste ({ebtItems.length})</span>
-          </button>
-        </div>
-
-        {/* TAB 1: ELEMENTS TABLE */}
-        {activeTab === 'ELEMENTS' && (
-          <div className="overflow-x-auto p-6">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-3">#</th>
-                  <th className="py-3 px-3">Element-Nr</th>
-                  <th className="py-3 px-3">Länge (mm)</th>
-                  <th className="py-3 px-3">Breite (mm)</th>
-                  <th className="py-3 px-3">Dicke (m)</th>
-                  <th className="py-3 px-3">Fläche ($m^2$)</th>
-                  <th className="py-3 px-3">Volumen ($m^3$)</th>
-                  <th className="py-3 px-3">Gewicht (t)</th>
-                  <th className="py-3 px-3">Stapel</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                {elements.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="py-8 text-center text-slate-400 text-xs">
-                      Keine Elemente in der ausgewählten Datei gefunden.
-                    </td>
-                  </tr>
-                ) : (
-                  elements.map((el, idx) => (
-                    <tr key={el.id || idx} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-2.5 px-3 text-slate-400 font-mono text-[11px]">{idx + 1}</td>
-                      <td className="py-2.5 px-3 font-bold text-slate-900">
-                        {el.element_nummer}
-                        {el.ist_v_element && (
-                          <span className="ml-1.5 px-1.5 py-0.2 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            Wand-V
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3 font-mono">{el.laenge_mm}</td>
-                      <td className="py-2.5 px-3 font-mono">{el.breite_mm}</td>
-                      <td className="py-2.5 px-3 font-mono">{el.dicke_m}</td>
-                      <td className="py-2.5 px-3 font-mono font-semibold text-emerald-600">{el.flaeche_m2}</td>
-                      <td className="py-2.5 px-3 font-mono font-semibold text-cyan-600">{el.volumen_m3}</td>
-                      <td className="py-2.5 px-3 font-mono font-semibold text-amber-600">{el.gewicht_t}</td>
-                      <td className="py-2.5 px-3">
-                        <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 font-mono font-bold text-[10px]">
-                          Stapel #{el.stapel_nr || 1}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* TAB 2: REINFORCEMENT & FITTINGS SUMMARY */}
-        {activeTab === 'REBAR' && (
-          <div className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Q-Mesh Steel */}
-              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-                  <span>Bewehrungsstahlliste (Matten &amp; Rundstahl)</span>
+      ) : (
+        /* EVALUATED DASHBOARD VIEW (Matching Screenshot 2 Pixel-for-Pixel) */
+        <div className="space-y-4 animate-fade-in text-xs">
+          
+          {/* TOP THREE-COLUMN GRID */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+            
+            {/* COLUMN 1 (Width: 3.5 / 12) */}
+            <div className="lg:col-span-3 space-y-3">
+              
+              {/* Elementliste (1) */}
+              <div className="bg-white rounded border border-slate-300 shadow-sm p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-1 mb-2">
+                  Elementliste ({data?.elements?.length || 0})
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {Object.entries(rebar).map(([k, count]) => (
-                    <div key={k} className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-700">{k}</span>
-                      <span className="text-xs font-bold font-mono bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md">
-                        {count} Stk
-                      </span>
+                <div className="max-h-40 overflow-y-auto space-y-2 font-sans text-[11px] pr-1">
+                  {data?.elements?.map((el, idx) => (
+                    <div key={idx} className="bg-slate-50 p-2 rounded border border-slate-200 space-y-0.5">
+                      <div className="flex justify-between font-bold text-slate-900">
+                        <span>Element: {el.element_nummer}</span>
+                        <span>Fläche: {el.flaeche_m2} m²</span>
+                      </div>
+                      <div className="text-slate-600 truncate">
+                        Betongüte: {el.betonguete}
+                      </div>
+                      <div className="flex justify-between text-slate-700">
+                        <span>Länge: {el.laenge_m} m</span>
+                        <span>Höhe: {el.hoehe_m} m</span>
+                      </div>
+                      <div className="flex justify-between text-slate-700">
+                        <span>Dicke: {el.dicke_cm} cm</span>
+                        <span>Gewicht: {el.gewicht_to} to</span>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Fittings & Accessories */}
-              <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-                <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center space-x-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
-                  <span>Einbauteile, Elektro &amp; Aussparungen</span>
+              {/* Elementhöhen (2) */}
+              <div className="bg-white rounded border border-slate-300 shadow-sm p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-1 mb-2">
+                  Elementhöhen ({data?.elementhoehen?.length || 0})
                 </h4>
-                <div className="space-y-2 text-xs">
-                  <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">Elektrodosen 1er / 2er / 3er / 4er</span>
-                    <span className="font-bold font-mono text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
-                      {fittings.e_dose_1 + fittings.e_dose_2 + fittings.e_dose_3 + fittings.e_dose_4} Dosen
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">Conduit-Rohre (PSM25 / PSM32)</span>
-                    <span className="font-bold font-mono text-slate-800 bg-slate-100 px-2 py-0.5 rounded-md">
-                      {fittings.psm25 + fittings.psm32} Stk
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">Styropor-Aussparungskörper (EL-Styro)</span>
-                    <span className="font-bold font-mono text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
-                      {fittings.styro} Stk
-                    </span>
-                  </div>
-                  <div className="p-2.5 bg-white rounded-xl border border-slate-200 flex items-center justify-between">
-                    <span className="font-semibold text-slate-700">Schräge Kanten &amp; Fase</span>
-                    <span className="font-bold font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                      {fittings.schraege_kanten} Stk
-                    </span>
+                <div className="space-y-1 text-[11px]">
+                  {data?.elementhoehen?.map((h, i) => (
+                    <div key={i} className="flex justify-between text-slate-700">
+                      <span>Elementhöhe: {h.hoehe_m} m</span>
+                      <span className="font-medium">Anzahl: {h.anzahl}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bewehrungsmatten (8) */}
+              <div className="bg-[#FDF2F2] rounded border border-rose-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-rose-200 pb-1 mb-2">
+                  Bewehrungsmatten (8)
+                </h4>
+                <div className="space-y-1.5 text-[11px]">
+                  {data?.bewehrungsmatten?.items?.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-slate-800 font-medium">
+                      <span>{item.name} :</span>
+                      <span>{item.gewicht_kg} kg = {item.stk} Stk</span>
+                    </div>
+                  ))}
+                  <div className="border-t border-rose-200 pt-1 flex justify-between font-bold text-slate-900">
+                    <span>Mattengewichte Gesamt :</span>
+                    <span>{data?.bewehrungsmatten?.gesamtgewicht_kg} kg</span>
                   </div>
                 </div>
               </div>
+
+              {/* Betonstahl (ohne Matten) */}
+              <div className="bg-[#FDF2F2] rounded border border-rose-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-rose-200 pb-1 mb-2">
+                  Betonstahl (ohne Matten)
+                </h4>
+                <div className="space-y-1 text-[11px]">
+                  {data?.betonstahl?.items?.map((st, i) => (
+                    <div key={i} className="flex justify-between text-slate-700">
+                      <span>Ø {st.diameter} Gesamtgewicht:</span>
+                      <span className="font-medium">{st.gewicht_kg} kg</span>
+                    </div>
+                  ))}
+                  <div className="border-t border-rose-200 pt-1 flex justify-between font-bold text-slate-900 mt-1">
+                    <span>Betonstahl Gesamt:</span>
+                    <span>{data?.betonstahl?.gesamtgewicht_kg} kg</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Anschlusseisen (11) */}
+              <div className="bg-[#FDF2F2] rounded border border-rose-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-rose-200 pb-1 mb-1.5">
+                  Anschlusseisen (11)
+                </h4>
+                <p className="text-rose-600 font-bold text-[11px]">
+                  {data?.anschlusseisen || 'Keine WD-Verbindung erkannt'}
+                </p>
+              </div>
+
+              {/* Hülsendübel (12) */}
+              <div className="bg-[#E8F5E9] rounded border border-emerald-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-emerald-200 pb-1 mb-1">
+                  Hülsendübel (12)
+                </h4>
+                <p className="text-slate-600 text-[11px]">
+                  {data?.huelsenduebel || 'Keine Hülsendübel vorhanden.'}
+                </p>
+              </div>
+            </div>
+
+            {/* COLUMN 2 (Width: 5.5 / 12) */}
+            <div className="lg:col-span-6 space-y-3">
+              
+              {/* Fläche nach Betongüten gruppiert (6) */}
+              <div className="bg-[#E8F5E9] rounded border border-emerald-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-emerald-200 pb-1 mb-2">
+                  Fläche nach Betongüten gruppiert (6)
+                </h4>
+                <div className="space-y-1 text-[11px]">
+                  {data?.betongueten_flaeche?.map((bg, idx) => (
+                    <div key={idx} className="flex justify-between text-slate-800 font-medium">
+                      <span>in {bg.guete} :</span>
+                      <span className="font-bold">{bg.flaeche_m2} m²</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Elementanzahl nach Betongüten gruppiert (4) */}
+              <div className="bg-[#E8F5E9] rounded border border-emerald-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-emerald-200 pb-1 mb-2">
+                  Elementanzahl nach Betongüten gruppiert (4)
+                </h4>
+                <div className="space-y-1 text-[11px]">
+                  {data?.betongueten_anzahl?.map((bg, idx) => (
+                    <div key={idx} className="flex space-x-3 text-slate-800 font-medium">
+                      <span className="w-6 font-bold">{bg.anzahl}</span>
+                      <span>Elemente in {bg.guete}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Volumen nach Betongüten gruppiert (13) */}
+              <div className="bg-[#E8F5E9] rounded border border-emerald-200 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-emerald-200 pb-1 mb-2">
+                  Volumen nach Betongüten gruppiert (13)
+                </h4>
+                <div className="space-y-1 text-[11px]">
+                  {data?.betongueten_volumen?.map((bg, idx) => (
+                    <div key={idx} className="flex justify-between text-slate-800 font-medium">
+                      <span>in {bg.guete} :</span>
+                      <span className="font-bold">{bg.volumen_m3} m³</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stapel mit Gewichte (10) & Stapel mit Elementen */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-white rounded border border-slate-300 p-2.5">
+                  <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-1 mb-1.5">
+                    Stapel mit Gewichte (10)
+                  </h4>
+                  <div className="text-[11px] text-slate-700">
+                    {data?.stapel_gewichte?.map((st, i) => (
+                      <div key={i} className="flex justify-between">
+                        <span>Stapel {st.stapel_nr}: {st.gewicht_to} to</span>
+                        <span>Trailerzahl: {st.trailerzahl}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded border border-slate-300 p-2.5">
+                  <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-1 mb-1.5">
+                    Stapel mit Elementen
+                  </h4>
+                  <div className="text-[11px] text-slate-700">
+                    {data?.stapel_elemente?.map((st, i) => (
+                      <div key={i}>{st.description}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Elektro-Bauteile (7) & Maueranker (9) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-[#E8F5E9] rounded border border-emerald-200 p-2.5">
+                  <h4 className="font-semibold text-slate-800 border-b border-emerald-200 pb-1 mb-1">
+                    Elektro-Bauteile (7)
+                  </h4>
+                  <p className="text-slate-600 text-[11px]">
+                    {data?.elektro_bauteile || 'Keine Elektro-Einbauteile gefunden.'}
+                  </p>
+                </div>
+
+                <div className="bg-[#E8F5E9] rounded border border-emerald-200 p-2.5">
+                  <h4 className="font-semibold text-slate-800 border-b border-emerald-200 pb-1 mb-1">
+                    Maueranker (9)
+                  </h4>
+                  <p className="text-slate-600 text-[11px]">
+                    {data?.maueranker || 'Keine Maueranker gefunden.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Warennummern (AU + EBT) */}
+              <div className="bg-[#E0F7FA] rounded border border-cyan-300 p-2.5">
+                <h4 className="font-semibold text-slate-800 border-b border-cyan-300 pb-1 mb-2">
+                  Warennummern (AU + EBT)
+                </h4>
+                <div className="max-h-36 overflow-y-auto space-y-1 text-[11px] pr-1">
+                  {data?.ebt_items?.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-slate-800 font-medium border-b border-cyan-100/60 pb-0.5">
+                      <span>{item.display}</span>
+                      <span className="font-bold shrink-0 ml-2">Menge : {item.wmenge}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* COLUMN 3 (Width: 3.5 / 12 - Right Panel & Summary Boxes) */}
+            <div className="lg:col-span-3 space-y-3">
+              
+              {/* Betonsorten nass / trocken (5) */}
+              <div className="bg-white rounded border border-slate-300 p-2.5 space-y-2">
+                <h4 className="font-semibold text-slate-800 border-b border-slate-200 pb-1">
+                  Betonsorten nass / trocken (5)
+                </h4>
+                <div className="space-y-1 text-[11px]">
+                  <div className="flex justify-between text-slate-700">
+                    <span>Fläche im Nassverfahren :</span>
+                    <span className="font-medium">{data?.nass_trocken?.flaeche_nass_m2} m² ({data?.nass_trocken?.prozent_nass}%)</span>
+                  </div>
+                  <div className="flex justify-between text-slate-700">
+                    <span>Fläche im Trockenverfahren :</span>
+                    <span className="font-medium">{data?.nass_trocken?.flaeche_trocken_m2} m² ({data?.nass_trocken?.prozent_trocken}%)</span>
+                  </div>
+                  <div className="border-t border-slate-200 pt-1 flex justify-between font-bold text-slate-900">
+                    <span>Fläche Gesamt :</span>
+                    <span>{data?.nass_trocken?.flaeche_gesamt_m2} m²</span>
+                  </div>
+                  <div className="flex justify-between text-slate-700">
+                    <span>Elemente Nass :</span>
+                    <span>{data?.nass_trocken?.elemente_nass}</span>
+                  </div>
+                </div>
+
+                {/* Legend Chart box (Blue vs Light Blue) */}
+                <div className="bg-slate-50 p-2 border border-slate-200 rounded flex items-center space-x-4 text-[11px] justify-center mt-2">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="w-3 h-3 bg-slate-900 inline-block border border-slate-700"></span>
+                    <span className="text-slate-700 font-medium">Nassverfahren</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5">
+                    <span className="w-3 h-3 bg-cyan-200 inline-block border border-cyan-400"></span>
+                    <span className="text-slate-700 font-medium">Trockenverfahren</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Elementanzahl & Wendeelemente KPI Card (Yellow Box) */}
+              <div className="bg-[#FFF9C4] rounded border border-amber-300 p-3 space-y-2">
+                <div className="flex justify-between items-center text-[12px] font-semibold text-slate-800">
+                  <span>Elementanzahl:</span>
+                  <input
+                    type="text"
+                    readOnly
+                    value={data?.elementanzahl || 0}
+                    className="w-16 px-2 py-0.5 bg-white border border-amber-300 text-center font-bold text-slate-900 rounded shadow-inner"
+                  />
+                </div>
+                <div className="flex justify-between items-center text-[12px] font-semibold text-slate-800">
+                  <span>davon Wendeelemente:</span>
+                  <input
+                    type="text"
+                    readOnly
+                    value={data?.wendeelemente || 0}
+                    className="w-16 px-2 py-0.5 bg-white border border-amber-300 text-center font-bold text-slate-900 rounded shadow-inner"
+                  />
+                </div>
+              </div>
+
+              {/* schwerstes Element Box */}
+              <div className="bg-[#FFF9C4] rounded border border-amber-300 p-2.5">
+                <h5 className="font-semibold text-slate-800 border-b border-amber-200 pb-1 mb-1">
+                  schwerstes Element
+                </h5>
+                <p className="text-slate-800 text-[11px] font-medium">
+                  {data?.schwerstes_element || 'Element 26 ist mit 7,072 kg das schwerste Element.'}
+                </p>
+              </div>
+
+              {/* Dachschrägen Box */}
+              <div className="bg-[#FFF9C4] rounded border border-amber-300 p-2.5">
+                <h5 className="font-semibold text-slate-800 mb-0.5">
+                  Dachschrägen
+                </h5>
+                <p className="text-slate-600 text-[11px]">
+                  {data?.dachschraegen}
+                </p>
+              </div>
+
+              {/* Customer & Project Box */}
+              <div className="bg-white rounded border border-slate-300 p-3 space-y-1 text-[11px]">
+                <div className="flex justify-between text-slate-700">
+                  <span className="font-medium text-slate-600">Kunde:</span>
+                  <span className="font-bold text-slate-900">{data?.auftraggeber}</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span className="font-medium text-slate-600">Projekt:</span>
+                  <span className="font-bold text-slate-900">{data?.bauvorhaben}</span>
+                </div>
+                <div className="flex justify-between text-slate-700">
+                  <span className="font-medium text-slate-600">Bearbeiter:</span>
+                  <span className="font-bold text-slate-900">{data?.bearbeiter}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* BOTTOM FULL-WIDTH CONSOLE LOG PANEL */}
+          <div className="bg-white rounded border border-slate-300 shadow-sm p-3 font-mono text-[11px]">
+            <div className="max-h-24 overflow-y-auto space-y-0.5 text-slate-700">
+              {data?.logs?.map((logLine, idx) => (
+                <div key={idx}>{logLine}</div>
+              ))}
             </div>
           </div>
-        )}
 
-        {/* TAB 3: EBT BOM LIST */}
-        {activeTab === 'EBT' && (
-          <div className="overflow-x-auto p-6">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-3">Artikel-Nr (WNummer)</th>
-                  <th className="py-3 px-3">Menge</th>
-                  <th className="py-3 px-3">Einheit</th>
-                  <th className="py-3 px-3">Beschreibung / Kommentar</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                {ebtItems.length === 0 ? (
-                  <tr>
-                    <td colSpan={4} className="py-8 text-center text-slate-400 text-xs">
-                      Keine EBT-Stücklistenpositionen vorhanden.
-                    </td>
-                  </tr>
-                ) : (
-                  ebtItems.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-2.5 px-3 font-mono font-bold text-slate-900">{item.wnummer}</td>
-                      <td className="py-2.5 px-3 font-mono font-bold text-indigo-600">{item.wmenge}</td>
-                      <td className="py-2.5 px-3 font-semibold text-slate-500">{item.unit || 'Stk'}</td>
-                      <td className="py-2.5 px-3 text-slate-800">{item.comment}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
