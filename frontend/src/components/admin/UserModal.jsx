@@ -41,7 +41,7 @@ export function UserModal({
     role: 'EMPLOYEE',
     department: 'Softwareentwicklung',
     position: 'Full Stack Entwickler',
-    location: 'Tinglev Headquarter',
+    location: 'Tinglev HQ Brandenburg',
     phone: '',
     mobile: '',
     supervisor_id: '',
@@ -547,16 +547,10 @@ export function UserModal({
                 onChange={handleChange}
                 className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
               >
-                <option value="Tinglev Headquarter">Tinglev HQ (DK 🇩🇰)</option>
-                <option value="München Headquarter">München (DE 🇩🇪)</option>
+                <option value="Tinglev HQ Brandenburg">Tinglev HQ (Brandenburg, DE 🇩🇪)</option>
                 <option value="Berlin Office">Berlin (DE 🇩🇪)</option>
+                <option value="München Headquarter">München (DE 🇩🇪)</option>
                 <option value="Frankfurt Office">Frankfurt (DE 🇩🇪)</option>
-                <option value="London Tech Hub">London (GB 🇬🇧)</option>
-                <option value="Warschau Center">Warschau (PL 🇵🇱)</option>
-                <option value="Istanbul Office">Istanbul (TR 🇹🇷)</option>
-                <option value="Madrid Office">Madrid (ES 🇪🇸)</option>
-                <option value="Wien Office">Wien (AT 🇦🇹)</option>
-                <option value="Zürich Office">Zürich (CH 🇨🇭)</option>
               </select>
             </div>
 

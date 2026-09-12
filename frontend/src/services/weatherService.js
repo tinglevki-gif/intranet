@@ -1,14 +1,8 @@
 export const COMPANY_LOCATIONS = [
-  { id: 'altlandsberg', name: 'Altlandsberg', country: 'DE', flag: '🇩🇪', lat: 52.5644, lon: 13.7278, isHQ: true },
+  { id: 'brandenburg', name: 'Tinglev HQ (Brandenburg)', country: 'DE', flag: '🇩🇪', lat: 52.5644, lon: 13.7278, isHQ: true },
   { id: 'ber', name: 'Berlin', country: 'DE', flag: '🇩🇪', lat: 52.520, lon: 13.405, isHQ: false },
   { id: 'muc', name: 'München', country: 'DE', flag: '🇩🇪', lat: 48.137, lon: 11.576, isHQ: false },
   { id: 'fra', name: 'Frankfurt', country: 'DE', flag: '🇩🇪', lat: 50.110, lon: 8.682, isHQ: false },
-  { id: 'lon', name: 'London', country: 'GB', flag: '🇬🇧', lat: 51.507, lon: -0.128, isHQ: false },
-  { id: 'waw', name: 'Warschau', country: 'PL', flag: '🇵🇱', lat: 52.229, lon: 21.012, isHQ: false },
-  { id: 'ist', name: 'Istanbul', country: 'TR', flag: '🇹🇷', lat: 41.008, lon: 28.978, isHQ: false },
-  { id: 'mad', name: 'Madrid', country: 'ES', flag: '🇪🇸', lat: 40.416, lon: -3.703, isHQ: false },
-  { id: 'vie', name: 'Wien', country: 'AT', flag: '🇦🇹', lat: 48.208, lon: 16.373, isHQ: false },
-  { id: 'zrh', name: 'Zürich', country: 'CH', flag: '🇨🇭', lat: 47.376, lon: 8.541, isHQ: false },
 ];
 
 /**

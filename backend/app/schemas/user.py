@@ -13,7 +13,7 @@ class UserBase(BaseModel):
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
     mobile: Optional[str] = None
-    location: str = "Tinglev Headquarter"
+    location: str = "Tinglev HQ Brandenburg"
     role: str = "EMPLOYEE"
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
@@ -136,7 +136,7 @@ class UserImportRow(BaseModel):
     position: str = "Mitarbeiter"
     phone: Optional[str] = None
     mobile: Optional[str] = None
-    location: str = "Tinglev Headquarter"
+    location: str = "Tinglev HQ Brandenburg"
     role: str = "EMPLOYEE"
     supervisor_email: Optional[str] = None
     can_manage_canteen: bool = False
