@@ -23,7 +23,9 @@ import {
   Headphones,
   UserCog,
   Sliders,
-  Smile
+  Smile,
+  Megaphone,
+  Wifi
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
@@ -46,6 +48,8 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
   // Icon mapping
   const renderModuleIcon = (iconName) => {
     switch (iconName) {
+      case 'Megaphone': return <Megaphone className="w-4 h-4" />;
+      case 'Wifi': return <Wifi className="w-4 h-4" />;
       case 'UtensilsCrossed': return <UtensilsCrossed className="w-4 h-4" />;
       case 'Navigation': return <Navigation className="w-4 h-4" />;
       case 'TrendingUp': return <TrendingUp className="w-4 h-4" />;

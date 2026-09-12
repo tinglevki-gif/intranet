@@ -51,6 +51,7 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     id: int
     custom_role_name: Optional[str] = None
+    role_permissions: Optional[Dict[str, Any]] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 

@@ -18,8 +18,11 @@ import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { RoleEditorModal } from '../components/admin/RoleEditorModal';
 
+import { useAuth } from '../context/AuthContext';
+
 export function AdminRolesPage() {
   const { t } = useLanguage();
+  const { refreshMenu, refreshUser } = useAuth();
 
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -166,7 +169,7 @@ export function AdminRolesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredRoles.map((role) => {
             const activeCount = countActivePermissions(role.permissions);
-            const totalModules = 19;
+            const totalModules = 21;
 
             return (
               <div
@@ -280,6 +283,8 @@ export function AdminRolesPage() {
         onSaveSuccess={() => {
           showToast(selectedRole ? 'Rolle erfolgreich aktualisiert.' : 'Neue Rolle erfolgreich erstellt.');
           loadRoles();
+          if (refreshMenu) refreshMenu();
+          if (refreshUser) refreshUser();
         }}
       />
     </div>

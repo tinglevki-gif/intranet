@@ -237,7 +237,7 @@ export function App() {
               <Route
                 path="hr/requests"
                 element={
-                  <ProtectedRoute allowedRoles={['HR_MANAGER', 'ADMIN']}>
+                  <ProtectedRoute requiredModule="hr-requests">
                     <PlaceholderModule
                       title="Urlaubs- & Abwesenheitsverwaltung"
                       description="HR-Management-Portal: Genehmigung von Urlaubsanträgen, Zeitausgleich und Krankmeldungen."
@@ -249,7 +249,7 @@ export function App() {
               <Route
                 path="hr/performance"
                 element={
-                  <ProtectedRoute allowedRoles={['HR_MANAGER', 'ADMIN']}>
+                  <ProtectedRoute requiredModule="performance">
                     <PlaceholderModule
                       title="Mitarbeitergespräche & Performance"
                       description="Zielvereinbarungen (OKRs), Quartals-Reviews und Zufriedenheitsumfragen."
@@ -263,7 +263,7 @@ export function App() {
               <Route
                 path="tickets"
                 element={
-                  <ProtectedRoute requiredModule="tickets">
+                  <ProtectedRoute requiredModule="it-helpdesk">
                     <TicketsPage />
                   </ProtectedRoute>
                 }
@@ -272,7 +272,7 @@ export function App() {
               <Route
                 path="it/helpdesk"
                 element={
-                  <ProtectedRoute requiredModule="tickets">
+                  <ProtectedRoute requiredModule="it-helpdesk">
                     <TicketsPage />
                   </ProtectedRoute>
                 }
@@ -280,7 +280,7 @@ export function App() {
               <Route
                 path="it/management"
                 element={
-                  <ProtectedRoute allowedRoles={['IT_ADMIN', 'ADMIN']}>
+                  <ProtectedRoute requiredModule="it-management">
                     <ITManagementPage />
                   </ProtectedRoute>
                 }
@@ -290,7 +290,7 @@ export function App() {
               <Route
                 path="admin/users"
                 element={
-                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <ProtectedRoute requiredModule="admin-users">
                     <AdminUsersPage />
                   </ProtectedRoute>
                 }
@@ -298,7 +298,7 @@ export function App() {
               <Route
                 path="admin/roles"
                 element={
-                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <ProtectedRoute requiredModule="admin-roles">
                     <AdminRolesPage />
                   </ProtectedRoute>
                 }
@@ -306,7 +306,7 @@ export function App() {
               <Route
                 path="admin/settings"
                 element={
-                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <ProtectedRoute requiredModule="admin-settings">
                     <AdminSettingsPage />
                   </ProtectedRoute>
                 }

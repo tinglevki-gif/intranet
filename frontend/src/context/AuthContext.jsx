@@ -97,32 +97,23 @@ export function AuthProvider({ children }) {
   const hasModulePermission = (moduleKey) => {
     if (!user) return false;
 
-    // 1. Global Module Active Check: if deactivated in Intranet-Einstellungen, hide everywhere for everyone
-    if (menuSections && menuSections.length > 0) {
-      const allActiveItems = menuSections.flatMap((s) => s.items || []);
-      const isPresentInActiveMenu = allActiveItems.some(
-        (i) =>
-          i.key === moduleKey ||
-          i.path === `/${moduleKey}` ||
-          (moduleKey === 'tickets' && (i.key === 'it-helpdesk' || i.path?.includes('tickets') || i.path?.includes('helpdesk'))) ||
-          (moduleKey === 'hr-requests' && (i.key === 'hr-requests' || i.key === 'hr_requests' || i.path?.includes('requests'))) ||
-          (moduleKey === 'it-management' && (i.key === 'it-management' || i.path?.includes('management')))
-      );
-
-      if (moduleKey !== 'dashboard' && !isPresentInActiveMenu) {
-        return false;
-      }
-    }
-
-    // 2. SuperAdmin has access to all currently active modules
+    // 1. SuperAdmin has access to all active modules
     if (user.role === 'ADMIN') return true;
 
-    // 3. Granular user module override matrix
+    // 2. Granular user module override matrix
     if (user.allowed_modules && Array.isArray(user.allowed_modules)) {
       return user.allowed_modules.includes(moduleKey);
     }
 
-    // 4. Default role-based boundaries
+    // 3. Custom Role permissions matrix (configured by SuperAdmin in RBAC)
+    const perms = user.role_permissions || user.custom_role?.permissions;
+    if (perms && typeof perms === 'object' && moduleKey in perms) {
+      const permLevel = perms[moduleKey];
+      if (permLevel === 'none') return false;
+      if (['read', 'read_write', 'admin'].includes(permLevel)) return true;
+    }
+
+    // 4. Default role-based boundaries if no matrix entry
     if (['admin-users', 'admin-roles', 'admin-settings'].includes(moduleKey)) {
       return user.role === 'ADMIN';
     }

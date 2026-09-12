@@ -499,26 +499,37 @@ def get_navigation_for_role(db: Session, user_role: Any, current_user: Optional[
     role_permissions = current_user.custom_role.permissions if (current_user and current_user.custom_role and current_user.custom_role.permissions) else None
 
     for item in items_to_filter:
-        # 1. Role Check
-        role_allowed = is_admin or user_role_str in item.allowed_roles
-        if not role_allowed:
+        # Dashboard is always accessible to logged-in users
+        if item.key == "dashboard":
+            filtered_items.append(item)
             continue
 
-        # 2. Granular Module Permission Check
-        if not is_admin:
-            # Core navigation items (dashboard, announcements) are always visible
-            if item.key not in ["dashboard", "announcements"] and item.key in CONTROLLABLE_MODULE_KEYS:
-                # Explicit user override takes highest precedence
-                if user_allowed_modules is not None:
-                    if item.key not in user_allowed_modules:
-                        continue
-                # Next, check custom role permission matrix
-                elif role_permissions is not None:
-                    perm = role_permissions.get(item.key, "read")
-                    if perm == "none":
-                        continue
+        # 1. SuperAdmin (ADMIN) sees all active menu items
+        if is_admin:
+            filtered_items.append(item)
+            continue
 
-        filtered_items.append(item)
+        # 2. User-level allowed_modules override takes highest precedence if set
+        if user_allowed_modules is not None:
+            if item.key in user_allowed_modules:
+                filtered_items.append(item)
+            continue
+
+        # 3. Custom Role permission matrix check (SuperAdmin configurable in RBAC)
+        if role_permissions is not None and item.key in role_permissions:
+            perm = role_permissions.get(item.key)
+            if perm == "none":
+                # Explicitly hidden for this role
+                continue
+            elif perm in ["read", "read_write", "admin"]:
+                # Explicitly permitted for this role
+                filtered_items.append(item)
+                continue
+
+        # 4. Fallback to default allowed_roles on MenuItem
+        role_allowed = user_role_str in item.allowed_roles or "ALL" in item.allowed_roles
+        if role_allowed:
+            filtered_items.append(item)
             
     # Group into sections
     sections_map = {}

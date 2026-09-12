@@ -100,4 +100,12 @@ class User(Base):
         perms["manage_canteen"] = bool(value)
         self.custom_permissions = perms
 
+    @property
+    def role_permissions(self) -> dict:
+        """Returns the module permissions dictionary from the user's custom role."""
+        if self.custom_role and self.custom_role.permissions:
+            return self.custom_role.permissions
+        return {}
+
+
 

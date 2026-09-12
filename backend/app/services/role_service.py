@@ -35,6 +35,38 @@ PERMISSION_LEVELS: List[PermissionLevelOption] = [
 SYSTEM_MODULES: List[PermissionModuleItem] = [
     # 1. Hauptbereich
     PermissionModuleItem(
+        key="announcements",
+        label="Mitteilungen & News",
+        category="Hauptbereich",
+        icon="Megaphone",
+        description="Unternehmensbekanntmachungen, News-Feed und Eilmeldungen.",
+        default_level="read"
+    ),
+    PermissionModuleItem(
+        key="phone-directory",
+        label="Telefonverzeichnis",
+        category="Hauptbereich",
+        icon="PhoneCall",
+        description="Interne Durchwahlen, Mobilnummern und Schnellkontakte.",
+        default_level="read"
+    ),
+    PermissionModuleItem(
+        key="org-chart",
+        label="Organigramm & Hierarchie",
+        category="Hauptbereich",
+        icon="Network",
+        description="Unternehmenshierarchie und Abteilungsstruktur.",
+        default_level="read"
+    ),
+    PermissionModuleItem(
+        key="directory",
+        label="Team- & Mitarbeiterverzeichnis",
+        category="Hauptbereich",
+        icon="Users",
+        description="Kollegenübersicht, Standorte und Abteilungsfilter.",
+        default_level="read"
+    ),
+    PermissionModuleItem(
         key="kantine",
         label="Kantine (Speiseplan & Bestellung)",
         category="Hauptbereich",
@@ -91,27 +123,11 @@ SYSTEM_MODULES: List[PermissionModuleItem] = [
         default_level="read_write"
     ),
     PermissionModuleItem(
-        key="phone-directory",
-        label="Telefonverzeichnis",
+        key="wlan",
+        label="WLAN für Mitarbeiter",
         category="Hauptbereich",
-        icon="PhoneCall",
-        description="Interne Durchwahlen, Mobilnummern und Schnellkontakte.",
-        default_level="read"
-    ),
-    PermissionModuleItem(
-        key="org-chart",
-        label="Organigramm & Hierarchie",
-        category="Hauptbereich",
-        icon="Network",
-        description="Unternehmenshierarchie und Abteilungsstruktur.",
-        default_level="read"
-    ),
-    PermissionModuleItem(
-        key="directory",
-        label="Team- & Mitarbeiterverzeichnis",
-        category="Hauptbereich",
-        icon="Users",
-        description="Kollegenübersicht, Standorte und Abteilungsfilter.",
+        icon="Wifi",
+        description="Zugangsdaten y QR-Code für das Mitarbeiter-WLAN (Tinglev Personal).",
         default_level="read"
     ),
 

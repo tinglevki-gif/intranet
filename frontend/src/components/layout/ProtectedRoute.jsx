@@ -24,32 +24,7 @@ export function ProtectedRoute({ children, allowedRoles, requiredModule }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 1. Role-based check
-  if (allowedRoles && allowedRoles.length > 0) {
-    const hasRolePermission = user?.role === 'ADMIN' || allowedRoles.includes(user?.role);
-    if (!hasRolePermission) {
-      return (
-        <div className="p-8 max-w-lg mx-auto text-center mt-12 bg-white rounded-3xl border border-rose-100 shadow-xl animate-fade-in">
-          <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <ShieldAlert className="w-8 h-8" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">{t('common.access_denied_title')}</h2>
-          <p className="text-sm text-slate-600 mb-6">
-            {t('common.access_denied_desc')} ({user?.role})
-          </p>
-          <a
-            href="/"
-            className="inline-flex items-center space-x-2 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-md shadow-indigo-600/20"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{t('common.back_to_dashboard')}</span>
-          </a>
-        </div>
-      );
-    }
-  }
-
-  // 2. Granular Module Permission check
+  // 1. Granular Module Permission check (RBAC Matrix)
   if (requiredModule) {
     const hasModPerm = hasModulePermission(requiredModule);
     if (!hasModPerm) {
@@ -65,6 +40,31 @@ export function ProtectedRoute({ children, allowedRoles, requiredModule }) {
           <p className="text-xs text-slate-600 mb-6 leading-relaxed">
             Ihr Benutzerkonto besitzt derzeit keine Freigabe für das Modul <strong className="font-mono text-slate-900">"{requiredModule}"</strong>. 
             Bitte wenden Sie sich an Ihren <strong>SuperAdmin</strong>, um die Berechtigung freizuschalten.
+          </p>
+          <a
+            href="/"
+            className="inline-flex items-center space-x-2 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-md shadow-indigo-600/20"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{t('common.back_to_dashboard')}</span>
+          </a>
+        </div>
+      );
+    }
+  }
+
+  // 2. Default Role-based fallback check (if requiredModule not specified)
+  if (!requiredModule && allowedRoles && allowedRoles.length > 0) {
+    const hasRolePermission = user?.role === 'ADMIN' || allowedRoles.includes(user?.role);
+    if (!hasRolePermission) {
+      return (
+        <div className="p-8 max-w-lg mx-auto text-center mt-12 bg-white rounded-3xl border border-rose-100 shadow-xl animate-fade-in">
+          <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">{t('common.access_denied_title')}</h2>
+          <p className="text-sm text-slate-600 mb-6">
+            {t('common.access_denied_desc')} ({user?.role})
           </p>
           <a
             href="/"
