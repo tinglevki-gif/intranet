@@ -16,6 +16,8 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 import { UserAvatar } from '../common/UserAvatar';
 
+import { useModalClose } from '../../hooks/useModalClose';
+
 export function EmployeeDetailModal({ 
   node, 
   onClose, 
@@ -23,6 +25,7 @@ export function EmployeeDetailModal({
   onCopyPhone 
 }) {
   const { t } = useLanguage();
+  useModalClose(!!node, onClose);
 
   if (!node) return null;
 
@@ -61,7 +64,10 @@ export function EmployeeDetailModal({
   const roleInfo = getRoleBadge(node.role);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+    >
       <div 
         className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden transform transition-all animate-scale-up"
         onClick={(e) => e.stopPropagation()}

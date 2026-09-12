@@ -18,9 +18,7 @@ import {
   Trash2,
   Sparkles
 } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
-import { api, getNewsCoverUrl } from '../../services/api';
-import { MarkdownRenderer } from './MarkdownRenderer';
+import { useModalClose } from '../../hooks/useModalClose';
 
 const CATEGORIES = [
   { value: 'Allgemein', label: 'Allgemein & Unternehmen', color: 'bg-indigo-50 text-indigo-700' },
@@ -50,13 +48,7 @@ export function NewsFormModal({ newsToEdit = null, onClose, onSaved }) {
   const [error, setError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  useModalClose(true, onClose);
 
   // Insert markdown helpers into textarea
   const insertMarkdown = (prefix, suffix = '', placeholder = 'Text') => {

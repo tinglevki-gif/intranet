@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function EventModal({ 
   isOpen, 
@@ -26,6 +27,8 @@ export function EventModal({
 }) {
   const { t, formatDate, formatTime } = useLanguage();
   const { user } = useAuth();
+
+  useModalClose(isOpen, onClose);
 
   // Form State for creating
   const [title, setTitle] = useState('');
@@ -111,8 +114,14 @@ export function EventModal({
   const canDelete = user?.role === 'ADMIN' || (event && event.created_by_id === user?.id);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center space-x-2.5">

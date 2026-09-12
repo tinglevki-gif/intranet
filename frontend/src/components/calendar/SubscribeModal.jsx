@@ -11,11 +11,14 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../services/api';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function SubscribeModal({ isOpen, onClose }) {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   const feedUrl = api.getIcsFeedUrl();
+
+  useModalClose(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -26,8 +29,14 @@ export function SubscribeModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden flex flex-col">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-lg overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-purple-50 via-indigo-50/50 to-white">
           <div className="flex items-center space-x-3">

@@ -14,6 +14,7 @@ import {
   Info
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { useModalClose } from '../../hooks/useModalClose';
 
 const PRESET_COLORS = [
   '#0078D4', // Outlook Blue
@@ -27,6 +28,7 @@ const PRESET_COLORS = [
 ];
 
 export function CalendarSourcesModal({ isOpen, onClose, onSourcesUpdated }) {
+  useModalClose(isOpen, onClose);
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -146,8 +148,14 @@ export function CalendarSourcesModal({ isOpen, onClose, onSourcesUpdated }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-slate-100 my-6">
+    <div 
+      className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-slate-100 my-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center space-x-3">

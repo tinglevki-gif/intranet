@@ -25,9 +25,12 @@ import { api, getAvatarUrl } from '../../services/api';
 import { UserAvatar } from '../common/UserAvatar';
 import { RoleBadge } from '../common/Badge';
 
+import { useModalClose } from '../../hooks/useModalClose';
+
 export function UserProfileModal({ isOpen, onClose }) {
   const { user, updateUser } = useAuth();
   const { t } = useLanguage();
+  useModalClose(isOpen, onClose);
 
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'password'
 
@@ -159,8 +162,14 @@ export function UserProfileModal({ isOpen, onClose }) {
   const strength = getPasswordStrength(newPassword);
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden my-8 z-[10000]">
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-y-auto"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden my-8 z-[10000]"
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 relative">
           <button

@@ -2,15 +2,21 @@ import React from 'react';
 import { X, Calendar, User, Pin } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { CategoryBadge } from '../common/Badge';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function AnnouncementModal({ announcement, onClose }) {
   const { t, formatDate } = useLanguage();
+  useModalClose(!!announcement, onClose);
+
   if (!announcement) return null;
 
   const formattedDate = formatDate(announcement.created_at || Date.now());
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
       <div
         className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] flex flex-col animate-slide-up"
         onClick={(e) => e.stopPropagation()}

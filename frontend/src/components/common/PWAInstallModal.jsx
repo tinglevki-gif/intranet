@@ -14,6 +14,7 @@ import {
   Apple, 
   Layers
 } from 'lucide-react';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function PWAInstallModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,6 +25,8 @@ export function PWAInstallModal() {
   const [isAndroid, setIsAndroid] = useState(false);
   const [copied, setCopied] = useState(false);
   const [installedSuccess, setInstalledSuccess] = useState(false);
+
+  useModalClose(isOpen, () => setIsOpen(false));
 
   useEffect(() => {
     // 1. Detect standalone mode
@@ -118,7 +121,10 @@ export function PWAInstallModal() {
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=${encodeURIComponent(currentUrl)}`;
 
   return (
-    <div className="fixed inset-0 z-[10000] bg-slate-950/80 backdrop-blur-md flex items-end sm:items-center justify-center p-3 sm:p-6 animate-fade-in">
+    <div 
+      className="fixed inset-0 z-[10000] bg-slate-950/80 backdrop-blur-md flex items-end sm:items-center justify-center p-3 sm:p-6 animate-fade-in"
+      onClick={() => setIsOpen(false)}
+    >
       <div 
         className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-scale-in"
         onClick={(e) => e.stopPropagation()}

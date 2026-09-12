@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Calendar, Pin, Clock, Eye, Share2, Check, Edit2, Trash2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { getNewsCoverUrl } from '../../services/api';
 import { getCategoryBadgeStyle } from '../common/Badge';
 import { UserAvatar } from '../common/UserAvatar';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function NewsDetailModal({ 
   news, 
@@ -16,13 +17,7 @@ export function NewsDetailModal({
   const { t, formatDate } = useLanguage();
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  useModalClose(!!news, onClose);
 
   if (!news) return null;
 

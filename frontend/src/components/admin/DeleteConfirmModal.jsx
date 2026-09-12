@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function DeleteConfirmModal({ 
   isOpen, 
@@ -11,11 +12,19 @@ export function DeleteConfirmModal({
 }) {
   const { t } = useLanguage();
 
+  useModalClose(isOpen, onClose);
+
   if (!isOpen || !userToDelete) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform transition-all">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform transition-all"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-6 text-center">
           <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-6 h-6" />

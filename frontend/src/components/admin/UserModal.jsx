@@ -77,6 +77,8 @@ const normalizeLocation = (loc) => {
   return loc;
 };
 
+import { useModalClose } from '../../hooks/useModalClose';
+
 export function UserModal({ 
   isOpen, 
   onClose, 
@@ -85,6 +87,7 @@ export function UserModal({
   availableSupervisors = [] 
 }) {
   const { t } = useLanguage();
+  useModalClose(isOpen, onClose);
   const isEditing = !!userToEdit;
   const fileInputRef = useRef(null);
 
@@ -438,8 +441,14 @@ export function UserModal({
   });
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-hidden">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl sm:max-w-3xl max-h-[92vh] flex flex-col my-auto overflow-hidden z-[10000] transform transition-all">
+    <div 
+      onClick={onClose}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-hidden"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl sm:max-w-3xl max-h-[92vh] flex flex-col my-auto overflow-hidden z-[10000] transform transition-all"
+      >
         {/* Modal Header */}
         <div className="px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white relative shrink-0">
           <button

@@ -15,10 +15,13 @@ import {
 import { api } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function PermissionsModal({ isOpen, onClose, user, onSaveSuccess }) {
   const { t } = useLanguage();
   const { user: currentUser, refreshMenu, refreshUser } = useAuth();
+
+  useModalClose(isOpen, onClose);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -102,8 +105,14 @@ export function PermissionsModal({ isOpen, onClose, user, onSaveSuccess }) {
   const isAdmin = user.role === 'ADMIN';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl overflow-hidden my-8 transform transition-all">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl overflow-hidden my-8 transform transition-all"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
           <div className="flex items-center space-x-3">

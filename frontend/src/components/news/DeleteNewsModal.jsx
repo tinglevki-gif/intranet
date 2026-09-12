@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { Trash2, AlertTriangle, Loader2 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../services/api';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function DeleteNewsModal({ news, onClose, onDeleted }) {
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useModalClose(!!news, onClose);
 
   if (!news) return null;
 

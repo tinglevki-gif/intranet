@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { api, getAvatarUrl } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalClose } from '../../hooks/useModalClose';
 
 const DEFAULT_FALLBACK_MODULES = [
   { key: 'announcements', label: 'Mitteilungen & News', category: 'Hauptbereich', icon: 'Megaphone', description: 'Unternehmensbekanntmachungen, News-Feed und Eilmeldungen.' },
@@ -64,6 +65,7 @@ const DEFAULT_FALLBACK_MODULES = [
 
 export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
   const { t } = useLanguage();
+  useModalClose(isOpen, onClose);
 
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -234,8 +236,14 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
   const categories = Array.from(new Set(activeModules.map((m) => m.category)));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all my-8">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden transform transition-all my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shrink-0">
           <div className="flex items-center space-x-3">

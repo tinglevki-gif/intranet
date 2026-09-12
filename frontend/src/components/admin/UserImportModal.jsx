@@ -16,9 +16,11 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalClose } from '../../hooks/useModalClose';
 
 export function UserImportModal({ isOpen, onClose, onSuccess }) {
   const { t } = useLanguage();
+  useModalClose(isOpen, onClose);
   const fileInputRef = useRef(null);
 
   const [file, setFile] = useState(null);
@@ -112,8 +114,14 @@ export function UserImportModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh]">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shrink-0">

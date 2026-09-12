@@ -18,6 +18,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { api, getAssetUrl } from '../../services/api';
+import { useModalClose } from '../../hooks/useModalClose';
 
 const ALLERGEN_OPTIONS = [
   { code: 'A', label: 'Glutenhaltiges Getreide (A)' },
@@ -99,6 +100,8 @@ export function CanteenMenuModal({
   const [aiPromptOpen, setAiPromptOpen] = useState(false);
   const [aiTheme, setAiTheme] = useState('');
   const [aiGeneratedSuccess, setAiGeneratedSuccess] = useState(false);
+
+  useModalClose(isOpen, onClose);
 
   // Initialize dates and day data
   useEffect(() => {
@@ -397,8 +400,14 @@ export function CanteenMenuModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh]">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-4xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shrink-0">
