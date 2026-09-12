@@ -292,20 +292,12 @@ def update_my_password(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Allows any authenticated user to change their own password."""
+    """Allows any authenticated user to change their own password without requiring current password."""
     if not password_in.new_password or len(password_in.new_password.strip()) < 4:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Das neue Passwort muss mindestens 4 Zeichen lang sein."
         )
-
-    # Verify current password if user has an existing password set
-    if current_user.hashed_password and password_in.current_password:
-        if not verify_password(password_in.current_password, current_user.hashed_password):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Das aktuelle Passwort ist falsch."
-            )
 
     current_user.hashed_password = get_password_hash(password_in.new_password.strip())
     db.commit()

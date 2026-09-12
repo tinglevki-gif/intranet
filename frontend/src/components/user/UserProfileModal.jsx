@@ -40,10 +40,8 @@ export function UserProfileModal({ isOpen, onClose }) {
   const [location, setLocation] = useState(user?.location || 'Tinglev HQ Brandenburg');
 
   // Password form state
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPass, setShowCurrentPass] = useState(false);
   const [showNewPass, setShowNewPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
@@ -134,11 +132,9 @@ export function UserProfileModal({ isOpen, onClose }) {
       setMessage(null);
 
       await api.updateMyPassword({
-        current_password: currentPassword,
         new_password: newPassword
       });
 
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setMessage({ type: 'success', text: t('profile.msg_pass_updated', 'Passwort erfolgreich geändert!') });
@@ -457,29 +453,6 @@ export function UserProfileModal({ isOpen, onClose }) {
                   <p className="text-[11.5px] text-amber-800/90 mt-0.5">
                     {t('profile.pass_security_desc', 'Wählen Sie ein sicheres Passwort mit mindestens 4 Zeichen, am besten kombiniert aus Buchstaben, Zahlen und Sonderzeichen.')}
                   </p>
-                </div>
-              </div>
-
-              {/* Current Password */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  {t('profile.current_pass', 'Aktuelles Passwort')}
-                </label>
-                <div className="relative">
-                  <input
-                    type={showCurrentPass ? 'text' : 'password'}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPass(!showCurrentPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
               </div>
 
