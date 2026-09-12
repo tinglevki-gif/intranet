@@ -8,6 +8,7 @@ import {
 export function TischplanReader() {
   const [data, setData] = useState(() => generateExactProductionPlan());
   const [inputFilePath, setInputFilePath] = useState('p:\\Tisch_Planung\\11-09-2026.txt');
+  const [tableNotes, setTableNotes] = useState({});
   const fileInputRef = useRef(null);
 
   const handleFileUpload = (file) => {
@@ -25,6 +26,13 @@ export function TischplanReader() {
       }
     };
     reader.readAsText(file, 'ISO-8859-1');
+  };
+
+  const handleNoteChange = (tischId, value) => {
+    setTableNotes(prev => ({
+      ...prev,
+      [tischId]: value
+    }));
   };
 
   const handlePrint = () => {
@@ -99,7 +107,7 @@ export function TischplanReader() {
                   || in <span className="font-semibold">{item.name}</span> = <span className="font-bold text-slate-900">{item.volume}</span>
                 </span>
               ))}
-              <span className="font-bold text-slate-950外 whitespace-nowrap">
+              <span className="font-bold text-slate-950 whitespace-nowrap">
                 || Gesamtvolumen: {data?.gesamtvolumenStr || '159,213 m³'}
               </span>
               <span className="font-bold text-slate-950 whitespace-nowrap">
@@ -123,16 +131,34 @@ export function TischplanReader() {
 
           {/* Top Row: Tische 10 bis 18 */}
           <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
-            {data?.halle1?.rowTop?.map((table) => (
-              <TableGridBox key={`h1-top-${table.tischNumber}`} table={table} />
-            ))}
+            {data?.halle1?.rowTop?.map((table) => {
+              const tableId = `h1-${table.tischNumber}`;
+              return (
+                <TableGridBox 
+                  key={tableId} 
+                  table={table} 
+                  tableId={tableId}
+                  note={tableNotes[tableId] || ''}
+                  onNoteChange={handleNoteChange}
+                />
+              );
+            })}
           </div>
 
           {/* Bottom Row: Tische 1 bis 9 */}
           <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
-            {data?.halle1?.rowBottom?.map((table) => (
-              <TableGridBox key={`h1-bot-${table.tischNumber}`} table={table} />
-            ))}
+            {data?.halle1?.rowBottom?.map((table) => {
+              const tableId = `h1-${table.tischNumber}`;
+              return (
+                <TableGridBox 
+                  key={tableId} 
+                  table={table} 
+                  tableId={tableId}
+                  note={tableNotes[tableId] || ''}
+                  onNoteChange={handleNoteChange}
+                />
+              );
+            })}
           </div>
 
           {/* Halle 1 Footer Totals */}
@@ -166,16 +192,34 @@ export function TischplanReader() {
 
           {/* Top Row: Tische 10 bis 18 */}
           <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
-            {data?.halle2?.rowTop?.map((table) => (
-              <TableGridBox key={`h2-top-${table.tischNumber}`} table={table} />
-            ))}
+            {data?.halle2?.rowTop?.map((table) => {
+              const tableId = `h2-${table.tischNumber}`;
+              return (
+                <TableGridBox 
+                  key={tableId} 
+                  table={table} 
+                  tableId={tableId}
+                  note={tableNotes[tableId] || ''}
+                  onNoteChange={handleNoteChange}
+                />
+              );
+            })}
           </div>
 
           {/* Bottom Row: Tische 1 bis 9 */}
           <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
-            {data?.halle2?.rowBottom?.map((table) => (
-              <TableGridBox key={`h2-bot-${table.tischNumber}`} table={table} />
-            ))}
+            {data?.halle2?.rowBottom?.map((table) => {
+              const tableId = `h2-${table.tischNumber}`;
+              return (
+                <TableGridBox 
+                  key={tableId} 
+                  table={table} 
+                  tableId={tableId}
+                  note={tableNotes[tableId] || ''}
+                  onNoteChange={handleNoteChange}
+                />
+              );
+            })}
           </div>
 
           {/* Halle 2 Footer Totals */}
@@ -273,9 +317,9 @@ export function TischplanReader() {
 }
 
 /**
- * Individual Table Grid Box (Exact reproduction of WPF table card in Desktop 2.8)
+ * Individual Table Grid Box with Editable Note Line right above bottom footer
  */
-function TableGridBox({ table }) {
+function TableGridBox({ table, tableId, note, onNoteChange }) {
   const hasElements = table?.elements && table.elements.length > 0;
 
   // Format header text to highlight ROT in red
@@ -303,7 +347,8 @@ function TableGridBox({ table }) {
 
       {/* Table Content Box */}
       <div className="w-full bg-white border border-[#b8b8b8] rounded-[2px] p-1 flex flex-col justify-between h-28 print:h-[84px] shadow-2xs overflow-hidden">
-        {/* Elements list scroll area */}
+        
+        {/* Top: Elements list scroll area */}
         <div className="flex-1 overflow-y-auto print:overflow-hidden overflow-x-hidden space-y-0.5 font-mono text-[7.5px] print:text-[6.5px] leading-[9.5px] print:leading-[8px]">
           {hasElements ? (
             table.elements.map((elText, idx) => (
@@ -323,11 +368,23 @@ function TableGridBox({ table }) {
           )}
         </div>
 
+        {/* Middle/Bottom: Interactive Anmerkung / Annotation Line */}
+        <div className="pt-0.5">
+          <input
+            type="text"
+            value={note}
+            onChange={(e) => onNoteChange(tableId, e.target.value)}
+            placeholder="..."
+            title="Anotationen / Anmerkungen eintragen"
+            className="w-full bg-transparent font-mono text-[8px] print:text-[7px] text-[#DC2626] font-bold focus:outline-none focus:bg-amber-50/70 border-b border-transparent hover:border-slate-300 focus:border-blue-400 px-0.5 py-0 truncate transition-colors"
+          />
+        </div>
+
         {/* Tisch Footer Bar (Line + Area m² + Weight to) */}
-        <div className="pt-0.5 border-t border-[#b8b8b8] flex items-center justify-between font-mono text-[8px] print:text-[7px] text-slate-800 font-semibold px-0.5">
+        <div className="pt-0.5 border-t border-[#b8b8b8] flex items-center justify-between font-mono text-[8px] print:text-[7px] text-slate-800 font-bold px-0.5">
           <span className="truncate">{table?.flaecheStr || '0 m²'}</span>
           {table?.weightStr && table.weightStr !== '0,00 to' && (
-            <span className="text-slate-600 whitespace-nowrap pl-1">{table.weightStr}</span>
+            <span className="text-slate-600 font-semibold whitespace-nowrap pl-1">{table.weightStr}</span>
           )}
         </div>
       </div>
