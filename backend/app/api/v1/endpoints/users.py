@@ -87,8 +87,15 @@ def get_organization_chart(
     
     roots = []
     for u in all_users:
-        if u.supervisor_id and u.supervisor_id in user_map:
-            children_map[u.supervisor_id].append(u)
+        sup_ids = u.get_supervisor_ids()
+        if sup_ids:
+            is_child = False
+            for s_id in sup_ids:
+                if s_id in user_map and s_id != u.id:
+                    children_map[s_id].append(u)
+                    is_child = True
+            if not is_child:
+                roots.append(u)
         else:
             roots.append(u)
             
@@ -111,6 +118,7 @@ def get_organization_chart(
             location=user.location,
             role=user.role,
             supervisor_id=user.supervisor_id,
+            supervisor_ids=user.get_supervisor_ids(),
             subordinates_count=len(children_nodes),
             children=children_nodes
         )

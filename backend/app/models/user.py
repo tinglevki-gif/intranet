@@ -46,12 +46,23 @@ class User(Base):
     custom_role_id = Column(Integer, ForeignKey("roles.id"), nullable=True)
     custom_role = relationship("Role", back_populates="users", foreign_keys=[custom_role_id])
 
-    # Self-referencing relationship for organizational hierarchy
+    # Self-referencing relationship for organizational hierarchy (Single & Multiple Supervisors)
     supervisor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    supervisor_ids = Column(JSON, nullable=True, default=list)
+
     subordinates = relationship(
         "User",
         backref=backref("supervisor", remote_side=[id])
     )
+
+    def get_supervisor_ids(self) -> list[int]:
+        """Returns a unique list of all supervisor IDs assigned to this user."""
+        res = []
+        if self.supervisor_ids and isinstance(self.supervisor_ids, list):
+            res.extend([int(x) for x in self.supervisor_ids if x is not None])
+        if self.supervisor_id is not None and self.supervisor_id not in res:
+            res.insert(0, int(self.supervisor_id))
+        return res
 
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

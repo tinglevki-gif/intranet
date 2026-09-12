@@ -48,7 +48,13 @@ ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif", "ima
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
 def map_user_to_admin_response(u: User, db: Session) -> UserAdminResponse:
-    supervisor_name = u.supervisor.full_name if u.supervisor else None
+    sup_ids = u.get_supervisor_ids()
+    sup_names = []
+    if sup_ids:
+        sups = db.query(User).filter(User.id.in_(sup_ids)).all()
+        sup_names = [s.full_name for s in sups]
+    supervisor_name = ", ".join(sup_names) if sup_names else None
+
     sub_count = db.query(User).filter(User.supervisor_id == u.id).count()
     custom_role_name = u.custom_role.name if u.custom_role else None
     return UserAdminResponse(
@@ -67,6 +73,7 @@ def map_user_to_admin_response(u: User, db: Session) -> UserAdminResponse:
         custom_role_id=u.custom_role_id,
         custom_role_name=custom_role_name,
         supervisor_id=u.supervisor_id,
+        supervisor_ids=sup_ids,
         supervisor_name=supervisor_name,
         subordinates_count=sub_count,
         allowed_modules=u.allowed_modules,
@@ -356,10 +363,18 @@ def create_admin_user(
     if not full_name:
         full_name = clean_email.split("@")[0].replace(".", " ").title()
 
-    if user_in.supervisor_id:
-        supervisor = db.query(User).filter(User.id == user_in.supervisor_id).first()
-        if not supervisor:
-            raise HTTPException(status_code=400, detail="Der angegebene Vorgesetzte existiert nicht.")
+    supervisor_ids = []
+    if user_in.supervisor_ids is not None and isinstance(user_in.supervisor_ids, list):
+        supervisor_ids = [int(sid) for sid in user_in.supervisor_ids if sid]
+    elif user_in.supervisor_id:
+        supervisor_ids = [int(user_in.supervisor_id)]
+
+    if supervisor_ids:
+        sups = db.query(User).filter(User.id.in_(supervisor_ids)).all()
+        if len(sups) != len(set(supervisor_ids)):
+            raise HTTPException(status_code=400, detail="Einer der angegebenen Vorgesetzten existiert nicht.")
+
+    primary_sup_id = supervisor_ids[0] if supervisor_ids else None
 
     custom_role_id = user_in.custom_role_id
     if not custom_role_id and user_in.role:
@@ -383,7 +398,8 @@ def create_admin_user(
         phone=user_in.phone.strip() if user_in.phone else None,
         mobile=user_in.mobile.strip() if user_in.mobile else None,
         location=user_in.location.strip() if user_in.location else "Tinglev Headquarter",
-        supervisor_id=user_in.supervisor_id,
+        supervisor_id=primary_sup_id,
+        supervisor_ids=supervisor_ids,
         allowed_modules=user_in.allowed_modules,
         is_active=user_in.is_active
     )
@@ -433,8 +449,21 @@ def update_admin_user(
                 )
             user.email = clean_email
 
-    # Check supervisor cycle
-    if user_in.supervisor_id is not None:
+    # Check supervisor cycle & update supervisor_ids
+    if user_in.supervisor_ids is not None:
+        raw_ids = [int(sid) for sid in user_in.supervisor_ids if sid]
+        if user_id in raw_ids:
+            raise HTTPException(
+                status_code=400,
+                detail="Ein Benutzer kann nicht sein eigener Vorgesetzter sein."
+            )
+        if raw_ids:
+            sups = db.query(User).filter(User.id.in_(raw_ids)).all()
+            if len(sups) != len(set(raw_ids)):
+                raise HTTPException(status_code=400, detail="Einer der angegebenen Vorgesetzten existiert nicht.")
+        user.supervisor_ids = raw_ids
+        user.supervisor_id = raw_ids[0] if raw_ids else None
+    elif user_in.supervisor_id is not None:
         if user_in.supervisor_id == user_id:
             raise HTTPException(
                 status_code=400,
@@ -445,8 +474,10 @@ def update_admin_user(
             if not sup:
                 raise HTTPException(status_code=400, detail="Der angegebene Vorgesetzte existiert nicht.")
             user.supervisor_id = user_in.supervisor_id
+            user.supervisor_ids = [user_in.supervisor_id]
         else:
             user.supervisor_id = None
+            user.supervisor_ids = []
 
     if user_in.first_name is not None:
         user.first_name = user_in.first_name.strip() if user_in.first_name else None

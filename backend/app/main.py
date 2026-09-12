@@ -41,6 +41,7 @@ with engine.connect() as conn:
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSON DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_permissions JSON DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_role_id INTEGER DEFAULT NULL;"))
+            conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS supervisor_ids JSON DEFAULT '[]';"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS views_count INTEGER DEFAULT 0;"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_id INTEGER DEFAULT NULL;"))
             conn.execute(text("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author_name VARCHAR DEFAULT 'Geschäftsleitung';"))

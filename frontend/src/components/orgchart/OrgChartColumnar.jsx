@@ -117,17 +117,27 @@ export function OrgCard({
       } ${className}`}
     >
       {/* Top Header: Department badge & Extension */}
-      <div className="flex items-center justify-between mb-3">
-        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${style.badge} truncate max-w-[150px]`}>
-          {node.department}
-        </span>
+      <div className="flex items-center justify-between mb-3 gap-1">
+        <div className="flex items-center space-x-1 min-w-0">
+          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${style.badge} truncate max-w-[130px]`}>
+            {node.department}
+          </span>
+          {node.supervisor_ids && node.supervisor_ids.length > 1 && (
+            <span 
+              className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0"
+              title="Mitarbeiter ist mehreren Vorgesetzten zugeordnet"
+            >
+              👥 Dual
+            </span>
+          )}
+        </div>
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
             onCopyPhone?.(node.phone || `+49 89 1234-${extension}`);
           }}
-          className="flex items-center space-x-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 text-slate-600 dark:text-slate-300 font-mono text-[11px] font-bold transition-colors"
+          className="flex items-center space-x-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 text-slate-600 dark:text-slate-300 font-mono text-[11px] font-bold transition-colors shrink-0"
           title="Durchwahl kopieren"
         >
           <Phone className="w-3 h-3" />

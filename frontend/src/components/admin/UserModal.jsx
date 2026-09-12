@@ -51,6 +51,7 @@ export function UserModal({
   });
 
   const [manageCanteen, setManageCanteen] = useState(false);
+  const [supervisorIds, setSupervisorIds] = useState([]);
 
   // Avatar file state
   const [avatarFile, setAvatarFile] = useState(null);
@@ -101,6 +102,13 @@ export function UserModal({
         userToEdit.custom_permissions?.manage_canteen === true ||
         (Array.isArray(userToEdit.allowed_modules) && userToEdit.allowed_modules.includes('manage_canteen'))
       );
+      let sups = [];
+      if (Array.isArray(userToEdit.supervisor_ids) && userToEdit.supervisor_ids.length > 0) {
+        sups = userToEdit.supervisor_ids.map(Number);
+      } else if (userToEdit.supervisor_id) {
+        sups = [Number(userToEdit.supervisor_id)];
+      }
+      setSupervisorIds(sups);
     } else {
       setFormData({
         first_name: '',
@@ -120,6 +128,7 @@ export function UserModal({
       });
       setAvatarPreview(null);
       setManageCanteen(false);
+      setSupervisorIds([]);
     }
     setAvatarFile(null);
     setAvatarRemoved(false);
@@ -203,6 +212,17 @@ export function UserModal({
     }
   };
 
+  const handleAddSupervisor = (e) => {
+    const val = parseInt(e.target.value, 10);
+    if (val && !supervisorIds.includes(val)) {
+      setSupervisorIds([...supervisorIds, val]);
+    }
+  };
+
+  const handleRemoveSupervisor = (idToRemove) => {
+    setSupervisorIds(supervisorIds.filter((id) => id !== idToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -241,7 +261,8 @@ export function UserModal({
       const payload = {
         ...formData,
         avatar_url: finalAvatarUrl,
-        supervisor_id: formData.supervisor_id ? parseInt(formData.supervisor_id, 10) : null,
+        supervisor_ids: supervisorIds,
+        supervisor_id: supervisorIds.length > 0 ? supervisorIds[0] : null,
         custom_permissions: {
           ...(userToEdit?.custom_permissions || {}),
           manage_canteen: manageCanteen,
@@ -572,22 +593,63 @@ export function UserModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <UserCheck className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.supervisor')}</span>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span className="flex items-center space-x-1">
+                  <UserCheck className="w-3 h-3 text-slate-400" />
+                  <span>Vorgesetzte (Hierarchie)</span>
+                </span>
+                {supervisorIds.length > 1 && (
+                  <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">
+                    {supervisorIds.length} Vorgesetzte
+                  </span>
+                )}
               </label>
+
+              {/* Selected Supervisor Chips */}
+              {supervisorIds.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {supervisorIds.map((supId) => {
+                    const supObj = filteredSupervisors.find((s) => s.id === supId);
+                    if (!supObj) return null;
+                    return (
+                      <div
+                        key={supId}
+                        className="inline-flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs font-medium shadow-xs"
+                      >
+                        <span className="max-w-[140px] truncate font-semibold">{supObj.full_name}</span>
+                        <span className="text-[10px] text-indigo-500 truncate">({supObj.department})</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSupervisor(supId)}
+                          className="text-indigo-400 hover:text-rose-600 transition-colors p-0.5 rounded-md hover:bg-indigo-100"
+                          title="Vorgesetzten entfernen"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Add Supervisor Select */}
               <select
-                name="supervisor_id"
-                value={formData.supervisor_id}
-                onChange={handleChange}
+                onChange={handleAddSupervisor}
+                value=""
                 className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
               >
-                <option value="">-- {t('admin_users.no_supervisor')} --</option>
-                {filteredSupervisors.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.full_name} ({s.position} - {s.department})
-                  </option>
-                ))}
+                <option value="">
+                  {supervisorIds.length === 0
+                    ? `-- ${t('admin_users.no_supervisor')} --`
+                    : '+ weiteren Vorgesetzten hinzufügen...'}
+                </option>
+                {filteredSupervisors
+                  .filter((s) => !supervisorIds.includes(s.id))
+                  .map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.full_name} ({s.position} - {s.department})
+                    </option>
+                  ))}
               </select>
             </div>
 

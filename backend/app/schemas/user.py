@@ -17,6 +17,7 @@ class UserBase(BaseModel):
     role: str = "EMPLOYEE"
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
+    supervisor_ids: Optional[List[int]] = []
     allowed_modules: Optional[List[str]] = None
     custom_permissions: Optional[Dict[str, Any]] = None
     can_manage_canteen: Optional[bool] = False
@@ -39,6 +40,7 @@ class UserUpdate(BaseModel):
     role: Optional[str] = None
     custom_role_id: Optional[int] = None
     supervisor_id: Optional[int] = None
+    supervisor_ids: Optional[List[int]] = None
     allowed_modules: Optional[List[str]] = None
     custom_permissions: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
@@ -117,6 +119,7 @@ class OrgChartNodeResponse(BaseModel):
     location: str
     role: str
     supervisor_id: Optional[int] = None
+    supervisor_ids: Optional[List[int]] = []
     children: List['OrgChartNodeResponse'] = []
 
     class Config:
