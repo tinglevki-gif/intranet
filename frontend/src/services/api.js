@@ -66,7 +66,15 @@ class ApiService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: 'Fehler bei der Anfrage' }));
-        throw new Error(errorData.detail || `HTTP-Fehler ${response.status}`);
+        let errorMsg = 'Fehler bei der Anfrage';
+        if (typeof errorData.detail === 'string') {
+          errorMsg = errorData.detail;
+        } else if (Array.isArray(errorData.detail)) {
+          errorMsg = errorData.detail.map((e) => (typeof e === 'object' ? e.msg || JSON.stringify(e) : String(e))).join('; ');
+        } else if (errorData.detail && typeof errorData.detail === 'object') {
+          errorMsg = errorData.detail.message || JSON.stringify(errorData.detail);
+        }
+        throw new Error(errorMsg || `HTTP-Fehler ${response.status}`);
       }
 
       return await response.json();

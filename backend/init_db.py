@@ -35,6 +35,8 @@ def ensure_schema_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSON DEFAULT NULL;"))
                 conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_permissions JSON DEFAULT NULL;"))
                 conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS custom_role_id INTEGER DEFAULT NULL;"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS supervisor_ids JSON DEFAULT '[]';"))
+                conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS departments JSON DEFAULT '[]';"))
                 conn.commit()
                 logger.info("PostgreSQL schema migrations verified.")
             elif dialect == "sqlite":
@@ -49,6 +51,12 @@ def ensure_schema_migrations():
                 if "custom_role_id" not in columns:
                     logger.info("Migrating schema: Adding 'custom_role_id' column to 'users' table...")
                     conn.execute(text("ALTER TABLE users ADD COLUMN custom_role_id INTEGER DEFAULT NULL;"))
+                if "supervisor_ids" not in columns:
+                    logger.info("Migrating schema: Adding 'supervisor_ids' column to 'users' table...")
+                    conn.execute(text("ALTER TABLE users ADD COLUMN supervisor_ids JSON DEFAULT '[]';"))
+                if "departments" not in columns:
+                    logger.info("Migrating schema: Adding 'departments' column to 'users' table...")
+                    conn.execute(text("ALTER TABLE users ADD COLUMN departments JSON DEFAULT '[]';"))
                 conn.commit()
                 logger.info("SQLite schema migrations verified.")
         except Exception as e:

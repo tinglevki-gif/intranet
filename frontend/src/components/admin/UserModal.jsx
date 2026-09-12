@@ -738,13 +738,17 @@ export function UserModal({
                       className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium text-slate-800"
                     >
                       <option value="Tinglev HQ Brandenburg">Tinglev HQ (Brandenburg, DE 🇩🇪)</option>
+                      <option value="Tinglev HQ (Brandenburg, DE 🇩🇪)">Tinglev HQ (Brandenburg, DE 🇩🇪) [DB]</option>
                       <option value="Berlin Office">Berlin (DE 🇩🇪)</option>
+                      <option value="Berlin (DE 🇩🇪)">Berlin (DE 🇩🇪) [DB]</option>
                       <option value="München Headquarter">München (DE 🇩🇪)</option>
                       <option value="Frankfurt Office">Frankfurt (DE 🇩🇪)</option>
                       <option value="Hamburg Office">Hamburg (DE 🇩🇪)</option>
                       {formData.location && ![
                         'Tinglev HQ Brandenburg',
+                        'Tinglev HQ (Brandenburg, DE 🇩🇪)',
                         'Berlin Office',
+                        'Berlin (DE 🇩🇪)',
                         'München Headquarter',
                         'Frankfurt Office',
                         'Hamburg Office'
