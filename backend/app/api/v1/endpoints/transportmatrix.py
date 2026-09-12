@@ -95,41 +95,60 @@ def init_db():
 def seed_demo_data(cursor):
     # Seed Carriers
     carriers = [
-        ("DACHSER", "Dachser SE Logistik", "M. Hansen", "+49 461 8892-0", "dispo.flensburg@dachser.com"),
-        ("SCHENKER", "DB Schenker Logistik", "K. Schmidt", "+49 40 3341-200", "nord.logistik@dbschenker.com"),
-        ("SANDER", "Sander Spedition GmbH", "H. Sander", "+49 431 7721-0", "dispo@sander-spedition.de"),
-        ("TINGLEV_EXPRESS", "Tinglev Eigener Fuhrpark", "W. Jürgensen", "+45 74 64 3000", "fuhrpark@tinglev-elementfabrik.dk")
+        ("Unbekannt", "Spedition Unbekannt / Undefiniert", "Dispo Team", "+49 40 0000-00", "dispo@unbekannt.de"),
+        ("K", "Kühne + Nagel Logistik", "M. Hansen", "+49 40 3341-100", "dispo.kuehne@kn.com"),
+        ("T", "Tinglev Eigener Fuhrpark", "W. Jürgensen", "+45 74 64 3000", "fuhrpark@tinglev.dk"),
+        ("k", "Krage Spedition GmbH", "H. Krage", "+49 431 7721-0", "dispo@krage.de"),
+        ("t", "Trans-Sped GmbH", "K. Schmidt", "+49 461 8892-0", "dispo@trans-sped.de")
     ]
     cursor.executemany("INSERT OR REPLACE INTO carriers VALUES (?,?,?,?,?);", carriers)
 
     # Seed Projects
     projects = [
-        ("PRJ-2026-NEM-882", "Gewerbepark Tinglev Süd - Halle 3", "Dansk Byggeri A/S", "6360 Tinglev", 340.0, 48),
-        ("PRJ-2026-HH-102", "Hafencity Hamburg Baufeld 102", "Nordbau GmbH", "20457 Hamburg", 680.0, 120),
-        ("PRJ-2026-FL-550", "Logistikzentrum Handewitt", "Scandic Warehousing", "24983 Handewitt", 510.0, 36)
+        ("45189", "Wohlfühlhaus Bau GmbH & Co.KG", "Marina City Haus 2", "Hafenstrasse 8", 340.0, 48),
+        ("45247", "Norddeutsche Wohnbau GmbH", "4RH Sarstedt", "Giesener Straße 10", 680.0, 120),
+        ("45270", "Norddeutsche Wohnbau GmbH", "MFH 14 WE", "Giesener Straße 10", 510.0, 36),
+        ("45515", "Wohlfühlhaus Bau GmbH & Co.KG", "Marina City FFO Haus 1", "Hafenstraße 7", 290.0, 24),
+        ("45516", "Wohlfühlhaus Bau GmbH & Co.KG", "Marina City Haus 3", "Hafenstrasse 8", 410.0, 52),
+        ("45517", "Wohlfühlhaus Bau GmbH & Co.KG", "Marina City FFO Haus 6", "Hafenstraße 14", 310.0, 30),
+        ("45518", "Wohlfühlhaus Bau GmbH & Co.KG", "Marina City FFO Haus 7", "Hafenstraße 15", 330.0, 32),
+        ("45592", "Schrobsdorff Bau AG", "MFH Rhen Haus 1 Typ1", "Rhenaniastraße 35", 550.0, 60),
+        ("45633", "Norddeutsche Wohnbau GmbH", "Frahms Gärten Haus B", "Frahmredder 52,54,56", 420.0, 44),
+        ("45696", "Otto Wulff Bauunternehmung GmbH", "MFH Indira Gandhi Strasse 6", "Indira-Gandhi-Strasse 6", 610.0, 75)
     ]
     cursor.executemany("INSERT OR REPLACE INTO projects VALUES (?,?,?,?,?,?);", projects)
 
-    # Seed Orders
+    # Seed Orders matching screenshots
     demo_orders = [
-        (
-            "TR-2026-3401", "TR-3401", 34, "Sattelzug 40t", "FL-TL 882", "2026-08-20", "07:30", "Montage-Team A", "Demag 50t",
-            6, 24500.0, "Schwergut", "TINGLEV_EXPRESS", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev",
-            "Dansk Byggeri A/S", "Gewerbepark Tinglev Süd", "Industrieallee 4", "6360 Tinglev", "Zone 1", "PRJ-2026-NEM-882",
-            1200.0, 1850.0, 1850.0, 1150.0, 85.0, 0.0, 0.0, 0.0, 615.0
-        ),
-        (
-            "TR-2026-3402", "TR-3402", 34, "Tieflader Euro 6", "FL-[# 992", "2026-08-21", "09:00", "Montage-Team B", "Liebherr 70t",
-            4, 38200.0, "Überbreite 3.2m", "DACHSER", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev",
-            "Nordbau GmbH", "Hafencity Baufeld 102", "Uferstraße 18", "20457 Hamburg", "Zone 3", "PRJ-2026-HH-102",
-            2400.0, 3400.0, 3400.0, 2250.0, 140.0, 100.0, 0.0, 0.0, 910.0
-        ),
-        (
-            "TR-2026-3501", "TR-3501", 35, "Spannbett-Trailer", "FL-SP 104", "2026-08-26", "08:00", "Werkstatt-Direkt", "Portalkran 32t",
-            8, 29800.0, "Standard-Fertigteil", "SANDER", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev",
-            "Scandic Warehousing", "Logistikpark Handewitt", "Europastraße 9", "24983 Handewitt", "Zone 2", "PRJ-2026-FL-550",
-            1450.0, 2100.0, 2100.0, 1380.0, 60.0, 0.0, 0.0, 0.0, 660.0
-        )
+        ("A26-00336-03", "A26-00336", 26, "3-Achser", "FL-TR 336", "", "", "", "Ja", 11, 18034.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Wohlfühlhaus Bau", "Marina City Haus 2", "Hafenstrasse 8", "Hamburg", "Zone 1", "45189", 0.0, 450.0, 450.0, 0.0, 0.0, 0.0, 0.0, 0.0, 450.0),
+        ("A26-00336-02", "A26-00336", 26, "3-Achser", "FL-TR 337", "", "", "", "Ja", 11, 16900.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Wohlfühlhaus Bau", "Marina City Haus 2", "Hafenstrasse 8", "Hamburg", "Zone 1", "45189", 0.0, 450.0, 450.0, 0.0, 0.0, 0.0, 0.0, 0.0, 450.0),
+        ("A26-00336-01", "A26-00336", 26, "3-Achser", "FL-TR 338", "", "", "", "Ja", 12, 21200.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Wohlfühlhaus Bau", "Marina City Haus 2", "Hafenstrasse 8", "Hamburg", "Zone 1", "45189", 0.0, 480.0, 480.0, 0.0, 0.0, 0.0, 0.0, 0.0, 480.0),
+        ("A26-00310-02", "A26-00310", 26, "3-Achser", "FL-TR 310", "", "", "", "Ja", 13, 19047.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Norddeutsche Wohnbau", "4RH Sarstedt", "Giesener Straße 10", "Sarstedt", "Zone 2", "45247", 0.0, 520.0, 520.0, 0.0, 0.0, 0.0, 0.0, 0.0, 520.0),
+        ("A26-00310-01", "A26-00310", 26, "3-Achser", "FL-TR 311", "", "", "", "Ja", 9, 20745.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Norddeutsche Wohnbau", "4RH Sarstedt", "Giesener Straße 10", "Sarstedt", "Zone 2", "45247", 0.0, 520.0, 520.0, 0.0, 0.0, 0.0, 0.0, 0.0, 520.0),
+        ("A26-00309-02", "A26-00309", 26, "3-Achser", "FL-TR 309", "", "", "", "Ja", 10, 17208.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Norddeutsche Wohnbau", "MFH 14 WE", "Giesener Straße 10", "Sarstedt", "Zone 2", "45270", 0.0, 490.0, 490.0, 0.0, 0.0, 0.0, 0.0, 0.0, 490.0),
+        ("A26-00309-01", "A26-00309", 26, "3-Achser", "FL-TR 309", "", "", "", "Ja", 10, 17126.0, "One-Way", "Unbekannt", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Norddeutsche Wohnbau", "MFH 14 WE", "Giesener Straße 10", "Sarstedt", "Zone 2", "45270", 0.0, 490.0, 490.0, 0.0, 0.0, 0.0, 0.0, 0.0, 490.0),
+        ("A26-00307-02", "A26-00307", 29, "Innenlader", "FL-IL 702", "16.7.2026", "08:00", "", "Ja", 3, 3815.0, "Rundlauf", "k", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Wohlfühlhaus Bau", "Marina City FFO Haus 1", "Hafenstraße 7", "Frankfurt (Oder)", "Zone 3", "45515", 0.0, 680.0, 680.0, 0.0, 0.0, 0.0, 0.0, 0.0, 680.0),
+        ("A26-00307-01", "A26-00307", 29, "Innenlader", "FL-IL 701", "16.7.2026", "09:30", "", "Ja", 8, 19630.0, "Rundlauf", "k", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Wohlfühlhaus Bau", "Marina City FFO Haus 1", "Hafenstraße 7", "Frankfurt (Oder)", "Zone 3", "45515", 0.0, 750.0, 750.0, 0.0, 0.0, 0.0, 0.0, 0.0, 750.0),
+        ("A26-00306-01", "A26-00306", 28, "Innenlader", "FL-IL 601", "7.7.2026", "08:00", "", "Ja", 12, 18577.0, "One-Way", "k", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "Wohlfühlhaus Bau", "Marina City Haus 3", "Hafenstrasse 8", "Hamburg", "Zone 1", "45516", 0.0, 620.0, 620.0, 0.0, 0.0, 0.0, 0.0, 0.0, 620.0),
+
+        # KW 12 Orders for Wochenplan
+        ("A25-00556-04", "A25-00556", 12, "Innenlader", "FL-IL 556", "2026-03-17", "08:00", "", "Ja", 4, 19701.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45517", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-03", "A25-00556", 12, "Innenlader", "FL-IL 556", "2026-03-17", "09:30", "", "Ja", 3, 17747.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45517", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-02", "A25-00556", 12, "Innenlader", "FL-IL 556", "2026-03-17", "11:00", "", "Ja", 4, 18545.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45517", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-01", "A25-00556", 12, "Innenlader", "FL-IL 556", "2026-03-17", "14:00", "", "Ja", 3, 15987.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45517", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+
+        ("A25-00556-08", "A25-00556", 12, "Innenlader", "FL-IL 557", "2026-03-18", "08:00", "", "Ja", 4, 16124.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45518", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-07", "A25-00556", 12, "Innenlader", "FL-IL 557", "2026-03-18", "09:30", "", "Ja", 4, 19969.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45518", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-06", "A25-00556", 12, "Innenlader", "FL-IL 557", "2026-03-18", "11:00", "", "Ja", 3, 19341.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45518", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-05", "A25-00556", 12, "Innenlader", "FL-IL 557", "2026-03-18", "14:00", "", "Ja", 3, 19770.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45518", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+
+        ("A25-00556-11", "A25-00556", 12, "Innenlader", "FL-IL 558", "2026-03-19", "08:00", "", "Ja", 2, 9541.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45592", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-10", "A25-00556", 12, "Innenlader", "FL-IL 558", "2026-03-19", "09:30", "", "Ja", 4, 15931.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45592", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00556-09", "A25-00556", 12, "Innenlader", "FL-IL 558", "2026-03-19", "11:00", "", "Ja", 3, 16181.0, "One-Way", "K", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "HKL 2B", "Lohkampstr.", "Lohkampstraße 22", "Hamburg", "Zone 1", "45592", 0.0, 580.0, 580.0, 0.0, 0.0, 0.0, 0.0, 0.0, 580.0),
+        ("A25-00544-01", "A25-00544", 12, "2-Achser", "FL-TR 544", "2026-03-19", "14:00", "", "Ja", 13, 21611.0, "One-Way", "t", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "EFH Otto/Gläser", "Bauvorhaben Gläser", "Hauptstraße 44", "Flensburg", "Zone 1", "45633", 0.0, 420.0, 420.0, 0.0, 0.0, 0.0, 0.0, 0.0, 420.0),
+
+        ("A25-00544-03", "A25-00544", 12, "2-Achser", "FL-TR 545", "2026-03-20", "08:00", "", "Ja", 14, 23079.0, "One-Way", "t", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "EFH Otto/Gläser", "Bauvorhaben Gläser", "Hauptstraße 44", "Flensburg", "Zone 1", "45696", 0.0, 420.0, 420.0, 0.0, 0.0, 0.0, 0.0, 0.0, 420.0),
+        ("A25-00544-02", "A25-00544", 12, "2-Achser", "FL-TR 545", "2026-03-20", "09:30", "", "Ja", 14, 22035.0, "One-Way", "t", "Werk Tinglev", "Fabrikvej 12", "6360 Tinglev", "EFH Otto/Gläser", "Bauvorhaben Gläser", "Hauptstraße 44", "Flensburg", "Zone 1", "45696", 0.0, 420.0, 420.0, 0.0, 0.0, 0.0, 0.0, 0.0, 420.0)
     ]
 
     cursor.executemany("""
@@ -137,6 +156,7 @@ def seed_demo_data(cursor):
         ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
     );
     """, demo_orders)
+
 
 # Initialize database tables on startup
 init_db()
