@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import * as LucideIcons from 'lucide-react';
 import { 
   X, 
   User, 
@@ -17,10 +19,44 @@ import {
   Trash2,
   Upload,
   RefreshCw,
-  UtensilsCrossed
+  UtensilsCrossed,
+  SlidersHorizontal,
+  Search,
+  Check,
+  Eye,
+  EyeOff,
+  Sparkles,
+  ShieldCheck
 } from 'lucide-react';
 import { api, getAvatarUrl } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
+
+// Intranet modules list for module access control
+const INTRANET_MODULES = [
+  { key: 'announcements', label: 'Mitteilungen & News', category: 'Hauptbereich', icon: 'Megaphone', description: 'Unternehmensbekanntmachungen, News-Feed und Eilmeldungen.' },
+  { key: 'phone-directory', label: 'Telefonverzeichnis', category: 'Hauptbereich', icon: 'PhoneCall', description: 'Durchwahlen, Mobilnummern und Kontaktschnellaktionen.' },
+  { key: 'org-chart', label: 'Organigramm', category: 'Hauptbereich', icon: 'Network', description: 'Interaktive Unternehmenshierarchie und Baumstruktur.' },
+  { key: 'directory', label: 'Teamverzeichnis', category: 'Hauptbereich', icon: 'Users', description: 'Mitarbeiterübersicht und Abteilungsfilter.' },
+  { key: 'kantine', label: 'Kantine & Speiseplan', category: 'Hauptbereich', icon: 'UtensilsCrossed', description: 'Wochen-Speiseplan, Tagesgerichte und Essensvorbestellung.' },
+  { key: 'gps', label: 'GPS & Flottenortung', category: 'Hauptbereich', icon: 'Navigation', description: 'Live-Telematik, Fahrzeugstatus und Routenüberwachung.' },
+  { key: 'vertrieb', label: 'Vertrieb & Sales', category: 'Hauptbereich', icon: 'TrendingUp', description: 'Sales-Pipeline, Großprojekte und Vertriebsunterlagen.' },
+  { key: 'technik', label: 'Technik & Geräte', category: 'Hauptbereich', icon: 'Cpu', description: 'Maschinen-Telemetrie, Wartungspläne und Support-Tickets.' },
+  { key: 'abwicklung', label: 'Auftragsabwicklung', category: 'Hauptbereich', icon: 'ClipboardCheck', description: 'Auftragstracking von Statik-Freigabe bis Baustellenlogistik.' },
+  { key: 'planung', label: 'Ressourcen & Planung', category: 'Hauptbereich', icon: 'CalendarClock', description: 'Kapazitätsauslastung der Fertigungslinien und Schichtpläne.' },
+  { key: 'schulungen', label: 'Schulungen & Handbücher', category: 'Hauptbereich', icon: 'GraduationCap', description: 'Benutzerhandbücher, Videoanleitungen und interaktiver KI-Chatbot.' },
+  { key: 'wlan', label: 'WLAN für Mitarbeiter', category: 'Hauptbereich', icon: 'Wifi', description: 'Zugangsdaten und QR-Code für Mitarbeiter-WLAN.' },
+  { key: 'documents', label: 'Dokumentenablage & KI', category: 'Arbeitsbereich', icon: 'FolderOpen', description: 'Zentraler Dokumentenspeicher mit semantischer KI-Vektorsuche.' },
+  { key: 'calendar', label: 'Unternehmenskalender', category: 'Arbeitsbereich', icon: 'Calendar', description: 'Terminverwaltung, Feiertage und iCal-Kalendersynchronisation.' },
+  { key: 'tickets', label: 'IT-Helpdesk & Tickets', category: 'IT & Systeme', icon: 'Headphones', description: 'Störungsmeldungen, Supportanfragen und Ticketbearbeitung.' },
+  { key: 'hr-requests', label: 'Urlaubs- & Abwesenheitsverwaltung', category: 'Personal & HR', icon: 'Clock', description: 'Urlaubsanträge, Zeitausgleich und Krankmeldungen.' },
+  { key: 'performance', label: 'Mitarbeitergespräche & Performance', category: 'Personal & HR', icon: 'Award', description: 'Zielvereinbarungen (OKRs) und Mitarbeiter-Feedback.' },
+  { key: 'it-management', label: 'IT-Infrastruktur & Sicherheit', category: 'IT & Systeme', icon: 'Server', description: 'Serverstatus, 2FA-Überwachung und Sicherheitsmanagement.' },
+  { key: 'admin-users', label: 'Benutzerverwaltung', category: 'Administration', icon: 'UserCheck', description: 'Mitarbeiterkonten verwalten und Passwörter zurücksetzen.' },
+  { key: 'admin-roles', label: 'Rollen & Berechtigungen', category: 'Administration', icon: 'SlidersHorizontal', description: 'Custom Roles (RBAC) und Rechtegruppen definieren.' },
+  { key: 'admin-settings', label: 'System-Einstellungen', category: 'Administration', icon: 'Settings', description: 'Systemweite Parameter, Branding und Integrationen.' },
+];
+
+const ALL_MODULE_KEYS = INTRANET_MODULES.map((m) => m.key);
 
 export function UserModal({ 
   isOpen, 
@@ -32,6 +68,8 @@ export function UserModal({
   const { t } = useLanguage();
   const isEditing = !!userToEdit;
   const fileInputRef = useRef(null);
+
+  const [activeTab, setActiveTab] = useState('data'); // 'data' | 'modules'
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -53,6 +91,8 @@ export function UserModal({
   const [manageCanteen, setManageCanteen] = useState(false);
   const [supervisorIds, setSupervisorIds] = useState([]);
   const [departmentsList, setDepartmentsList] = useState([]);
+  const [allowedModules, setAllowedModules] = useState(ALL_MODULE_KEYS);
+  const [moduleSearch, setModuleSearch] = useState('');
 
   // Avatar file state
   const [avatarFile, setAvatarFile] = useState(null);
@@ -62,6 +102,12 @@ export function UserModal({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [availableRoles, setAvailableRoles] = useState([]);
+
+  // Helper to render dynamic module icons
+  const renderModuleIcon = (iconName) => {
+    const IconComp = LucideIcons[iconName] || LucideIcons.Sparkles;
+    return <IconComp className="w-4 h-4" />;
+  };
 
   useEffect(() => {
     async function loadRoles() {
@@ -89,7 +135,7 @@ export function UserModal({
         role: userToEdit.role || 'EMPLOYEE',
         department: userToEdit.department || 'General',
         position: userToEdit.position || 'Mitarbeiter',
-        location: userToEdit.location || 'Tinglev Headquarter',
+        location: userToEdit.location || 'Tinglev HQ Brandenburg',
         phone: userToEdit.phone || '',
         mobile: userToEdit.mobile || '',
         supervisor_id: userToEdit.supervisor_id ? String(userToEdit.supervisor_id) : '',
@@ -103,6 +149,14 @@ export function UserModal({
         userToEdit.custom_permissions?.manage_canteen === true ||
         (Array.isArray(userToEdit.allowed_modules) && userToEdit.allowed_modules.includes('manage_canteen'))
       );
+
+      // Allowed modules initialization
+      if (Array.isArray(userToEdit.allowed_modules)) {
+        setAllowedModules(userToEdit.allowed_modules);
+      } else {
+        setAllowedModules(ALL_MODULE_KEYS);
+      }
+
       let sups = [];
       if (Array.isArray(userToEdit.supervisor_ids) && userToEdit.supervisor_ids.length > 0) {
         sups = userToEdit.supervisor_ids.map(Number);
@@ -141,10 +195,13 @@ export function UserModal({
       setManageCanteen(false);
       setSupervisorIds([]);
       setDepartmentsList(['Softwareentwicklung']);
+      setAllowedModules(ALL_MODULE_KEYS);
     }
     setAvatarFile(null);
     setAvatarRemoved(false);
     setError(null);
+    setActiveTab('data');
+    setModuleSearch('');
   }, [userToEdit, isOpen]);
 
   if (!isOpen) return null;
@@ -157,7 +214,6 @@ export function UserModal({
         [name]: type === 'checkbox' ? checked : value,
       };
 
-      // Auto update full_name when typing first or last name
       if (name === 'first_name' || name === 'last_name') {
         const fn = name === 'first_name' ? value : prev.first_name;
         const ln = name === 'last_name' ? value : prev.last_name;
@@ -171,13 +227,11 @@ export function UserModal({
   const handleFileSelect = (file) => {
     if (!file) return;
 
-    // Check MIME type
     if (!file.type.startsWith('image/')) {
       setError('Bitte wählen Sie eine gültige Bilddatei (JPG, PNG, WebP oder GIF) aus.');
       return;
     }
 
-    // Check size (max 5 MB)
     if (file.size > 5 * 1024 * 1024) {
       setError('Das Bild ist zu groß. Die maximale Dateigröße beträgt 5 MB.');
       return;
@@ -243,8 +297,27 @@ export function UserModal({
   };
 
   const handleRemoveDepartment = (deptToRemove) => {
-    if (departmentsList.length <= 1) return; // Keep at least one department
+    if (departmentsList.length <= 1) return;
     setDepartmentsList(departmentsList.filter((d) => d !== deptToRemove));
+  };
+
+  // Module toggle handlers
+  const handleToggleModule = (key) => {
+    setAllowedModules((prev) => {
+      if (prev.includes(key)) {
+        return prev.filter((k) => k !== key);
+      } else {
+        return [...prev, key];
+      }
+    });
+  };
+
+  const handleSelectAllModules = () => {
+    setAllowedModules(ALL_MODULE_KEYS);
+  };
+
+  const handleDeselectAllModules = () => {
+    setAllowedModules([]);
   };
 
   const handleSubmit = async (e) => {
@@ -271,13 +344,11 @@ export function UserModal({
 
       let finalAvatarUrl = formData.avatar_url;
 
-      // 1. If user is creating a new user and selected a file
       if (!isEditing && avatarFile) {
         const tempUpload = await api.uploadTempAvatar(avatarFile);
         finalAvatarUrl = tempUpload.avatar_url;
       }
 
-      // 2. If avatar was explicitly removed on an existing user
       if (isEditing && avatarRemoved) {
         finalAvatarUrl = null;
       }
@@ -289,6 +360,7 @@ export function UserModal({
         avatar_url: finalAvatarUrl,
         supervisor_ids: supervisorIds,
         supervisor_id: supervisorIds.length > 0 ? supervisorIds[0] : null,
+        allowed_modules: allowedModules,
         custom_permissions: {
           ...(userToEdit?.custom_permissions || {}),
           manage_canteen: manageCanteen,
@@ -299,10 +371,8 @@ export function UserModal({
         delete payload.password;
       }
 
-      // Save user record
       const savedUser = await onSave(payload, userToEdit ? userToEdit.id : null);
 
-      // 3. If editing and user selected a new avatar file, upload directly
       if (isEditing && avatarFile && userToEdit?.id) {
         await api.uploadUserAvatar(userToEdit.id, avatarFile);
       }
@@ -319,13 +389,31 @@ export function UserModal({
     (s) => !userToEdit || s.id !== userToEdit.id
   );
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-2xl overflow-hidden my-8 transform transition-all">
+  const filteredModules = INTRANET_MODULES.filter((m) => {
+    if (!moduleSearch) return true;
+    const q = moduleSearch.toLowerCase().strip ? moduleSearch.toLowerCase().strip() : moduleSearch.toLowerCase();
+    return (
+      m.label.toLowerCase().includes(q) ||
+      m.category.toLowerCase().includes(q) ||
+      m.key.toLowerCase().includes(q) ||
+      m.description.toLowerCase().includes(q)
+    );
+  });
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 w-full max-w-3xl overflow-hidden my-8 z-[10000] transform transition-all">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white">
+        <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white relative">
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
           <div className="flex items-center space-x-3">
-            <div className="p-2.5 rounded-2xl bg-indigo-500/20 border border-indigo-400/30">
+            <div className="p-2.5 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 shrink-0">
               <User className="w-5 h-5 text-indigo-300" />
             </div>
             <div>
@@ -337,12 +425,37 @@ export function UserModal({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+
+          {/* Modal Header Tabs */}
+          <div className="flex space-x-2 mt-5 pt-2 border-t border-white/10">
+            <button
+              type="button"
+              onClick={() => setActiveTab('data')}
+              className={`flex items-center space-x-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                activeTab === 'data'
+                  ? 'bg-white text-indigo-950 shadow-md'
+                  : 'text-indigo-200 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>Stammdaten & Profil</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('modules')}
+              className={`flex items-center space-x-2 px-4 py-2 text-xs font-bold rounded-xl transition-all ${
+                activeTab === 'modules'
+                  ? 'bg-white text-indigo-950 shadow-md'
+                  : 'text-indigo-200 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              <span>
+                Aktive Module ({allowedModules.length}/{INTRANET_MODULES.length})
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Modal Body / Form */}
@@ -354,435 +467,524 @@ export function UserModal({
             </div>
           )}
 
-          {/* ========================================================= */}
-          {/* INTERACTIVE AVATAR UPLOAD & PREVIEW SECTION */}
-          {/* ========================================================= */}
-          <div 
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`p-4 rounded-2xl border-2 transition-all ${
-              isDragging 
-                ? 'border-indigo-500 bg-indigo-50/50' 
-                : 'border-dashed border-slate-200 bg-slate-50/60 hover:border-indigo-300'
-            }`}
-          >
-            <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              {/* Avatar Preview circle */}
-              <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-md ring-4 ring-white">
-                  {avatarPreview ? (
-                    <img 
-                      src={avatarPreview} 
-                      alt="Avatar Preview" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span>{formData.full_name?.charAt(0) || 'U'}</span>
-                  )}
-                </div>
-
-                {/* Camera Overlay on Hover */}
-                <div className="absolute inset-0 bg-slate-900/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Camera className="w-6 h-6 text-white" />
-                </div>
-              </div>
-
-              {/* Upload actions & instructions */}
-              <div className="flex-1 text-center sm:text-left space-y-1.5">
-                <p className="text-xs font-bold text-slate-800">
-                  Profilbild {isEditing ? 'ändern' : 'hochladen'}
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  Bild hierher ziehen oder Datei auswählen (JPG, PNG, WebP • max. 5 MB)
-                </p>
-
-                <div className="flex items-center justify-center sm:justify-start space-x-2 pt-1">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileInputChange}
-                    accept="image/png, image/jpeg, image/webp, image/gif"
-                    className="hidden"
-                  />
-
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-indigo-300 text-indigo-600 hover:text-indigo-700 text-xs font-bold rounded-xl shadow-2xs transition-colors"
-                  >
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Foto auswählen</span>
-                  </button>
-
-                  {(avatarPreview || formData.avatar_url) && (
-                    <button
-                      type="button"
-                      onClick={handleRemoveAvatar}
-                      className="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
-                      title="Profilbild auf Standard zurücksetzen"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Foto entfernen</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Form Fields Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                {t('admin_users.first_name')} *
-              </label>
-              <input
-                type="text"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                required
-                placeholder="z. B. Max"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                {t('admin_users.last_name')} *
-              </label>
-              <input
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                required
-                placeholder="z. B. Mustermann"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Mail className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.email')} *</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="m.mustermann@empresa.com"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Shield className="w-3 h-3 text-indigo-500" />
-                <span>{t('admin_users.role')} *</span>
-              </label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={(e) => {
-                  const selectedSlug = e.target.value;
-                  const selectedRoleObj = availableRoles.find((r) => r.slug === selectedSlug);
-                  setFormData((prev) => ({
-                    ...prev,
-                    role: selectedSlug,
-                    custom_role_id: selectedRoleObj ? selectedRoleObj.id : prev.custom_role_id,
-                  }));
-                }}
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-semibold text-slate-800"
+          {/* TAB 1: STAMMDATEN & PROFIL */}
+          {activeTab === 'data' && (
+            <div className="space-y-5">
+              {/* AVATAR UPLOAD & PREVIEW SECTION */}
+              <div 
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`p-4 rounded-2xl border-2 transition-all ${
+                  isDragging 
+                    ? 'border-indigo-500 bg-indigo-50/50' 
+                    : 'border-dashed border-slate-200 bg-slate-50/60 hover:border-indigo-300'
+                }`}
               >
-                {availableRoles.length > 0 ? (
-                  availableRoles.map((r) => (
-                    <option key={r.id} value={r.slug}>
-                      {r.name} {r.is_system_role ? '(System)' : '(Benutzerdefiniert)'}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="EMPLOYEE">Mitarbeiter (Standard)</option>
-                    <option value="HR_MANAGER">HR-Manager (Personal)</option>
-                    <option value="IT_ADMIN">IT-Administrator (Systeme)</option>
-                    <option value="ADMIN">SuperAdmin (Vollzugriff)</option>
-                  </>
-                )}
-              </select>
-            </div>
-          </div>
+                <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                  <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-md ring-4 ring-white">
+                      {avatarPreview ? (
+                        <img 
+                          src={avatarPreview} 
+                          alt="Avatar Preview" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>{formData.full_name?.charAt(0) || 'U'}</span>
+                      )}
+                    </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
-                <span className="flex items-center space-x-1">
-                  <Building className="w-3 h-3 text-slate-400" />
-                  <span>{t('admin_users.department')} (Multi-Abteilung) *</span>
-                </span>
-                {departmentsList.length > 1 && (
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    {departmentsList.length} Abteilungen
-                  </span>
-                )}
-              </label>
+                    <div className="absolute inset-0 bg-slate-900/50 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Camera className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
 
-              {/* Department Badge Chips */}
-              <div className="flex flex-wrap items-center gap-1.5 mb-2 min-h-[34px] p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
-                {departmentsList.map((dept) => (
-                  <span
-                    key={dept}
-                    className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 shadow-xs"
-                  >
-                    <span>{dept}</span>
-                    {departmentsList.length > 1 && (
+                  <div className="flex-1 text-center sm:text-left space-y-1.5">
+                    <p className="text-xs font-bold text-slate-800">
+                      Profilbild {isEditing ? 'ändern' : 'hochladen'}
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      Bild hierher ziehen oder Datei auswählen (JPG, PNG, WebP • max. 5 MB)
+                    </p>
+
+                    <div className="flex items-center justify-center sm:justify-start space-x-2 pt-1">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileInputChange}
+                        accept="image/png, image/jpeg, image/webp, image/gif"
+                        className="hidden"
+                      />
+
                       <button
                         type="button"
-                        onClick={() => handleRemoveDepartment(dept)}
-                        className="text-slate-400 hover:text-rose-600 rounded-full p-0.5 transition-colors ml-1"
-                        title="Abteilung entfernen"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-indigo-300 text-indigo-600 hover:text-indigo-700 text-xs font-bold rounded-xl shadow-2xs transition-colors"
                       >
-                        <X className="w-3 h-3" />
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Foto auswählen</span>
                       </button>
-                    )}
-                  </span>
-                ))}
-              </div>
 
-              {/* Add Department Dropdown */}
-              <select
-                onChange={(e) => {
-                  if (e.target.value) {
-                    handleAddDepartment(e.target.value);
-                    e.target.value = '';
-                  }
-                }}
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              >
-                <option value="">+ weitere Abteilung hinzufügen...</option>
-                <option value="Geschäftsführung">Geschäftsführung</option>
-                <option value="Geschäftsentwicklung">Geschäftsentwicklung</option>
-                <option value="Rezeption">Rezeption & Empfang</option>
-                <option value="Vertriebsabteilung">Vertriebsabteilung</option>
-                <option value="Kontrolle">Kontrolle & QS</option>
-                <option value="Technik">Technik & Statik</option>
-                <option value="Buchhaltung">Buchhaltung & Finanzen</option>
-                <option value="Produktion \ Planung">Produktion \ Planung</option>
-                <option value="Abwicklung">Abwicklung & Disposition</option>
-                <option value="IT \ SuperAdmin">IT \ SuperAdmin</option>
-                <option value="General">Allgemein (General)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Briefcase className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.position')} *</span>
-              </label>
-              <input
-                type="text"
-                name="position"
-                value={formData.position}
-                onChange={handleChange}
-                required
-                placeholder="z. B. Senior Cloud Engineer"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <MapPin className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.location')}</span>
-              </label>
-              <select
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              >
-                <option value="Tinglev HQ Brandenburg">Tinglev HQ (Brandenburg, DE 🇩🇪)</option>
-                <option value="Berlin Office">Berlin (DE 🇩🇪)</option>
-                <option value="München Headquarter">München (DE 🇩🇪)</option>
-                <option value="Frankfurt Office">Frankfurt (DE 🇩🇪)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Phone className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.phone')}</span>
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="+49 89 1234-105"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Smartphone className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.mobile')}</span>
-              </label>
-              <input
-                type="text"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-                placeholder="+49 170 1234567"
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
-                <span className="flex items-center space-x-1">
-                  <UserCheck className="w-3 h-3 text-slate-400" />
-                  <span>Vorgesetzte (Hierarchie)</span>
-                </span>
-                {supervisorIds.length > 1 && (
-                  <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">
-                    {supervisorIds.length} Vorgesetzte
-                  </span>
-                )}
-              </label>
-
-              {/* Selected Supervisor Chips */}
-              {supervisorIds.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {supervisorIds.map((supId) => {
-                    const supObj = filteredSupervisors.find((s) => s.id === supId);
-                    if (!supObj) return null;
-                    return (
-                      <div
-                        key={supId}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs font-medium shadow-xs"
-                      >
-                        <span className="max-w-[140px] truncate font-semibold">{supObj.full_name}</span>
-                        <span className="text-[10px] text-indigo-500 truncate">({supObj.department})</span>
+                      {(avatarPreview || formData.avatar_url) && (
                         <button
                           type="button"
-                          onClick={() => handleRemoveSupervisor(supId)}
-                          className="text-indigo-400 hover:text-rose-600 transition-colors p-0.5 rounded-md hover:bg-indigo-100"
-                          title="Vorgesetzten entfernen"
+                          onClick={handleRemoveAvatar}
+                          className="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
+                          title="Profilbild auf Standard zurücksetzen"
                         >
-                          <X className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Foto entfernen</span>
                         </button>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Fields Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    {t('admin_users.first_name')} *
+                  </label>
+                  <input
+                    type="text"
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    required
+                    placeholder="z. B. Max"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    {t('admin_users.last_name')} *
+                  </label>
+                  <input
+                    type="text"
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    required
+                    placeholder="z. B. Mustermann"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <Mail className="w-3 h-3 text-slate-400" />
+                    <span>{t('admin_users.email')} *</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="m.mustermann@empresa.com"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <Shield className="w-3 h-3 text-indigo-500" />
+                    <span>{t('admin_users.role')} *</span>
+                  </label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={(e) => {
+                      const selectedSlug = e.target.value;
+                      const selectedRoleObj = availableRoles.find((r) => r.slug === selectedSlug);
+                      setFormData((prev) => ({
+                        ...prev,
+                        role: selectedSlug,
+                        custom_role_id: selectedRoleObj ? selectedRoleObj.id : prev.custom_role_id,
+                      }));
+                    }}
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-semibold text-slate-800"
+                  >
+                    {availableRoles.length > 0 ? (
+                      availableRoles.map((r) => (
+                        <option key={r.id} value={r.slug}>
+                          {r.name} {r.is_system_role ? '(System)' : '(Benutzerdefiniert)'}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="EMPLOYEE">Mitarbeiter (Standard)</option>
+                        <option value="HR_MANAGER">HR-Manager (Personal)</option>
+                        <option value="IT_ADMIN">IT-Administrator (Systeme)</option>
+                        <option value="ADMIN">SuperAdmin (Vollzugriff)</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span className="flex items-center space-x-1">
+                      <Building className="w-3 h-3 text-slate-400" />
+                      <span>{t('admin_users.department')} (Multi-Abteilung) *</span>
+                    </span>
+                    {departmentsList.length > 1 && (
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        {departmentsList.length} Abteilungen
+                      </span>
+                    )}
+                  </label>
+
+                  <div className="flex flex-wrap items-center gap-1.5 mb-2 min-h-[34px] p-1.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    {departmentsList.map((dept) => (
+                      <span
+                        key={dept}
+                        className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-white text-slate-800 border border-slate-200 shadow-xs"
+                      >
+                        <span>{dept}</span>
+                        {departmentsList.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveDepartment(dept)}
+                            className="text-slate-400 hover:text-rose-600 rounded-full p-0.5 transition-colors ml-1"
+                            title="Abteilung entfernen"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+
+                  <select
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleAddDepartment(e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  >
+                    <option value="">+ weitere Abteilung hinzufügen...</option>
+                    <option value="Geschäftsführung">Geschäftsführung</option>
+                    <option value="Geschäftsentwicklung">Geschäftsentwicklung</option>
+                    <option value="Rezeption">Rezeption & Empfang</option>
+                    <option value="Vertriebsabteilung">Vertriebsabteilung</option>
+                    <option value="Kontrolle">Kontrolle & QS</option>
+                    <option value="Technik">Technik & Statik</option>
+                    <option value="Buchhaltung">Buchhaltung & Finanzen</option>
+                    <option value="Produktion \ Planung">Produktion \ Planung</option>
+                    <option value="Abwicklung">Abwicklung & Disposition</option>
+                    <option value="IT \ SuperAdmin">IT \ SuperAdmin</option>
+                    <option value="General">Allgemein (General)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <Briefcase className="w-3 h-3 text-slate-400" />
+                    <span>{t('admin_users.position')} *</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                    required
+                    placeholder="z. B. Senior Cloud Engineer"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <MapPin className="w-3 h-3 text-slate-400" />
+                    <span>{t('admin_users.location')}</span>
+                  </label>
+                  <select
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  >
+                    <option value="Tinglev HQ Brandenburg">Tinglev HQ (Brandenburg, DE 🇩🇪)</option>
+                    <option value="Berlin Office">Berlin (DE 🇩🇪)</option>
+                    <option value="München Headquarter">München (DE 🇩🇪)</option>
+                    <option value="Frankfurt Office">Frankfurt (DE 🇩🇪)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <Phone className="w-3 h-3 text-slate-400" />
+                    <span>{t('admin_users.phone')}</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+49 89 1234-105"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <Smartphone className="w-3 h-3 text-slate-400" />
+                    <span>{t('admin_users.mobile')}</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    placeholder="+49 170 1234567"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span className="flex items-center space-x-1">
+                      <UserCheck className="w-3 h-3 text-slate-400" />
+                      <span>Vorgesetzte (Hierarchie)</span>
+                    </span>
+                    {supervisorIds.length > 1 && (
+                      <span className="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-1.5 py-0.5 rounded-md">
+                        {supervisorIds.length} Vorgesetzte
+                      </span>
+                    )}
+                  </label>
+
+                  {supervisorIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {supervisorIds.map((supId) => {
+                        const supObj = filteredSupervisors.find((s) => s.id === supId);
+                        if (!supObj) return null;
+                        return (
+                          <div
+                            key={supId}
+                            className="inline-flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 border border-indigo-200 text-indigo-800 rounded-xl text-xs font-medium shadow-xs"
+                          >
+                            <span className="max-w-[140px] truncate font-semibold">{supObj.full_name}</span>
+                            <span className="text-[10px] text-indigo-500 truncate">({supObj.department})</span>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveSupervisor(supId)}
+                              className="text-indigo-400 hover:text-rose-600 transition-colors p-0.5 rounded-md hover:bg-indigo-100"
+                              title="Vorgesetzten entfernen"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <select
+                    onChange={handleAddSupervisor}
+                    value=""
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  >
+                    <option value="">
+                      {supervisorIds.length === 0
+                        ? `-- ${t('admin_users.no_supervisor')} --`
+                        : '+ weiteren Vorgesetzten hinzufügen...'}
+                    </option>
+                    {filteredSupervisors
+                      .filter((s) => !supervisorIds.includes(s.id))
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.full_name} ({s.position} - {s.department})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
+                    <Lock className="w-3 h-3 text-slate-400" />
+                    <span>{t('admin_users.password')} {!isEditing && '*'}</span>
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required={!isEditing}
+                    placeholder={isEditing ? t('admin_users.password_hint_edit') : t('admin_users.password_hint_create')}
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-1 block">
+                    {isEditing ? t('admin_users.password_hint_edit') : t('admin_users.password_hint_create')}
+                  </span>
+                </div>
+              </div>
+
+              {/* Canteen Management Delegation Toggle */}
+              <div className="flex items-center justify-between p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200/80">
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2 rounded-xl bg-amber-500/15 text-amber-700">
+                    <UtensilsCrossed className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Kantine & Speiseplan verwalten</p>
+                    <p className="text-[11px] text-slate-500">
+                      Erlaubt diesem Mitarbeiter das Erstellen, Bearbeiten von Wochenplänen und PDF-Uploads.
+                    </p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={manageCanteen}
+                    onChange={(e) => setManageCanteen(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: MODUL-ZUGRIFF & BERECHTIGUNGEN */}
+          {activeTab === 'modules' && (
+            <div className="space-y-4">
+              {/* SuperAdmin Notice */}
+              {formData.role === 'ADMIN' && (
+                <div className="p-3.5 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center space-x-3 text-indigo-900 text-xs">
+                  <ShieldCheck className="w-5 h-5 text-indigo-600 shrink-0" />
+                  <div>
+                    <p className="font-bold">SuperAdmin Konto</p>
+                    <p className="text-[11px] text-indigo-700">
+                      SuperAdmins besitzen systemweit vollen Zugriff. Sie können hier dennoch spezifische Modul-Präferenzen festlegen.
+                    </p>
+                  </div>
                 </div>
               )}
 
-              {/* Add Supervisor Select */}
-              <select
-                onChange={handleAddSupervisor}
-                value=""
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              >
-                <option value="">
-                  {supervisorIds.length === 0
-                    ? `-- ${t('admin_users.no_supervisor')} --`
-                    : '+ weiteren Vorgesetzten hinzufügen...'}
-                </option>
-                {filteredSupervisors
-                  .filter((s) => !supervisorIds.includes(s.id))
-                  .map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.full_name} ({s.position} - {s.department})
-                    </option>
-                  ))}
-              </select>
-            </div>
+              {/* Action Toolbar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-bold text-slate-800">
+                    Aktivierte Module: <span className="text-indigo-600 font-mono font-bold">{allowedModules.length}</span> von {INTRANET_MODULES.length}
+                  </span>
+                </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center space-x-1">
-                <Lock className="w-3 h-3 text-slate-400" />
-                <span>{t('admin_users.password')} {!isEditing && '*'}</span>
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required={!isEditing}
-                placeholder={isEditing ? t('admin_users.password_hint_edit') : t('admin_users.password_hint_create')}
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
-              />
-              <span className="text-[10px] text-slate-400 mt-1 block">
-                {isEditing ? t('admin_users.password_hint_edit') : t('admin_users.password_hint_create')}
-              </span>
-            </div>
-          </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={handleSelectAllModules}
+                    className="px-3 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
+                  >
+                    Alle freischalten
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeselectAllModules}
+                    className="px-3 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
+                  >
+                    Alle ausblenden
+                  </button>
+                </div>
+              </div>
 
-          {/* Canteen Management Delegation Toggle */}
-          <div className="flex items-center justify-between p-3.5 bg-amber-50/70 rounded-2xl border border-amber-200/80">
-            <div className="flex items-center space-x-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/15 text-amber-700">
-                <UtensilsCrossed className="w-4 h-4" />
+              {/* Search Bar for Modules */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={moduleSearch}
+                  onChange={(e) => setModuleSearch(e.target.value)}
+                  placeholder="Module filtern nach Name, Kategorie oder Beschreibung..."
+                  className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+                />
               </div>
-              <div>
-                <p className="text-xs font-bold text-slate-800">Kantine & Speiseplan verwalten</p>
-                <p className="text-[11px] text-slate-500">
-                  Erlaubt diesem Mitarbeiter das Erstellen, Bearbeiten von Wochenplänen und PDF-Uploads.
-                </p>
-              </div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={manageCanteen}
-                onChange={(e) => setManageCanteen(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
-            </label>
-          </div>
 
-          {/* Active Status Toggle */}
-          <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-            <div className="flex items-center space-x-2.5">
-              <span className={`w-2.5 h-2.5 rounded-full ${formData.is_active ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
-              <div>
-                <p className="text-xs font-bold text-slate-800">{t('admin_users.is_active')}</p>
-                <p className="text-[11px] text-slate-400">
-                  {formData.is_active ? 'Konto ist freigeschaltet und kann sich im Intranet anmelden.' : 'Konto ist gesperrt.'}
-                </p>
+              {/* Modules Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[360px] overflow-y-auto pr-1">
+                {filteredModules.map((mod) => {
+                  const isAllowed = allowedModules.includes(mod.key);
+
+                  return (
+                    <div
+                      key={mod.key}
+                      onClick={() => handleToggleModule(mod.key)}
+                      className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-start space-x-3 select-none ${
+                        isAllowed
+                          ? 'border-indigo-500 bg-indigo-50/40 ring-1 ring-indigo-500/20 shadow-xs'
+                          : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 opacity-60'
+                      }`}
+                    >
+                      {/* Checkbox Switch */}
+                      <div className="pt-0.5">
+                        <div className={`w-5 h-5 rounded-lg flex items-center justify-center transition-colors ${
+                          isAllowed ? 'bg-indigo-600 text-white' : 'border border-slate-300 bg-white'
+                        }`}>
+                          {isAllowed && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                        </div>
+                      </div>
+
+                      {/* Icon & Title */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center space-x-2 truncate">
+                            <span className={`p-1.5 rounded-lg shrink-0 ${
+                              isAllowed ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-200 text-slate-500'
+                            }`}>
+                              {renderModuleIcon(mod.icon)}
+                            </span>
+                            <span className="text-xs font-bold text-slate-900 truncate">
+                              {mod.label}
+                            </span>
+                          </div>
+
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                            isAllowed 
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                              : 'bg-slate-200 text-slate-600'
+                          }`}>
+                            {isAllowed ? 'Aktiv' : 'Ausgeblendet'}
+                          </span>
+                        </div>
+
+                        <p className="text-[11px] text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+                          {mod.description}
+                        </p>
+
+                        <span className="text-[10px] text-slate-400 font-mono mt-1 block">
+                          Kategorie: {mod.category}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                name="is_active"
-                checked={formData.is_active}
-                onChange={handleChange}
-                className="sr-only peer"
-              />
-              <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
-            </label>
-          </div>
+          )}
 
           {/* Modal Footer */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end space-x-3">
+          <div className="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
             >
-              {t('admin_users.cancel_btn')}
+              Abbrechen
             </button>
             <button
               type="submit"
@@ -790,11 +992,12 @@ export function UserModal({
               className="flex items-center space-x-2 px-5 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-xl shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{loading ? 'Wird gespeichert...' : t('admin_users.save_btn')}</span>
+              <span>{loading ? 'Wird gespeichert...' : 'Benutzer speichern'}</span>
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
