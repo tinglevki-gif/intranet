@@ -38,7 +38,16 @@ export function Sidebar({ isOpen, onClose }) {
         {/* Brand Header */}
         <div className="px-5 py-4 border-b border-[#002B49]/80 bg-[#001424]/60">
           <div className="flex items-center justify-between">
-            <TinglevLogo variant="full" theme="light-text" showSubtitle={true} />
+            <NavLink
+              to="/"
+              onClick={() => {
+                if (window.innerWidth < 768 && onClose) onClose();
+              }}
+              className="cursor-pointer group hover:opacity-90 transition-all flex items-center focus:outline-none"
+              title="Zur Startseite / Dashboard"
+            >
+              <TinglevLogo variant="full" theme="light-text" showSubtitle={true} />
+            </NavLink>
 
             <button
               onClick={onClose}
