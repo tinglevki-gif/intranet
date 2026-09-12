@@ -141,9 +141,6 @@ export function TischplanReader() {
           </div>
         </div>
 
-        {/* MISCHMEISTER PROTOCOL (TOP EDITABLE BLOCK) */}
-        <ProtocolBlock protocol={protocol} onChange={handleProtocolChange} />
-
         {/* 3. HALLE 1 CONTAINER */}
         <div className="p-3 rounded-[3px] border-[1.5px] border-[#F5C2C7] bg-[#FFF5F5] print:p-1.5">
           <h3 className="text-xs font-bold text-[#842029] mb-2 print:mb-1 print:text-[11px]">
