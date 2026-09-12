@@ -161,18 +161,18 @@ export function ElementUebersichtWidget() {
             </div>
           </div>
 
-          {/* Right Title Header */}
-          <div className="text-right shrink-0">
-            <h2 className="text-2xl sm:text-3xl font-extrabold font-serif tracking-wider text-[#475569] uppercase">
-              ELEMENT - PREVIEW 1.2
-            </h2>
-            <p className="text-[10px] tracking-widest text-slate-500 font-bold uppercase">
-              SETZT EINE VORHANDENE KST-DATEI VORAUS
-            </p>
-            <p className="text-[9px] tracking-wider text-slate-400 font-mono">
-              VERSION - 1.2.0.6
-            </p>
-          </div>
+          {/* Right Title Header (ELEMENT - PREVIEW 3.1 Live) */}
+        <div className="text-right shrink-0">
+          <h2 className="text-2xl sm:text-3xl font-extrabold font-serif tracking-wider text-[#475569] uppercase">
+            ELEMENT - PREVIEW 3.1 Live
+          </h2>
+          <p className="text-[10px] tracking-widest text-slate-500 font-bold uppercase">
+            SETZT EINE VORHANDENE KST-DATEI VORAUS
+          </p>
+          <p className="text-[9px] tracking-wider text-slate-400 font-mono">
+            VERSION - 3.1.1
+          </p>
+        </div>
         </div>
 
         {/* MAIN SCREEN BODY */}
