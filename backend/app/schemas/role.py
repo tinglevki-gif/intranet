@@ -16,10 +16,23 @@ class RoleUpdate(BaseModel):
     description: Optional[str] = None
     permissions: Optional[Dict[str, str]] = None
 
+class RoleUserSummary(BaseModel):
+    id: int
+    full_name: str
+    email: str
+    department: str
+    position: str
+    avatar_url: Optional[str] = None
+    is_active: bool = True
+
+    class Config:
+        from_attributes = True
+
 class RoleResponse(RoleBase):
     id: int
     is_system_role: bool
     users_count: int = 0
+    assigned_users: List[RoleUserSummary] = []
     created_at: datetime
     updated_at: Optional[datetime] = None
 

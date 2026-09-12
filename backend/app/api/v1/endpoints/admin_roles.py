@@ -9,7 +9,8 @@ from app.schemas.role import (
     RoleResponse, 
     RoleCreate, 
     RoleUpdate, 
-    PermissionsCatalogResponse
+    PermissionsCatalogResponse,
+    RoleUserSummary
 )
 from app.services.auth_service import require_roles
 from app.services.role_service import (
@@ -21,7 +22,23 @@ from app.services.role_service import (
 router = APIRouter(dependencies=[Depends(require_roles([RoleEnum.ADMIN]))])
 
 def map_role_response(role: Role, db: Session) -> RoleResponse:
-    users_count = db.query(User).filter(User.custom_role_id == role.id).count()
+    assigned_users_db = db.query(User).filter(
+        (User.custom_role_id == role.id) | (User.role == role.slug)
+    ).order_by(User.full_name.asc()).all()
+
+    assigned_users = [
+        RoleUserSummary(
+            id=u.id,
+            full_name=u.full_name,
+            email=u.email,
+            department=u.department,
+            position=u.position,
+            avatar_url=u.avatar_url,
+            is_active=u.is_active
+        )
+        for u in assigned_users_db
+    ]
+
     return RoleResponse(
         id=role.id,
         name=role.name,
@@ -29,7 +46,8 @@ def map_role_response(role: Role, db: Session) -> RoleResponse:
         description=role.description,
         is_system_role=role.is_system_role,
         permissions=role.permissions or {},
-        users_count=users_count,
+        users_count=len(assigned_users),
+        assigned_users=assigned_users,
         created_at=role.created_at,
         updated_at=role.updated_at
     )
