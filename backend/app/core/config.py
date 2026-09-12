@@ -16,8 +16,8 @@ class Settings(BaseModel):
     VERSION: str = "6.0.0"
     API_V1_STR: str = "/api/v1"
     
-    # Trial Edition Flag (True by default for trial build)
-    IS_TRIAL_BUILD: bool = os.getenv("IS_TRIAL_BUILD", "true").lower() in ("true", "1", "yes")
+    # Trial Edition Flag (False by default for full production build)
+    IS_TRIAL_BUILD: bool = os.getenv("IS_TRIAL_BUILD", "false").lower() in ("true", "1", "yes")
 
     # JWT Security settings
     SECRET_KEY: str = os.getenv("SECRET_KEY", "tiglev-elementfabrik-super-secret-jwt-key-2026-production-change-me")
