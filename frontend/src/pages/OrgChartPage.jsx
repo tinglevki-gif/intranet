@@ -176,146 +176,158 @@ export function OrgChartPage() {
         </div>
       )}
 
-      {/* Main Toolbar & View Selector */}
-      <div className={`bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800 shadow-card flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4 print:hidden ${
+      {/* Main Toolbar & View Selector (Structured 2-Line Layout) */}
+      <div className={`bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800 shadow-card flex flex-col gap-3.5 print:hidden ${
         isFullscreen ? 'hidden' : ''
       }`}>
-        {/* Left: View Mode Tabs */}
-        <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl overflow-x-auto">
-          <button
-            onClick={() => setViewMode('hybrid')}
-            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              viewMode === 'hybrid'
-                ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
-            title={t('org_chart.view_hybrid_desc')}
-          >
-            <Columns3 className="w-4 h-4" />
-            <span>{t('org_chart.view_hybrid')}</span>
-          </button>
+        {/* Line 1: View Mode Selection Tabs */}
+        <div className="flex flex-wrap items-center justify-between gap-2 p-1.5 bg-slate-100/80 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2 w-full sm:w-auto">
+            <button
+              onClick={() => setViewMode('hybrid')}
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'hybrid'
+                  ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title={t('org_chart.view_hybrid_desc')}
+            >
+              <Columns3 className="w-4 h-4" />
+              <span>{t('org_chart.view_hybrid')}</span>
+            </button>
 
-          <button
-            onClick={() => setViewMode('tree')}
-            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              viewMode === 'tree'
-                ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
-            title={t('org_chart.view_tree_desc')}
-          >
-            <GitFork className="w-4 h-4" />
-            <span>{t('org_chart.view_tree')}</span>
-          </button>
+            <button
+              onClick={() => setViewMode('tree')}
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'tree'
+                  ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title={t('org_chart.view_tree_desc')}
+            >
+              <GitFork className="w-4 h-4" />
+              <span>{t('org_chart.view_tree')}</span>
+            </button>
 
-          <button
-            onClick={() => setViewMode('blocks')}
-            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              viewMode === 'blocks'
-                ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
-            title={t('org_chart.view_blocks_desc')}
-          >
-            <LayoutGrid className="w-4 h-4" />
-            <span>{t('org_chart.view_blocks')}</span>
-          </button>
+            <button
+              onClick={() => setViewMode('blocks')}
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'blocks'
+                  ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title={t('org_chart.view_blocks_desc')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span>{t('org_chart.view_blocks')}</span>
+            </button>
 
-          <button
-            onClick={() => setViewMode('horizontal')}
-            className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
-              viewMode === 'horizontal'
-                ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
-            }`}
-            title={t('org_chart.view_horizontal_desc')}
-          >
-            <MoveHorizontal className="w-4 h-4" />
-            <span>{t('org_chart.view_horizontal')}</span>
-          </button>
+            <button
+              onClick={() => setViewMode('horizontal')}
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'horizontal'
+                  ? 'bg-white dark:bg-slate-700 text-tinglev-blue shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title={t('org_chart.view_horizontal_desc')}
+            >
+              <MoveHorizontal className="w-4 h-4" />
+              <span>{t('org_chart.view_horizontal')}</span>
+            </button>
+          </div>
+
+          <div className="hidden lg:flex items-center space-x-2 px-3 py-1 text-[11px] font-medium text-slate-400 dark:text-slate-500">
+            <span>{t('org_chart.view_mode')}</span>
+          </div>
         </div>
 
-        {/* Right: Filters, Search, Density & Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Department Filter Selector */}
-          <div className="relative min-w-[160px] sm:min-w-[200px]">
-            <select
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full pl-8 pr-8 py-2 text-xs font-semibold bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-tinglev-blue/20 cursor-pointer appearance-none"
-            >
-              <option value="ALL">{t('org_chart.all_departments')}</option>
-              {departmentList.map((dept) => (
-                <option key={dept} value={dept}>{dept}</option>
-              ))}
-            </select>
-            <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-          </div>
-
-          {/* Search Input */}
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('org_chart.search_placeholder')}
-              className="w-full pl-9 pr-7 py-2 text-xs bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-tinglev-blue/20 transition-all"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+        {/* Line 2: Department Filter, Search, Density & Action Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Filter & Search Group */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 flex-1">
+            {/* Department Filter Selector */}
+            <div className="relative w-full sm:w-56 shrink-0">
+              <select
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+                className="w-full pl-8 pr-8 py-2 text-xs font-semibold bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-tinglev-blue/20 cursor-pointer appearance-none"
               >
-                <X className="w-3.5 h-3.5" />
+                <option value="ALL">{t('org_chart.all_departments')}</option>
+                {departmentList.map((dept) => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+              <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            </div>
+
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64 flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('org_chart.search_placeholder')}
+                className="w-full pl-9 pr-7 py-2 text-xs bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-tinglev-blue/20 transition-all"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Density & Action Buttons Group */}
+          <div className="flex flex-wrap items-center justify-end gap-2.5 shrink-0">
+            {/* Density Switcher */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200/40 dark:border-slate-700/40">
+              <button
+                onClick={() => setDensity('detailed')}
+                className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-colors ${
+                  density === 'detailed'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                {t('org_chart.density_detailed')}
               </button>
-            )}
-          </div>
+              <button
+                onClick={() => setDensity('compact')}
+                className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-colors ${
+                  density === 'compact'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                }`}
+              >
+                {t('org_chart.density_compact')}
+              </button>
+            </div>
 
-          {/* Density Switcher */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+            {/* Expand/Collapse All */}
             <button
-              onClick={() => setDensity('detailed')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
-                density === 'detailed'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
+              onClick={() => setAllExpanded(!allExpanded)}
+              className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition-colors border border-slate-200/40 dark:border-slate-700/40"
+              title={allExpanded ? t('org_chart.collapse_all') : t('org_chart.expand_all')}
             >
-              {t('org_chart.density_detailed')}
+              {allExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+              <span>
+                {allExpanded ? t('org_chart.collapse_all') : t('org_chart.expand_all')}
+              </span>
             </button>
+
+            {/* Print */}
             <button
-              onClick={() => setDensity('compact')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors ${
-                density === 'compact'
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
+              onClick={handlePrint}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors border border-slate-200/40 dark:border-slate-700/40"
+              title="Drucken / PDF"
             >
-              {t('org_chart.density_compact')}
+              <Printer className="w-4 h-4" />
             </button>
           </div>
-
-          {/* Expand/Collapse All */}
-          <button
-            onClick={() => setAllExpanded(!allExpanded)}
-            className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center space-x-1.5 transition-colors"
-            title={allExpanded ? t('org_chart.collapse_all') : t('org_chart.expand_all')}
-          >
-            {allExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">
-              {allExpanded ? t('org_chart.collapse_all') : t('org_chart.expand_all')}
-            </span>
-          </button>
-
-          {/* Print */}
-          <button
-            onClick={handlePrint}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors"
-            title="Drucken / PDF"
-          >
-            <Printer className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
