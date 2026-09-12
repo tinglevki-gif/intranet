@@ -1187,6 +1187,29 @@ class ApiService {
       method: 'POST',
     });
   }
+
+  // Technik & Elementübersicht CAD Parser
+  async parseElementUebersicht(kstFile = null, prjattFile = null) {
+    const token = this.getToken();
+    const formData = new FormData();
+    if (kstFile) formData.append('kst_file', kstFile);
+    if (prjattFile) formData.append('prjatt_file', prjattFile);
+
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/technik/elementuebersicht/parse`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Fehler beim Analysieren der CAD-Dateien' }));
+      throw new Error(err.detail || 'Fehler beim Analysieren der CAD-Dateien');
+    }
+    return await response.json();
+  }
 }
 
 export const api = new ApiService();

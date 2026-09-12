@@ -19,7 +19,8 @@ from app.api.v1.endpoints import (
     search,
     fleet,
     public_tracking,
-    license
+    license,
+    technik
 )
 
 api_router = APIRouter()
@@ -48,3 +49,4 @@ api_router.include_router(schulungen.router, prefix="/schulungen", tags=["Schulu
 api_router.include_router(tickets.router, prefix="/tickets", tags=["Helpdesk & Ticket-System"])
 api_router.include_router(fleet.router, prefix="/fleet", tags=["Flottenortung & GPS Telemetrie (Navkonzept)"])
 api_router.include_router(public_tracking.router, prefix="/public", tags=["Öffentliche Live-Lieferverfolgung (Baustelle / ETA)"])
+api_router.include_router(technik.router, prefix="/technik", tags=["Technik & Elementübersicht CAD"])
