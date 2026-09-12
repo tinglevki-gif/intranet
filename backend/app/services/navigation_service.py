@@ -312,7 +312,7 @@ DEFAULT_MENUS = [
         "order": 14,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": None,
-        "is_active": False,
+        "is_active": True,
     },
 
     # 3. Personal & HR (HR_MANAGER & ADMIN)

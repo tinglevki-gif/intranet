@@ -116,11 +116,11 @@ def create_calendar_event(
     current_user: User = Depends(get_current_user)
 ):
     """Creates a new calendar appointment or company event."""
-    if event_in.category in [EventCategory.TOWNHALL, EventCategory.COMPANY, EventCategory.HOLIDAY]:
+    if event_in.category == EventCategory.HOLIDAY:
         if current_user.role not in [RoleEnum.ADMIN, RoleEnum.HR_MANAGER, RoleEnum.IT_ADMIN]:
             raise HTTPException(
                 status_code=403, 
-                detail="Nur Administratoren oder HR-Manager dürfen globale Firmen-Events oder Feiertage erstellen."
+                detail="Nur Administratoren oder HR-Manager dürfen gesetzliche Feiertage erstellen."
             )
             
     event = Event(
@@ -166,7 +166,7 @@ def delete_calendar_event(
     if not event:
         raise HTTPException(status_code=404, detail="Termin nicht gefunden")
         
-    if current_user.role != RoleEnum.ADMIN and event.created_by_id != current_user.id:
+    if current_user.role not in [RoleEnum.ADMIN, RoleEnum.IT_ADMIN] and event.created_by_id != current_user.id:
         raise HTTPException(status_code=403, detail="Keine Berechtigung zum Löschen dieses Termins")
         
     db.delete(event)

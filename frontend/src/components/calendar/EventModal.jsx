@@ -235,6 +235,25 @@ export function EventModal({
 
               <div>
                 <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">
+                  Gültigkeitsbereich / Abteilung
+                </label>
+                <select
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 text-xs font-medium"
+                >
+                  <option value="ALL">🏢 Alle Abteilungen (Unternehmensweit)</option>
+                  <option value="IT \ SuperAdmin">IT \ SuperAdmin</option>
+                  <option value="Produktion \ Planung">Produktion \ Planung</option>
+                  <option value="Abwicklung">Abwicklung</option>
+                  <option value="Vertrieb">Vertrieb & Sales</option>
+                  <option value="HR & Personal">HR & Personal</option>
+                  <option value="Geschäftsführung">Geschäftsführung</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">
                   {t('calendar.desc_label')}
                 </label>
                 <textarea
