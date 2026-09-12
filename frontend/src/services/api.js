@@ -494,6 +494,39 @@ class ApiService {
     return await response.json();
   }
 
+  // Dynamic Roles & Permissions Management (RBAC Matrix)
+  getPermissionsCatalog() {
+    return this.request('/admin/roles/permissions-catalog');
+  }
+
+  getRoles() {
+    return this.request('/admin/roles');
+  }
+
+  getRoleById(roleId) {
+    return this.request(`/admin/roles/${roleId}`);
+  }
+
+  createRole(roleData) {
+    return this.request('/admin/roles', {
+      method: 'POST',
+      body: JSON.stringify(roleData),
+    });
+  }
+
+  updateRole(roleId, roleData) {
+    return this.request(`/admin/roles/${roleId}`, {
+      method: 'PUT',
+      body: JSON.stringify(roleData),
+    });
+  }
+
+  deleteRole(roleId) {
+    return this.request(`/admin/roles/${roleId}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Granular Permissions Matrix
   getUserPermissions(userId) {
     return this.request(`/admin/users/${userId}/permissions`);

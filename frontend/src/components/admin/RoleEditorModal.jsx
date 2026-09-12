@@ -30,6 +30,34 @@ import {
 import { api } from '../../services/api';
 import { useLanguage } from '../../context/LanguageContext';
 
+const DEFAULT_FALLBACK_MODULES = [
+  { key: 'announcements', label: 'Mitteilungen & News', category: 'Hauptbereich', icon: 'Megaphone', description: 'Unternehmensbekanntmachungen, News-Feed und Eilmeldungen.' },
+  { key: 'phone-directory', label: 'Telefonverzeichnis', category: 'Hauptbereich', icon: 'PhoneCall', description: 'Interne Durchwahlen, Mobilnummern und Schnellkontakte.' },
+  { key: 'org-chart', label: 'Organigramm & Hierarchie', category: 'Hauptbereich', icon: 'Network', description: 'Unternehmenshierarchie und Abteilungsstruktur.' },
+  { key: 'directory', label: 'Team- & Mitarbeiterverzeichnis', category: 'Hauptbereich', icon: 'Users', description: 'Kollegenübersicht, Standorte und Abteilungsfilter.' },
+  { key: 'kantine', label: 'Kantine (Speiseplan & Bestellung)', category: 'Hauptbereich', icon: 'UtensilsCrossed', description: 'Wochenspeiseplan, Essensvorbestellungen und Nährwertangaben.' },
+  { key: 'gps', label: 'GPS (Fahrzeugortung & Flotte)', category: 'Hauptbereich', icon: 'Navigation', description: 'Live-Flottenverfolgung, Routen und Baustellenanlieferungen.' },
+  { key: 'vertrieb', label: 'Vertrieb & Kalkulation', category: 'Hauptbereich', icon: 'TrendingUp', description: 'Vertriebs-Dashboard, Kundenangebote und CRM-Kennzahlen.' },
+  { key: 'technik', label: 'Technik & Instandhaltung', category: 'Hauptbereich', icon: 'Cpu', description: 'Geräteverwaltung, Maschinen-Wartungsintervalle und CAD-Systeme.' },
+  { key: 'abwicklung', label: 'Auftragsabwicklung & QS', category: 'Hauptbereich', icon: 'ClipboardCheck', description: 'Fertigungsprozess, Statik-Freigaben und Beton-Druckprüfungen.' },
+  { key: 'planung', label: 'Ressourcen- & Projektplanung', category: 'Hauptbereich', icon: 'CalendarClock', description: 'Kapazitätsplanung, Schichtpläne und Baustellen-Terminierung.' },
+  { key: 'schulungen', label: 'Schulungen & KI-Wissensassistent', category: 'Hauptbereich', icon: 'GraduationCap', description: 'Benutzerhandbücher, Sicherheitsunterweisungen und RAG-Chatbot.' },
+  { key: 'wlan', label: 'WLAN für Mitarbeiter', category: 'Hauptbereich', icon: 'Wifi', description: 'Zugangsdaten und QR-Code für das Mitarbeiter-WLAN.' },
+  
+  { key: 'documents', label: 'Dokumentenablage & KI-Suche', category: 'Arbeitsbereich', icon: 'FolderOpen', description: 'Zentraler Speicher für Verträge, Richtlinien und semantische KI-Suche.' },
+  { key: 'calendar', label: 'Unternehmensweiter Kalender', category: 'Arbeitsbereich', icon: 'Calendar', description: 'Terminplanung, Firmen-Events, Feiertage und iCal-Abonnement.' },
+  
+  { key: 'hr-requests', label: 'Anträge & Urlaubsverwaltung', category: 'Personal & HR', icon: 'ClipboardCheck', description: 'Urlaubsanträge, Gleitzeitausgleich und Krankmeldungen.' },
+  { key: 'performance', label: 'Feedback & Mitarbeiterklima', category: 'Personal & HR', icon: 'Smile', description: 'Mitarbeiterbefragungen, Puls-Checks und Leistungsfeedback.' },
+  
+  { key: 'it-management', label: 'IT-Infrastruktur & Sicherheit', category: 'IT & Systeme', icon: 'Server', description: 'Serverstatus, VPN-Tunnel, Firewall und Lizenzverwaltung.' },
+  { key: 'it-helpdesk', label: 'IT-Helpdesk & Support-Tickets', category: 'IT & Systeme', icon: 'Headphones', description: 'Ticketerstellung, Störungsmeldungen und Service Level Agreements.' },
+  
+  { key: 'admin-users', label: 'Benutzerverwaltung (CRUD & Profile)', category: 'Administration', icon: 'UserCog', description: 'Mitarbeiter anlegen, Rollen zuweisen, Passwörter & Avatare verwalten.' },
+  { key: 'admin-roles', label: 'Rollen & Berechtigungs-Matrix (RBAC)', category: 'Administration', icon: 'ShieldCheck', description: 'Rollen erstellen, Rechte pro Modul konfigurieren und Berechtigungen steuern.' },
+  { key: 'admin-settings', label: 'Systemkonfiguration & Audit-Logs', category: 'Administration', icon: 'Sliders', description: 'Globale Intranet-Parameter, Branding und Sicherheitsaudits.' }
+];
+
 export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
   const { t } = useLanguage();
 
@@ -77,7 +105,9 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
       try {
         setLoadingCatalog(true);
         const data = await api.getPermissionsCatalog();
-        setCatalog(data);
+        if (data && data.modules) {
+          setCatalog(data);
+        }
       } catch (err) {
         console.error('Error loading permissions catalog:', err);
       } finally {
@@ -121,6 +151,8 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
     }
   };
 
+  const activeModules = catalog?.modules?.length > 0 ? catalog.modules : DEFAULT_FALLBACK_MODULES;
+
   const handleSetPermission = (modKey, levelKey) => {
     setPermissions((prev) => ({
       ...prev,
@@ -130,8 +162,7 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
 
   const handleBulkSet = (levelKey) => {
     const updated = {};
-    catalog.modules.forEach((mod) => {
-      // If setting admin on admin-only modules for non-system roles, allow full config
+    activeModules.forEach((mod) => {
       updated[mod.key] = levelKey;
     });
     setPermissions(updated);
@@ -180,7 +211,7 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
   if (!isOpen) return null;
 
   // Group modules by category
-  const categories = Array.from(new Set(catalog.modules.map((m) => m.category)));
+  const categories = Array.from(new Set(activeModules.map((m) => m.category)));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
@@ -316,7 +347,7 @@ export function RoleEditorModal({ isOpen, onClose, role, onSaveSuccess }) {
             ) : (
               <div className="space-y-6">
                 {categories.map((cat) => {
-                  const catModules = catalog.modules.filter((m) => m.category === cat);
+                  const catModules = activeModules.filter((m) => m.category === cat);
                   return (
                     <div key={cat} className="bg-slate-50/60 rounded-2xl p-4 border border-slate-200/70">
                       <div className="text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
