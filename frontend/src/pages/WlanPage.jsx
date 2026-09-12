@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import {
   Wifi,
   Copy,
@@ -21,70 +22,22 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 
 /**
- * Pure SVG QR Code Generator component for WiFi URI:
+ * SVG QR Code Generator component for WiFi URI:
  * WIFI:T:WPA;S:Tinglev Personal;P:wdDtH6y3;;
- * Generates an accurate 29x29 matrix SVG QR code for direct mobile scanning.
+ * Generates an accurate, scannable SVG QR code for direct mobile scanning.
  */
 function WiFiQRCode({ size = 220, value = 'WIFI:T:WPA;S:Tinglev Personal;P:wdDtH6y3;;' }) {
-  // Matrix data for standard WiFi QR code format (Version 3/4 ECC Level L/M)
-  // Ensures 100% valid scanner recognition on iOS Camera and Android WiFi Scanner
-  const qrMatrix = [
-    [1,1,1,1,1,1,1,0,1,0,1,1,0,1,0,0,1,0,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,1,0,0,1,1,0,1,0,0,1,0,0,1,0,0,0,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0,0,1,0,1,1,0,1,0,1,0,1,1,1,0,1],
-    [1,0,1,1,1,0,1,0,0,1,0,1,1,0,0,1,0,0,1,0,1,1,1,0,1],
-    [1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1,1,0,1,0,1,1,1,0,1],
-    [1,0,0,0,0,0,1,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
-    [0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0],
-    [1,1,0,1,0,1,1,0,1,1,1,0,0,1,1,0,1,1,0,1,1,0,1,0,1],
-    [0,1,1,0,1,0,0,1,0,0,1,1,1,0,1,0,0,1,1,0,1,0,0,1,0],
-    [1,0,1,1,0,1,1,0,1,0,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1],
-    [1,1,0,0,1,0,0,1,1,1,0,0,1,0,1,0,1,1,0,0,1,1,0,1,1],
-    [0,0,1,1,0,1,1,0,0,0,1,1,0,1,1,0,0,1,1,1,0,0,1,0,0],
-    [1,0,0,1,1,0,0,1,0,1,0,0,1,0,0,1,0,0,1,0,1,1,0,1,0],
-    [0,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,1,0,0,1,1,0,1,0,1],
-    [1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,0,0,1,1,0,0,1,0,1,0],
-    [1,1,0,1,1,0,1,0,1,1,1,0,0,1,0,1,1,0,1,0,1,0,1,1,1],
-    [0,0,0,0,0,0,0,0,1,0,0,1,1,0,1,0,0,1,0,1,0,1,0,0,0],
-    [1,1,1,1,1,1,1,0,1,1,0,1,0,1,0,1,1,0,1,0,0,1,1,0,1],
-    [1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0,1,0,1,1,0,0,1,0],
-    [1,0,1,1,1,0,1,0,1,0,0,1,1,0,0,1,0,0,1,0,1,0,1,1,1],
-    [1,0,1,1,1,0,1,0,0,1,1,0,0,1,1,0,1,1,0,1,0,1,0,0,1],
-    [1,0,1,1,1,0,1,0,1,0,1,1,0,0,1,0,0,0,1,1,1,0,1,1,0],
-    [1,0,0,0,0,0,1,0,1,1,0,0,1,1,0,1,1,0,0,0,0,1,0,1,1],
-    [1,1,1,1,1,1,1,0,0,1,1,0,1,0,1,0,0,1,1,0,1,1,1,0,1]
-  ];
-
-  const count = qrMatrix.length;
-  const cellSize = size / count;
-
   return (
     <div className="relative flex items-center justify-center p-3 bg-white rounded-2xl shadow-inner border border-slate-200 print:p-1 print:shadow-none">
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${size} ${size}`}
+      <QRCodeSVG
+        value={value}
+        size={size}
+        bgColor="#FFFFFF"
+        fgColor="#001E36"
+        level="M"
         className="w-full h-auto max-w-[220px]"
         aria-label={`WLAN QR-Code für ${value}`}
-      >
-        <rect width={size} height={size} fill="#FFFFFF" rx="8" />
-        {qrMatrix.map((row, rIdx) =>
-          row.map((cell, cIdx) =>
-            cell === 1 ? (
-              <rect
-                key={`${rIdx}-${cIdx}`}
-                x={cIdx * cellSize}
-                y={rIdx * cellSize}
-                width={cellSize + 0.3}
-                height={cellSize + 0.3}
-                fill="#001E36"
-                rx={0.5}
-              />
-            ) : null
-          )
-        )}
-      </svg>
+      />
       {/* Central WiFi Icon Overlay */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div className="w-10 h-10 bg-white rounded-full p-1.5 shadow-md flex items-center justify-center border border-slate-200">
