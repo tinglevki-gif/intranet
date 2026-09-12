@@ -1,0 +1,449 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/admin/LanguageManagementCard.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import {
+  Languages,
+  Check,
+  AlertCircle,
+  Star,
+  Loader2,
+  ShieldAlert,
+  RefreshCw,
+  Globe2,
+  Sparkles,
+  Info
+} from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+import { api } from "/src/services/api.js";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+export function LanguageManagementCard() {
+  _s();
+  const { t, refreshLanguages } = useLanguage();
+  const [languages, setLanguages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [updatingCode, setUpdatingCode] = useState(null);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const showSuccess = (msg) => {
+    setSuccessMessage(msg);
+    setTimeout(() => setSuccessMessage(null), 3500);
+  };
+  const loadLanguages = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getAdminLanguages();
+      setLanguages(data || []);
+    } catch (err) {
+      console.error("Fehler beim Laden der Sprachen:", err);
+      setError(err.message || "Fehler beim Laden der Sprachkonfigurationen.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    loadLanguages();
+  }, []);
+  const handleToggle = async (lang) => {
+    if (lang.is_default && lang.is_active) {
+      setError(`Die Standardsprache „${lang.name}“ kann nicht deaktiviert werden. Bitte wählen Sie zuerst eine andere Sprache als Standard.`);
+      return;
+    }
+    try {
+      setUpdatingCode(lang.code);
+      setError(null);
+      const newStatus = !lang.is_active;
+      await api.toggleLanguage(lang.code, newStatus);
+      setLanguages(
+        (prev) => prev.map((l) => l.code === lang.code ? { ...l, is_active: newStatus } : l)
+      );
+      await refreshLanguages();
+      showSuccess(`Sprache „${lang.name}“ wurde ${newStatus ? "aktiviert" : "deaktiviert"}.`);
+    } catch (err) {
+      console.error("Fehler beim Umschalten der Sprache:", err);
+      setError(err.message || "Aktion fehlgeschlagen.");
+    } finally {
+      setUpdatingCode(null);
+    }
+  };
+  const handleSetDefault = async (lang) => {
+    if (lang.is_default) return;
+    try {
+      setUpdatingCode(lang.code);
+      setError(null);
+      await api.setDefaultLanguage(lang.code);
+      setLanguages(
+        (prev) => prev.map((l) => ({
+          ...l,
+          is_default: l.code === lang.code,
+          is_active: l.code === lang.code ? true : l.is_active
+        }))
+      );
+      await refreshLanguages();
+      showSuccess(`„${lang.name}“ wurde als neue Standardsprache festgelegt.`);
+    } catch (err) {
+      console.error("Fehler beim Setzen der Standardsprache:", err);
+      setError(err.message || "Fehler beim Festlegen der Standardsprache.");
+    } finally {
+      setUpdatingCode(null);
+    }
+  };
+  const activeCount = languages.filter((l) => l.is_active).length;
+  return /* @__PURE__ */ jsxDEV("div", { className: "bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "p-2.5 rounded-2xl bg-indigo-50 text-indigo-600", children: /* @__PURE__ */ jsxDEV(Languages, { className: "w-5 h-5" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+          lineNumber: 133,
+          columnNumber: 13
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+          lineNumber: 132,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2", children: [
+            /* @__PURE__ */ jsxDEV("h2", { className: "text-base sm:text-lg font-bold text-slate-900", children: "Verfügbare System-Sprachen (i18n)" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+              lineNumber: 137,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200", children: [
+              activeCount,
+              " / ",
+              languages.length,
+              " Aktiv"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+              lineNumber: 140,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+            lineNumber: 136,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-500", children: "Steuern Sie, welche Sprachen im Sprachumschalter für alle Mitarbeiter zur Verfügung stehen." }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+            lineNumber: 144,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+          lineNumber: 135,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 131,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: loadLanguages,
+          disabled: loading,
+          className: "self-start sm:self-auto p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors",
+          title: "Aktualisieren",
+          children: /* @__PURE__ */ jsxDEV(RefreshCw, { className: `w-4 h-4 ${loading ? "animate-spin" : ""}` }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+            lineNumber: 156,
+            columnNumber: 11
+          }, this)
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+          lineNumber: 150,
+          columnNumber: 9
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+      lineNumber: 130,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 flex items-start space-x-3", children: [
+      /* @__PURE__ */ jsxDEV(Info, { className: "w-4 h-4 text-indigo-500 shrink-0 mt-0.5" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 162,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("p", { className: "leading-relaxed", children: [
+        "Deaktivierte Sprachen werden im Sprachwähler in der Sidebar, der Navbar und auf der Login-Seite sofort ausgeblendet. Falls ein Mitarbeiter eine deaktivierte Sprache gewählt hatte, wechselt die Anwendung automatisch auf die ",
+        /* @__PURE__ */ jsxDEV("strong", { children: "Standardsprache" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+          lineNumber: 164,
+          columnNumber: 234
+        }, this),
+        "."
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 163,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+      lineNumber: 161,
+      columnNumber: 7
+    }, this),
+    successMessage && /* @__PURE__ */ jsxDEV("div", { className: "p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center space-x-2 animate-fade-in", children: [
+      /* @__PURE__ */ jsxDEV(Check, { className: "w-4 h-4 text-emerald-600 shrink-0" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 171,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("span", { children: successMessage }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 172,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+      lineNumber: 170,
+      columnNumber: 7
+    }, this),
+    error && /* @__PURE__ */ jsxDEV("div", { className: "p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center space-x-2 animate-fade-in", children: [
+      /* @__PURE__ */ jsxDEV(AlertCircle, { className: "w-4 h-4 text-rose-600 shrink-0" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 179,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("span", { children: error }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 180,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+      lineNumber: 178,
+      columnNumber: 7
+    }, this),
+    loading ? /* @__PURE__ */ jsxDEV("div", { className: "py-12 text-center space-y-2", children: [
+      /* @__PURE__ */ jsxDEV(Loader2, { className: "w-7 h-7 text-indigo-600 animate-spin mx-auto" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 187,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-400 font-medium", children: "Sprachen werden geladen..." }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+        lineNumber: 188,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+      lineNumber: 186,
+      columnNumber: 7
+    }, this) : /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: languages.map((lang) => {
+      const isUpdating = updatingCode === lang.code;
+      return /* @__PURE__ */ jsxDEV(
+        "div",
+        {
+          className: `p-4 sm:p-5 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-4 ${lang.is_active ? "bg-white border-slate-200/90 shadow-2xs hover:border-indigo-200" : "bg-slate-50/70 border-slate-200/50 opacity-70"}`,
+          children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3.5 min-w-0", children: [
+              /* @__PURE__ */ jsxDEV("div", { className: "w-11 h-11 rounded-2xl bg-slate-100 flex items-center justify-center text-2xl shadow-inner shrink-0", children: lang.flag }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                lineNumber: 206,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV("div", { className: "min-w-0", children: [
+                /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2 flex-wrap", children: [
+                  /* @__PURE__ */ jsxDEV("h3", { className: "text-sm font-bold text-slate-900 truncate", children: lang.name }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 212,
+                    columnNumber: 23
+                  }, this),
+                  lang.is_default && /* @__PURE__ */ jsxDEV("span", { className: "inline-flex items-center space-x-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200", children: [
+                    /* @__PURE__ */ jsxDEV(Star, { className: "w-2.5 h-2.5 fill-current" }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                      lineNumber: 218,
+                      columnNumber: 27
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("span", { children: "Standard" }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                      lineNumber: 219,
+                      columnNumber: 27
+                    }, this)
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 217,
+                    columnNumber: 21
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                  lineNumber: 211,
+                  columnNumber: 21
+                }, this),
+                /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2 mt-0.5 text-xs text-slate-400", children: [
+                  /* @__PURE__ */ jsxDEV("span", { className: "font-medium text-slate-600", children: lang.native_name }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 225,
+                    columnNumber: 23
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("span", { children: "•" }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 226,
+                    columnNumber: 23
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("span", { className: "font-mono text-[11px] uppercase bg-slate-100 px-1.5 py-0.2 rounded text-slate-500", children: [
+                    lang.code,
+                    " (",
+                    lang.locale,
+                    ")"
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 227,
+                    columnNumber: 23
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                  lineNumber: 224,
+                  columnNumber: 21
+                }, this)
+              ] }, void 0, true, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                lineNumber: 210,
+                columnNumber: 19
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+              lineNumber: 205,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3 shrink-0", children: [
+              !lang.is_default && lang.is_active && /* @__PURE__ */ jsxDEV(
+                "button",
+                {
+                  onClick: () => handleSetDefault(lang),
+                  disabled: isUpdating,
+                  title: "Als Standard-Systemsprache festlegen",
+                  className: "p-2 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors",
+                  children: /* @__PURE__ */ jsxDEV(Star, { className: "w-4 h-4" }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 244,
+                    columnNumber: 23
+                  }, this)
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                  lineNumber: 238,
+                  columnNumber: 17
+                },
+                this
+              ),
+              /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2", children: [
+                /* @__PURE__ */ jsxDEV("span", { className: `text-[11px] font-bold ${lang.is_active ? "text-emerald-600" : "text-slate-400"}`, children: lang.is_active ? "Aktiv" : "Inaktiv" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                  lineNumber: 250,
+                  columnNumber: 21
+                }, this),
+                /* @__PURE__ */ jsxDEV(
+                  "button",
+                  {
+                    type: "button",
+                    disabled: isUpdating || lang.is_default && lang.is_active,
+                    onClick: () => handleToggle(lang),
+                    className: `relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${lang.is_active ? "bg-indigo-600" : "bg-slate-300"}`,
+                    title: lang.is_default ? "Standardsprache kann nicht deaktiviert werden" : void 0,
+                    children: /* @__PURE__ */ jsxDEV(
+                      "span",
+                      {
+                        className: `pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out flex items-center justify-center ${lang.is_active ? "translate-x-5" : "translate-x-0"}`,
+                        children: isUpdating && /* @__PURE__ */ jsxDEV(Loader2, { className: "w-3 h-3 text-indigo-600 animate-spin" }, void 0, false, {
+                          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                          lineNumber: 268,
+                          columnNumber: 40
+                        }, this)
+                      },
+                      void 0,
+                      false,
+                      {
+                        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                        lineNumber: 263,
+                        columnNumber: 23
+                      },
+                      this
+                    )
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                    lineNumber: 254,
+                    columnNumber: 21
+                  },
+                  this
+                )
+              ] }, void 0, true, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+                lineNumber: 249,
+                columnNumber: 19
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+              lineNumber: 235,
+              columnNumber: 17
+            }, this)
+          ]
+        },
+        lang.code,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+          lineNumber: 196,
+          columnNumber: 13
+        },
+        this
+      );
+    }) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+      lineNumber: 191,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx",
+    lineNumber: 128,
+    columnNumber: 5
+  }, this);
+}
+_s(LanguageManagementCard, "Je8bLHgNggX20Vv/3xGp7VwhS58=", false, function() {
+  return [useLanguage];
+});
+_c = LanguageManagementCard;
+var _c;
+$RefreshReg$(_c, "LanguageManagementCard");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/LanguageManagementCard.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUNoQyxXQUFXLGdOQUNUQSxLQUFLRSxZQUFZLGtCQUFrQixjQUFjO0FBQUEsb0JBRW5ELE9BQU9GLEtBQUtDLGFBQWEsa0RBQWtEa0I7QUFBQUEsb0JBRTNFO0FBQUEsc0JBQUM7QUFBQTtBQUFBLHdCQUNDLFdBQVcsa0tBQ1RuQixLQUFLRSxZQUFZLGtCQUFrQixlQUFlO0FBQUEsd0JBR25EYSx3QkFBYyx1QkFBQyxXQUFRLFdBQVUsMENBQW5CO0FBQUE7QUFBQTtBQUFBO0FBQUEsK0JBQXlEO0FBQUE7QUFBQSxzQkFMMUU7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLG9CQU1BO0FBQUE7QUFBQSxrQkFmRjtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsZ0JBZ0JBO0FBQUEsbUJBckJGO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBc0JBO0FBQUEsaUJBcENGO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBcUNBO0FBQUE7QUFBQTtBQUFBLFFBM0VLZixLQUFLSTtBQUFBQSxRQURaO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsTUE2RUE7QUFBQSxJQUVKLENBQUMsS0FwRkg7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQXFGQTtBQUFBLE9BcEpKO0FBQUE7QUFBQTtBQUFBO0FBQUEsU0FzSkE7QUFFSjtBQUFDM0IsR0FwUGVELHdCQUFzQjtBQUFBLFVBQ0pELFdBQVc7QUFBQTtBQUFBLEtBRDdCQztBQUFzQixJQUFBNEM7QUFBQSxhQUFBQSxJQUFBIiwibmFtZXMiOlsiUmVhY3QiLCJ1c2VTdGF0ZSIsInVzZUVmZmVjdCIsIkxhbmd1YWdlcyIsIkNoZWNrIiwiQWxlcnRDaXJjbGUiLCJTdGFyIiwiTG9hZGVyMiIsIlNoaWVsZEFsZXJ0IiwiUmVmcmVzaEN3IiwiR2xvYmUyIiwiU3BhcmtsZXMiLCJJbmZvIiwiYXBpIiwidXNlTGFuZ3VhZ2UiLCJMYW5ndWFnZU1hbmFnZW1lbnRDYXJkIiwiX3MiLCJ0IiwicmVmcmVzaExhbmd1YWdlcyIsImxhbmd1YWdlcyIsInNldExhbmd1YWdlcyIsImxvYWRpbmciLCJzZXRMb2FkaW5nIiwidXBkYXRpbmdDb2RlIiwic2V0VXBkYXRpbmdDb2RlIiwiZXJyb3IiLCJzZXRFcnJvciIsInN1Y2Nlc3NNZXNzYWdlIiwic2V0U3VjY2Vzc01lc3NhZ2UiLCJzaG93U3VjY2VzcyIsIm1zZyIsInNldFRpbWVvdXQiLCJsb2FkTGFuZ3VhZ2VzIiwiZGF0YSIsImdldEFkbWluTGFuZ3VhZ2VzIiwiZXJyIiwiY29uc29sZSIsIm1lc3NhZ2UiLCJoYW5kbGVUb2dnbGUiLCJsYW5nIiwiaXNfZGVmYXVsdCIsImlzX2FjdGl2ZSIsIm5hbWUiLCJjb2RlIiwibmV3U3RhdHVzIiwidG9nZ2xlTGFuZ3VhZ2UiLCJwcmV2IiwibWFwIiwibCIsImhhbmRsZVNldERlZmF1bHQiLCJzZXREZWZhdWx0TGFuZ3VhZ2UiLCJhY3RpdmVDb3VudCIsImZpbHRlciIsImxlbmd0aCIsImlzVXBkYXRpbmciLCJmbGFnIiwibmF0aXZlX25hbWUiLCJsb2NhbGUiLCJ1bmRlZmluZWQiLCJfYyJdLCJpZ25vcmVMaXN0IjpbXSwic291cmNlcyI6WyJMYW5ndWFnZU1hbmFnZW1lbnRDYXJkLmpzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgUmVhY3QsIHsgdXNlU3RhdGUsIHVzZUVmZmVjdCB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IFxuICBMYW5ndWFnZXMsIFxuICBDaGVjaywgXG4gIEFsZXJ0Q2lyY2xlLCBcbiAgU3RhciwgXG4gIExvYWRlcjIsIFxuICBTaGllbGRBbGVydCwgXG4gIFJlZnJlc2hDdyxcbiAgR2xvYmUyLFxuICBTcGFya2xlcyxcbiAgSW5mb1xufSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgYXBpIH0gZnJvbSAnLi4vLi4vc2VydmljZXMvYXBpJztcbmltcG9ydCB7IHVzZUxhbmd1YWdlIH0gZnJvbSAnLi4vLi4vY29udGV4dC9MYW5ndWFnZUNvbnRleHQnO1xuXG5leHBvcnQgZnVuY3Rpb24gTGFuZ3VhZ2VNYW5hZ2VtZW50Q2FyZCgpIHtcbiAgY29uc3QgeyB0LCByZWZyZXNoTGFuZ3VhZ2VzIH0gPSB1c2VMYW5ndWFnZSgpO1xuICBjb25zdCBbbGFuZ3VhZ2VzLCBzZXRMYW5ndWFnZXNdID0gdXNlU3RhdGUoW10pO1xuICBjb25zdCBbbG9hZGluZywgc2V0TG9hZGluZ10gPSB1c2VTdGF0ZSh0cnVlKTtcbiAgY29uc3QgW3VwZGF0aW5nQ29kZSwgc2V0VXBkYXRpbmdDb2RlXSA9IHVzZVN0YXRlKG51bGwpO1xuICBjb25zdCBbZXJyb3IsIHNldEVycm9yXSA9IHVzZVN0YXRlKG51bGwpO1xuICBjb25zdCBbc3VjY2Vzc01lc3NhZ2UsIHNldFN1Y2Nlc3NNZXNzYWdlXSA9IHVzZVN0YXRlKG51bGwpO1xuXG4gIGNvbnN0IHNob3dTdWNjZXNzID0gKG1zZykgPT4ge1xuICAgIHNldFN1Y2Nlc3NNZXNzYWdlKG1zZyk7XG4gICAgc2V0VGltZW91dCgoKSA9PiBzZXRTdWNjZXNzTWVzc2FnZShudWxsKSwgMzUwMCk7XG4gIH07XG5cbiAgY29uc3QgbG9hZExhbmd1YWdlcyA9IGFzeW5jICgpID0+IHtcbiAgICB0cnkge1xuICAgICAgc2V0TG9hZGluZyh0cnVlKTtcbiAgICAgIHNldEVycm9yKG51bGwpO1xuICAgICAgY29uc3QgZGF0YSA9IGF3YWl0IGFwaS5nZXRBZG1pbkxhbmd1YWdlcygpO1xuICAgICAgc2V0TGFuZ3VhZ2VzKGRhdGEgfHwgW10pO1xuICAgIH0gY2F0Y2ggKGVycikge1xuICAgICAgY29uc29sZS5lcnJvcignRmVobGVyIGJlaW0gTGFkZW4gZGVyIFNwcmFjaGVuOicsIGVycik7XG4gICAgICBzZXRFcnJvcihlcnIubWVzc2FnZSB8fCAnRmVobGVyIGJlaW0gTGFkZW4gZGVyIFNwcmFjaGtvbmZpZ3VyYXRpb25lbi4nKTtcbiAgICB9IGZpbmFsbHkge1xuICAgICAgc2V0TG9hZGluZyhmYWxzZSk7XG4gICAgfVxuICB9O1xuXG4gIHVzZUVmZmVjdCgoKSA9PiB7XG4gICAgbG9hZExhbmd1YWdlcygpO1xuICB9LCBbXSk7XG5cbiAgY29uc3QgaGFuZGxlVG9nZ2xlID0gYXN5bmMgKGxhbmcpID0+IHtcbiAgICBpZiAobGFuZy5pc19kZWZhdWx0ICYmIGxhbmcuaXNfYWN0aXZlKSB7XG4gICAgICBzZXRFcnJvcihgRGllIFN0YW5kYXJkc3ByYWNoZSDigJ4ke2xhbmcubmFtZX3igJwga2FubiBuaWNodCBkZWFrdGl2aWVydCB3ZXJkZW4uIEJpdHRlIHfDpGhsZW4gU2llIHp1ZXJzdCBlaW5lIGFuZGVyZSBTcHJhY2hlIGFscyBTdGFuZGFyZC5gKTtcbiAgICAgIHJldHVybjtcbiAgICB9XG5cbiAgICB0cnkge1xuICAgICAgc2V0VXBkYXRpbmdDb2RlKGxhbmcuY29kZSk7XG4gICAgICBzZXRFcnJvcihudWxsKTtcbiAgICAgIGNvbnN0IG5ld1N0YXR1cyA9ICFsYW5nLmlzX2FjdGl2ZTtcbiAgICAgIGF3YWl0IGFwaS50b2dnbGVMYW5ndWFnZShsYW5nLmNvZGUsIG5ld1N0YXR1cyk7XG4gICAgICBcbiAgICAgIC8vIFVwZGF0ZSBsb2NhbCBsaXN0XG4gICAgICBzZXRMYW5ndWFnZXMoKHByZXYpID0+XG4gICAgICAgIHByZXYubWFwKChsKSA9PiAobC5jb2RlID09PSBsYW5nLmNvZGUgPyB7IC4uLmwsIGlzX2FjdGl2ZTogbmV3U3RhdHVzIH0gOiBsKSlcbiAgICAgICk7XG5cbiAgICAgIC8vIFJlZnJlc2ggZ2xvYmFsIGNvbnRleHRcbiAgICAgIGF3YWl0IHJlZnJlc2hMYW5ndWFnZXMoKTtcblxuICAgICAgc2hvd1N1Y2Nlc3MoYFNwcmFjaGUg4oCeJHtsYW5nLm5hbWV94oCcIHd1cmRlICR7bmV3U3RhdHVzID8gJ2FrdGl2aWVydCcgOiAnZGVha3RpdmllcnQnfS5gKTtcbiAgICB9IGNhdGNoIChlcnIpIHtcbiAgICAgIGNvbnNvbGUuZXJyb3IoJ0ZlaGxlciBiZWltIFVtc2NoYWx0ZW4gZGVyIFNwcmFjaGU6JywgZXJyKTtcbiAgICAgIHNldEVycm9yKGVyci5tZXNzYWdlIHx8ICdBa3Rpb24gZmVobGdlc2NobGFnZW4uJyk7XG4gICAgfSBmaW5hbGx5IHtcbiAgICAgIHNldFVwZGF0aW5nQ29kZShudWxsKTtcbiAgICB9XG4gIH07XG5cbiAgY29uc3QgaGFuZGxlU2V0RGVmYXVsdCA9IGFzeW5jIChsYW5nKSA9PiB7XG4gICAgaWYgKGxhbmcuaXNfZGVmYXVsdCkgcmV0dXJuO1xuXG4gICAgdHJ5IHtcbiAgICAgIHNldFVwZGF0aW5nQ29kZShsYW5nLmNvZGUpO1xuICAgICAgc2V0RXJyb3IobnVsbCk7XG4gICAgICBhd2FpdCBhcGkuc2V0RGVmYXVsdExhbmd1YWdlKGxhbmcuY29kZSk7XG5cbiAgICAgIC8vIFVwZGF0ZSBsb2NhbCBzdGF0ZVxuICAgICAgc2V0TGFuZ3VhZ2VzKChwcmV2KSA9PlxuICAgICAgICBwcmV2Lm1hcCgobCkgPT4gKHtcbiAgICAgICAgICAuLi5sLFxuICAgICAgICAgIGlzX2RlZmF1bHQ6IGwuY29kZSA9PT0gbGFuZy5jb2RlLFxuICAgICAgICAgIGlzX2FjdGl2ZTogbC5jb2RlID09PSBsYW5nLmNvZGUgPyB0cnVlIDogbC5pc19hY3RpdmUsXG4gICAgICAgIH0pKVxuICAgICAgKTtcblxuICAgICAgLy8gUmVmcmVzaCBnbG9iYWwgY29udGV4dFxuICAgICAgYXdhaXQgcmVmcmVzaExhbmd1YWdlcygpO1xuXG4gICAgICBzaG93U3VjY2Vzcyhg4oCeJHtsYW5nLm5hbWV94oCcIHd1cmRlIGFscyBuZXVlIFN0YW5kYXJkc3ByYWNoZSBmZXN0Z2VsZWd0LmApO1xuICAgIH0gY2F0Y2ggKGVycikge1xuICAgICAgY29uc29sZS5lcnJvcignRmVobGVyIGJlaW0gU2V0emVuIGRlciBTdGFuZGFyZHNwcmFjaGU6JywgZXJyKTtcbiAgICAgIHNldEVycm9yKGVyci5tZXNzYWdlIHx8ICdGZWhsZXIgYmVpbSBGZXN0bGVnZW4gZGVyIFN0YW5kYXJkc3ByYWNoZS4nKTtcbiAgICB9IGZpbmFsbHkge1xuICAgICAgc2V0VXBkYXRpbmdDb2RlKG51bGwpO1xuICAgIH1cbiAgfTtcblxuICBjb25zdCBhY3RpdmVDb3VudCA9IGxhbmd1YWdlcy5maWx0ZXIoKGwpID0+IGwuaXNfYWN0aXZlKS5sZW5ndGg7XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLXdoaXRlIHJvdW5kZWQtM3hsIHAtNiBzbTpwLTggYm9yZGVyIGJvcmRlci1zbGF0ZS0xMDAgc2hhZG93LWNhcmQgc3BhY2UteS02XCI+XG4gICAgICB7LyogSGVhZGVyICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGZsZXgtY29sIHNtOmZsZXgtcm93IHNtOml0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gZ2FwLTQgcGItNCBib3JkZXItYiBib3JkZXItc2xhdGUtMTAwXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0zXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTIuNSByb3VuZGVkLTJ4bCBiZy1pbmRpZ28tNTAgdGV4dC1pbmRpZ28tNjAwXCI+XG4gICAgICAgICAgICA8TGFuZ3VhZ2VzIGNsYXNzTmFtZT1cInctNSBoLTVcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMlwiPlxuICAgICAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwidGV4dC1iYXNlIHNtOnRleHQtbGcgZm9udC1ib2xkIHRleHQtc2xhdGUtOTAwXCI+XG4gICAgICAgICAgICAgICAgVmVyZsO8Z2JhcmUgU3lzdGVtLVNwcmFjaGVuIChpMThuKVxuICAgICAgICAgICAgICA8L2gyPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJweC0yIHB5LTAuNSByb3VuZGVkLWZ1bGwgdGV4dC1bMTFweF0gZm9udC1ib2xkIGJnLWluZGlnby01MCB0ZXh0LWluZGlnby03MDAgYm9yZGVyIGJvcmRlci1pbmRpZ28tMjAwXCI+XG4gICAgICAgICAgICAgICAge2FjdGl2ZUNvdW50fSAvIHtsYW5ndWFnZXMubGVuZ3RofSBBa3RpdlxuICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zbGF0ZS01MDBcIj5cbiAgICAgICAgICAgICAgU3RldWVybiBTaWUsIHdlbGNoZSBTcHJhY2hlbiBpbSBTcHJhY2h1bXNjaGFsdGVyIGbDvHIgYWxsZSBNaXRhcmJlaXRlciB6dXIgVmVyZsO8Z3VuZyBzdGVoZW4uXG4gICAgICAgICAgICA8L3A+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIDxidXR0b25cbiAgICAgICAgICBvbkNsaWNrPXtsb2FkTGFuZ3VhZ2VzfVxuICAgICAgICAgIGRpc2FibGVkPXtsb2FkaW5nfVxuICAgICAgICAgIGNsYXNzTmFtZT1cInNlbGYtc3RhcnQgc206c2VsZi1hdXRvIHAtMiByb3VuZGVkLXhsIHRleHQtc2xhdGUtNDAwIGhvdmVyOnRleHQtc2xhdGUtNzAwIGhvdmVyOmJnLXNsYXRlLTEwMCB0cmFuc2l0aW9uLWNvbG9yc1wiXG4gICAgICAgICAgdGl0bGU9XCJBa3R1YWxpc2llcmVuXCJcbiAgICAgICAgPlxuICAgICAgICAgIDxSZWZyZXNoQ3cgY2xhc3NOYW1lPXtgdy00IGgtNCAke2xvYWRpbmcgPyAnYW5pbWF0ZS1zcGluJyA6ICcnfWB9IC8+XG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBJbmZvIEFsZXJ0ICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTQgcm91bmRlZC0yeGwgYmctc2xhdGUtNTAgYm9yZGVyIGJvcmRlci1zbGF0ZS0yMDAvODAgdGV4dC14cyB0ZXh0LXNsYXRlLTYwMCBmbGV4IGl0ZW1zLXN0YXJ0IHNwYWNlLXgtM1wiPlxuICAgICAgICA8SW5mbyBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtaW5kaWdvLTUwMCBzaHJpbmstMCBtdC0wLjVcIiAvPlxuICAgICAgICA8cCBjbGFzc05hbWU9XCJsZWFkaW5nLXJlbGF4ZWRcIj5cbiAgICAgICAgICBEZWFrdGl2aWVydGUgU3ByYWNoZW4gd2VyZGVuIGltIFNwcmFjaHfDpGhsZXIgaW4gZGVyIFNpZGViYXIsIGRlciBOYXZiYXIgdW5kIGF1ZiBkZXIgTG9naW4tU2VpdGUgc29mb3J0IGF1c2dlYmxlbmRldC4gRmFsbHMgZWluIE1pdGFyYmVpdGVyIGVpbmUgZGVha3RpdmllcnRlIFNwcmFjaGUgZ2V3w6RobHQgaGF0dGUsIHdlY2hzZWx0IGRpZSBBbndlbmR1bmcgYXV0b21hdGlzY2ggYXVmIGRpZSA8c3Ryb25nPlN0YW5kYXJkc3ByYWNoZTwvc3Ryb25nPi5cbiAgICAgICAgPC9wPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBTdWNjZXNzIE5vdGlmaWNhdGlvbiAqL31cbiAgICAgIHtzdWNjZXNzTWVzc2FnZSAmJiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0zLjUgcm91bmRlZC0yeGwgYmctZW1lcmFsZC01MCBib3JkZXIgYm9yZGVyLWVtZXJhbGQtMjAwIHRleHQtZW1lcmFsZC04MDAgdGV4dC14cyBmb250LXNlbWlib2xkIGZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBhbmltYXRlLWZhZGUtaW5cIj5cbiAgICAgICAgICA8Q2hlY2sgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LWVtZXJhbGQtNjAwIHNocmluay0wXCIgLz5cbiAgICAgICAgICA8c3Bhbj57c3VjY2Vzc01lc3NhZ2V9PC9zcGFuPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICl9XG5cbiAgICAgIHsvKiBFcnJvciBBbGVydCAqL31cbiAgICAgIHtlcnJvciAmJiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0zLjUgcm91bmRlZC0yeGwgYmctcm9zZS01MCBib3JkZXIgYm9yZGVyLXJvc2UtMjAwIHRleHQtcm9zZS04MDAgdGV4dC14cyBmb250LW1lZGl1bSBmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTIgYW5pbWF0ZS1mYWRlLWluXCI+XG4gICAgICAgICAgPEFsZXJ0Q2lyY2xlIGNsYXNzTmFtZT1cInctNCBoLTQgdGV4dC1yb3NlLTYwMCBzaHJpbmstMFwiIC8+XG4gICAgICAgICAgPHNwYW4+e2Vycm9yfTwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICApfVxuXG4gICAgICB7LyogTGFuZ3VhZ2UgTGlzdCAvIEdyaWQgKi99XG4gICAgICB7bG9hZGluZyA/IChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweS0xMiB0ZXh0LWNlbnRlciBzcGFjZS15LTJcIj5cbiAgICAgICAgICA8TG9hZGVyMiBjbGFzc05hbWU9XCJ3LTcgaC03IHRleHQtaW5kaWdvLTYwMCBhbmltYXRlLXNwaW4gbXgtYXV0b1wiIC8+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LXNsYXRlLTQwMCBmb250LW1lZGl1bVwiPlNwcmFjaGVuIHdlcmRlbiBnZWxhZGVuLi4uPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICkgOiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMSBtZDpncmlkLWNvbHMtMiBnYXAtNFwiPlxuICAgICAgICAgIHtsYW5ndWFnZXMubWFwKChsYW5nKSA9PiB7XG4gICAgICAgICAgICBjb25zdCBpc1VwZGF0aW5nID0gdXBkYXRpbmdDb2RlID09PSBsYW5nLmNvZGU7XG5cbiAgICAgICAgICAgIHJldHVybiAoXG4gICAgICAgICAgICAgIDxkaXZcbiAgICAgICAgICAgICAgICBrZXk9e2xhbmcuY29kZX1cbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2BwLTQgc206cC01IHJvdW5kZWQtMnhsIGJvcmRlciB0cmFuc2l0aW9uLWFsbCBkdXJhdGlvbi0yMDAgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIGdhcC00ICR7XG4gICAgICAgICAgICAgICAgICBsYW5nLmlzX2FjdGl2ZVxuICAgICAgICAgICAgICAgICAgICA/ICdiZy13aGl0ZSBib3JkZXItc2xhdGUtMjAwLzkwIHNoYWRvdy0yeHMgaG92ZXI6Ym9yZGVyLWluZGlnby0yMDAnXG4gICAgICAgICAgICAgICAgICAgIDogJ2JnLXNsYXRlLTUwLzcwIGJvcmRlci1zbGF0ZS0yMDAvNTAgb3BhY2l0eS03MCdcbiAgICAgICAgICAgICAgICB9YH1cbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIHsvKiBMYW5ndWFnZSBJbmZvICovfVxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0zLjUgbWluLXctMFwiPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTExIGgtMTEgcm91bmRlZC0yeGwgYmctc2xhdGUtMTAwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHRleHQtMnhsIHNoYWRvdy1pbm5lciBzaHJpbmstMFwiPlxuICAgICAgICAgICAgICAgICAgICB7bGFuZy5mbGFnfVxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWluLXctMFwiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBmbGV4LXdyYXBcIj5cbiAgICAgICAgICAgICAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LWJvbGQgdGV4dC1zbGF0ZS05MDAgdHJ1bmNhdGVcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIHtsYW5nLm5hbWV9XG4gICAgICAgICAgICAgICAgICAgICAgPC9oMz5cblxuICAgICAgICAgICAgICAgICAgICAgIHtsYW5nLmlzX2RlZmF1bHQgJiYgKFxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiaW5saW5lLWZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMSBweC0yIHB5LTAuNSByb3VuZGVkLW1kIHRleHQtWzEwcHhdIGZvbnQtYm9sZCBiZy1hbWJlci01MCB0ZXh0LWFtYmVyLTcwMCBib3JkZXIgYm9yZGVyLWFtYmVyLTIwMFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8U3RhciBjbGFzc05hbWU9XCJ3LTIuNSBoLTIuNSBmaWxsLWN1cnJlbnRcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj5TdGFuZGFyZDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBtdC0wLjUgdGV4dC14cyB0ZXh0LXNsYXRlLTQwMFwiPlxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtIHRleHQtc2xhdGUtNjAwXCI+e2xhbmcubmF0aXZlX25hbWV9PC9zcGFuPlxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuPuKAojwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gdGV4dC1bMTFweF0gdXBwZXJjYXNlIGJnLXNsYXRlLTEwMCBweC0xLjUgcHktMC4yIHJvdW5kZWQgdGV4dC1zbGF0ZS01MDBcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIHtsYW5nLmNvZGV9ICh7bGFuZy5sb2NhbGV9KVxuICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgIHsvKiBBY3Rpb25zOiBTZXQgRGVmYXVsdCAmIFRvZ2dsZSBTd2l0Y2ggKi99XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTMgc2hyaW5rLTBcIj5cbiAgICAgICAgICAgICAgICAgIHsvKiBTZXQgRGVmYXVsdCBCdXR0b24gKi99XG4gICAgICAgICAgICAgICAgICB7IWxhbmcuaXNfZGVmYXVsdCAmJiBsYW5nLmlzX2FjdGl2ZSAmJiAoXG4gICAgICAgICAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVTZXREZWZhdWx0KGxhbmcpfVxuICAgICAgICAgICAgICAgICAgICAgIGRpc2FibGVkPXtpc1VwZGF0aW5nfVxuICAgICAgICAgICAgICAgICAgICAgIHRpdGxlPVwiQWxzIFN0YW5kYXJkLVN5c3RlbXNwcmFjaGUgZmVzdGxlZ2VuXCJcbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJwLTIgcm91bmRlZC14bCB0ZXh0LXNsYXRlLTQwMCBob3Zlcjp0ZXh0LWFtYmVyLTYwMCBob3ZlcjpiZy1hbWJlci01MCB0cmFuc2l0aW9uLWNvbG9yc1wiXG4gICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICA8U3RhciBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cbiAgICAgICAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgICAgICApfVxuXG4gICAgICAgICAgICAgICAgICB7LyogVG9nZ2xlIFN3aXRjaCAqL31cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yXCI+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17YHRleHQtWzExcHhdIGZvbnQtYm9sZCAke2xhbmcuaXNfYWN0aXZlID8gJ3RleHQtZW1lcmFsZC02MDAnIDogJ3RleHQtc2xhdGUtNDAwJ31gfT5cbiAgICAgICAgICAgICAgICAgICAgICB7bGFuZy5pc19hY3RpdmUgPyAnQWt0aXYnIDogJ0luYWt0aXYnfVxuICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XG5cbiAgICAgICAgICAgICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgICAgICAgICAgIHR5cGU9XCJidXR0b25cIlxuICAgICAgICAgICAgICAgICAgICAgIGRpc2FibGVkPXtpc1VwZGF0aW5nIHx8IChsYW5nLmlzX2RlZmF1bHQgJiYgbGFuZy5pc19hY3RpdmUpfVxuICAgICAgICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IGhhbmRsZVRvZ2dsZShsYW5nKX1cbiAgICAgICAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2ByZWxhdGl2ZSBpbmxpbmUtZmxleCBoLTYgdy0xMSBzaHJpbmstMCBjdXJzb3ItcG9pbnRlciByb3VuZGVkLWZ1bGwgYm9yZGVyLTIgYm9yZGVyLXRyYW5zcGFyZW50IHRyYW5zaXRpb24tY29sb3JzIGR1cmF0aW9uLTIwMCBlYXNlLWluLW91dCBmb2N1czpvdXRsaW5lLW5vbmUgZGlzYWJsZWQ6b3BhY2l0eS01MCBkaXNhYmxlZDpjdXJzb3Itbm90LWFsbG93ZWQgJHtcbiAgICAgICAgICAgICAgICAgICAgICAgIGxhbmcuaXNfYWN0aXZlID8gJ2JnLWluZGlnby02MDAnIDogJ2JnLXNsYXRlLTMwMCdcbiAgICAgICAgICAgICAgICAgICAgICB9YH1cbiAgICAgICAgICAgICAgICAgICAgICB0aXRsZT17bGFuZy5pc19kZWZhdWx0ID8gJ1N0YW5kYXJkc3ByYWNoZSBrYW5uIG5pY2h0IGRlYWt0aXZpZXJ0IHdlcmRlbicgOiB1bmRlZmluZWR9XG4gICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICA8c3BhblxuICAgICAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgcG9pbnRlci1ldmVudHMtbm9uZSBpbmxpbmUtYmxvY2sgaC01IHctNSB0cmFuc2Zvcm0gcm91bmRlZC1mdWxsIGJnLXdoaXRlIHNoYWRvdy1tZCByaW5nLTAgdHJhbnNpdGlvbiBkdXJhdGlvbi0yMDAgZWFzZS1pbi1vdXQgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgJHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgbGFuZy5pc19hY3RpdmUgPyAndHJhbnNsYXRlLXgtNScgOiAndHJhbnNsYXRlLXgtMCdcbiAgICAgICAgICAgICAgICAgICAgICAgIH1gfVxuICAgICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICAgIHtpc1VwZGF0aW5nICYmIDxMb2FkZXIyIGNsYXNzTmFtZT1cInctMyBoLTMgdGV4dC1pbmRpZ28tNjAwIGFuaW1hdGUtc3BpblwiIC8+fVxuICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApO1xuICAgICAgICAgIH0pfVxuICAgICAgICA8L2Rpdj5cbiAgICAgICl9XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL2FkbWluL0xhbmd1YWdlTWFuYWdlbWVudENhcmQuanN4In0=

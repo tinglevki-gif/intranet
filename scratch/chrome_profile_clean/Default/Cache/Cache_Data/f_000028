@@ -1,0 +1,199 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/layout/MobileBottomNav.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react;
+import { NavLink, useLocation, useNavigate } from "/node_modules/.vite/deps/react-router-dom.js?v=490e586b";
+import { Truck, Clock, Wrench, Menu, Building2, User } from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+import { useAuth } from "/src/context/AuthContext.jsx";
+import { UserAvatar } from "/src/components/common/UserAvatar.jsx";
+export function MobileBottomNav({ onToggleSidebar }) {
+  _s();
+  const { t } = useLanguage();
+  const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isGpsPage = location.pathname === "/gps";
+  const queryParams = new URLSearchParams(location.search);
+  const currentTab = queryParams.get("tab") || "MAP";
+  const handleTabClick = (tabName) => {
+    navigate(`/gps?tab=${tabName}`);
+  };
+  return /* @__PURE__ */ jsxDEV("nav", { className: "fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#001E36]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-[#002B49] pb-safe md:hidden shadow-2xl transition-all", children: /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-4 h-16 items-center px-2", children: [
+    /* @__PURE__ */ jsxDEV(
+      "button",
+      {
+        onClick: () => handleTabClick("MAP"),
+        className: `flex flex-col items-center justify-center space-y-1 h-full py-1 transition-all group ${isGpsPage && currentTab === "MAP" ? "text-sky-600 dark:text-[#38BDF8] font-bold" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`,
+        children: [
+          /* @__PURE__ */ jsxDEV("div", { className: `p-1 rounded-xl transition-all ${isGpsPage && currentTab === "MAP" ? "bg-sky-100 dark:bg-sky-500/20 scale-110 shadow-xs" : ""}`, children: /* @__PURE__ */ jsxDEV(Truck, { className: "w-5 h-5" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 56,
+            columnNumber: 13
+          }, this) }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 53,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] tracking-tight", children: "Flotte" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 58,
+            columnNumber: 11
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+        lineNumber: 45,
+        columnNumber: 9
+      },
+      this
+    ),
+    /* @__PURE__ */ jsxDEV(
+      "button",
+      {
+        onClick: () => handleTabClick("STAYS"),
+        className: `flex flex-col items-center justify-center space-y-1 h-full py-1 transition-all group ${isGpsPage && (currentTab === "STAYS" || currentTab === "DEMURRAGE" || currentTab === "DISPATCH") ? "text-sky-600 dark:text-[#38BDF8] font-bold" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`,
+        children: [
+          /* @__PURE__ */ jsxDEV("div", { className: `p-1 rounded-xl transition-all ${isGpsPage && (currentTab === "STAYS" || currentTab === "DEMURRAGE" || currentTab === "DISPATCH") ? "bg-sky-100 dark:bg-sky-500/20 scale-110 shadow-xs" : ""}`, children: /* @__PURE__ */ jsxDEV(Clock, { className: "w-5 h-5" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 75,
+            columnNumber: 13
+          }, this) }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 70,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] tracking-tight", children: "Ladezeiten" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 77,
+            columnNumber: 11
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+        lineNumber: 62,
+        columnNumber: 9
+      },
+      this
+    ),
+    /* @__PURE__ */ jsxDEV(
+      "button",
+      {
+        onClick: () => handleTabClick("MAINTENANCE"),
+        className: `flex flex-col items-center justify-center space-y-1 h-full py-1 transition-all group ${isGpsPage && currentTab === "MAINTENANCE" ? "text-sky-600 dark:text-[#38BDF8] font-bold" : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"}`,
+        children: [
+          /* @__PURE__ */ jsxDEV("div", { className: `p-1 rounded-xl transition-all ${isGpsPage && currentTab === "MAINTENANCE" ? "bg-sky-100 dark:bg-sky-500/20 scale-110 shadow-xs" : ""}`, children: /* @__PURE__ */ jsxDEV(Wrench, { className: "w-5 h-5" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 94,
+            columnNumber: 13
+          }, this) }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 89,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] tracking-tight", children: "Wartung" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 96,
+            columnNumber: 11
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+        lineNumber: 81,
+        columnNumber: 9
+      },
+      this
+    ),
+    /* @__PURE__ */ jsxDEV(
+      "button",
+      {
+        onClick: onToggleSidebar,
+        className: "flex flex-col items-center justify-center space-y-1 h-full py-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all group",
+        children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "p-1 rounded-xl group-hover:bg-slate-100 dark:group-hover:bg-[#002B49] transition-colors relative", children: [
+            /* @__PURE__ */ jsxDEV(Menu, { className: "w-5 h-5" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+              lineNumber: 105,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-sky-500" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+              lineNumber: 106,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 104,
+            columnNumber: 11
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] tracking-tight", children: "Menü" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+            lineNumber: 108,
+            columnNumber: 11
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+        lineNumber: 100,
+        columnNumber: 9
+      },
+      this
+    )
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+    lineNumber: 43,
+    columnNumber: 7
+  }, this) }, void 0, false, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx",
+    lineNumber: 42,
+    columnNumber: 5
+  }, this);
+}
+_s(MobileBottomNav, "u0S7D/qgJF3wrWE9V7rzXiTZUUQ=", false, function() {
+  return [useLanguage, useAuth, useLocation, useNavigate];
+});
+_c = MobileBottomNav;
+var _c;
+$RefreshReg$(_c, "MobileBottomNav");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/MobileBottomNav.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUFBO0FBQUE7QUFBQTtBQUFBLElBZ0JBO0FBQUEsSUFHQTtBQUFBLE1BQUM7QUFBQTtBQUFBLFFBQ0MsU0FBU1g7QUFBQUEsUUFDVCxXQUFVO0FBQUEsUUFFVjtBQUFBLGlDQUFDLFNBQUksV0FBVSxvR0FDYjtBQUFBLG1DQUFDLFFBQUssV0FBVSxhQUFoQjtBQUFBO0FBQUE7QUFBQTtBQUFBLG1CQUF5QjtBQUFBLFlBQ3pCLHVCQUFDLFVBQUssV0FBVSxrRUFBaEI7QUFBQTtBQUFBO0FBQUE7QUFBQSxtQkFBK0U7QUFBQSxlQUZqRjtBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQUdBO0FBQUEsVUFDQSx1QkFBQyxVQUFLLFdBQVUsOEJBQTZCLG9CQUE3QztBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQUFpRDtBQUFBO0FBQUE7QUFBQSxNQVJuRDtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsSUFTQTtBQUFBLE9BbEVGO0FBQUE7QUFBQTtBQUFBO0FBQUEsU0FtRUEsS0FwRUY7QUFBQTtBQUFBO0FBQUE7QUFBQSxTQXFFQTtBQUVKO0FBQUNDLEdBdEZlRixpQkFBZTtBQUFBLFVBQ2ZILGFBQ0dDLFNBQ0FULGFBQ0FDLFdBQVc7QUFBQTtBQUFBLEtBSmRVO0FBQWUsSUFBQWdCO0FBQUEsYUFBQUEsSUFBQSIsIm5hbWVzIjpbIlJlYWN0IiwiTmF2TGluayIsInVzZUxvY2F0aW9uIiwidXNlTmF2aWdhdGUiLCJUcnVjayIsIkNsb2NrIiwiV3JlbmNoIiwiTWVudSIsIkJ1aWxkaW5nMiIsIlVzZXIiLCJ1c2VMYW5ndWFnZSIsInVzZUF1dGgiLCJVc2VyQXZhdGFyIiwiTW9iaWxlQm90dG9tTmF2Iiwib25Ub2dnbGVTaWRlYmFyIiwiX3MiLCJ0IiwidXNlciIsImxvY2F0aW9uIiwibmF2aWdhdGUiLCJpc0dwc1BhZ2UiLCJwYXRobmFtZSIsInF1ZXJ5UGFyYW1zIiwiVVJMU2VhcmNoUGFyYW1zIiwic2VhcmNoIiwiY3VycmVudFRhYiIsImdldCIsImhhbmRsZVRhYkNsaWNrIiwidGFiTmFtZSIsIl9jIl0sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIk1vYmlsZUJvdHRvbU5hdi5qc3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IE5hdkxpbmssIHVzZUxvY2F0aW9uLCB1c2VOYXZpZ2F0ZSB9IGZyb20gJ3JlYWN0LXJvdXRlci1kb20nO1xuaW1wb3J0IHsgVHJ1Y2ssIENsb2NrLCBXcmVuY2gsIE1lbnUsIEJ1aWxkaW5nMiwgVXNlciB9IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5pbXBvcnQgeyB1c2VMYW5ndWFnZSB9IGZyb20gJy4uLy4uL2NvbnRleHQvTGFuZ3VhZ2VDb250ZXh0JztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICcuLi8uLi9jb250ZXh0L0F1dGhDb250ZXh0JztcbmltcG9ydCB7IFVzZXJBdmF0YXIgfSBmcm9tICcuLi9jb21tb24vVXNlckF2YXRhcic7XG5cbmV4cG9ydCBmdW5jdGlvbiBNb2JpbGVCb3R0b21OYXYoeyBvblRvZ2dsZVNpZGViYXIgfSkge1xuICBjb25zdCB7IHQgfSA9IHVzZUxhbmd1YWdlKCk7XG4gIGNvbnN0IHsgdXNlciB9ID0gdXNlQXV0aCgpO1xuICBjb25zdCBsb2NhdGlvbiA9IHVzZUxvY2F0aW9uKCk7XG4gIGNvbnN0IG5hdmlnYXRlID0gdXNlTmF2aWdhdGUoKTtcblxuICBjb25zdCBpc0dwc1BhZ2UgPSBsb2NhdGlvbi5wYXRobmFtZSA9PT0gJy9ncHMnO1xuICBjb25zdCBxdWVyeVBhcmFtcyA9IG5ldyBVUkxTZWFyY2hQYXJhbXMobG9jYXRpb24uc2VhcmNoKTtcbiAgY29uc3QgY3VycmVudFRhYiA9IHF1ZXJ5UGFyYW1zLmdldCgndGFiJykgfHwgJ01BUCc7XG5cbiAgY29uc3QgaGFuZGxlVGFiQ2xpY2sgPSAodGFiTmFtZSkgPT4ge1xuICAgIG5hdmlnYXRlKGAvZ3BzP3RhYj0ke3RhYk5hbWV9YCk7XG4gIH07XG5cbiAgcmV0dXJuIChcbiAgICA8bmF2IGNsYXNzTmFtZT1cImZpeGVkIGJvdHRvbS0wIGxlZnQtMCByaWdodC0wIHotNDAgYmctd2hpdGUvOTUgZGFyazpiZy1bIzAwMUUzNl0vOTUgYmFja2Ryb3AtYmx1ci14bCBib3JkZXItdCBib3JkZXItc2xhdGUtMjAwLzgwIGRhcms6Ym9yZGVyLVsjMDAyQjQ5XSBwYi1zYWZlIG1kOmhpZGRlbiBzaGFkb3ctMnhsIHRyYW5zaXRpb24tYWxsXCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTQgaC0xNiBpdGVtcy1jZW50ZXIgcHgtMlwiPlxuICAgICAgICB7LyogMS4gRmxvdHRlIC8gS2FydGUgKi99XG4gICAgICAgIDxidXR0b25cbiAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVUYWJDbGljaygnTUFQJyl9XG4gICAgICAgICAgY2xhc3NOYW1lPXtgZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgc3BhY2UteS0xIGgtZnVsbCBweS0xIHRyYW5zaXRpb24tYWxsIGdyb3VwICR7XG4gICAgICAgICAgICBpc0dwc1BhZ2UgJiYgY3VycmVudFRhYiA9PT0gJ01BUCdcbiAgICAgICAgICAgICAgPyAndGV4dC1za3ktNjAwIGRhcms6dGV4dC1bIzM4QkRGOF0gZm9udC1ib2xkJ1xuICAgICAgICAgICAgICA6ICd0ZXh0LXNsYXRlLTUwMCBkYXJrOnRleHQtc2xhdGUtNDAwIGhvdmVyOnRleHQtc2xhdGUtOTAwIGRhcms6aG92ZXI6dGV4dC13aGl0ZSdcbiAgICAgICAgICB9YH1cbiAgICAgICAgPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPXtgcC0xIHJvdW5kZWQteGwgdHJhbnNpdGlvbi1hbGwgJHtcbiAgICAgICAgICAgIGlzR3BzUGFnZSAmJiBjdXJyZW50VGFiID09PSAnTUFQJyA/ICdiZy1za3ktMTAwIGRhcms6Ymctc2t5LTUwMC8yMCBzY2FsZS0xMTAgc2hhZG93LXhzJyA6ICcnXG4gICAgICAgICAgfWB9PlxuICAgICAgICAgICAgPFRydWNrIGNsYXNzTmFtZT1cInctNSBoLTVcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIHRyYWNraW5nLXRpZ2h0XCI+RmxvdHRlPC9zcGFuPlxuICAgICAgICA8L2J1dHRvbj5cblxuICAgICAgICB7LyogMi4gTGFkZXplaXRlbiAvIFdlcmtzc3RhdHVzICovfVxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgb25DbGljaz17KCkgPT4gaGFuZGxlVGFiQ2xpY2soJ1NUQVlTJyl9XG4gICAgICAgICAgY2xhc3NOYW1lPXtgZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgc3BhY2UteS0xIGgtZnVsbCBweS0xIHRyYW5zaXRpb24tYWxsIGdyb3VwICR7XG4gICAgICAgICAgICBpc0dwc1BhZ2UgJiYgKGN1cnJlbnRUYWIgPT09ICdTVEFZUycgfHwgY3VycmVudFRhYiA9PT0gJ0RFTVVSUkFHRScgfHwgY3VycmVudFRhYiA9PT0gJ0RJU1BBVENIJylcbiAgICAgICAgICAgICAgPyAndGV4dC1za3ktNjAwIGRhcms6dGV4dC1bIzM4QkRGOF0gZm9udC1ib2xkJ1xuICAgICAgICAgICAgICA6ICd0ZXh0LXNsYXRlLTUwMCBkYXJrOnRleHQtc2xhdGUtNDAwIGhvdmVyOnRleHQtc2xhdGUtOTAwIGRhcms6aG92ZXI6dGV4dC13aGl0ZSdcbiAgICAgICAgICB9YH1cbiAgICAgICAgPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPXtgcC0xIHJvdW5kZWQteGwgdHJhbnNpdGlvbi1hbGwgJHtcbiAgICAgICAgICAgIGlzR3BzUGFnZSAmJiAoY3VycmVudFRhYiA9PT0gJ1NUQVlTJyB8fCBjdXJyZW50VGFiID09PSAnREVNVVJSQUdFJyB8fCBjdXJyZW50VGFiID09PSAnRElTUEFUQ0gnKVxuICAgICAgICAgICAgICA/ICdiZy1za3ktMTAwIGRhcms6Ymctc2t5LTUwMC8yMCBzY2FsZS0xMTAgc2hhZG93LXhzJ1xuICAgICAgICAgICAgICA6ICcnXG4gICAgICAgICAgfWB9PlxuICAgICAgICAgICAgPENsb2NrIGNsYXNzTmFtZT1cInctNSBoLTVcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIHRyYWNraW5nLXRpZ2h0XCI+TGFkZXplaXRlbjwvc3Bhbj5cbiAgICAgICAgPC9idXR0b24+XG5cbiAgICAgICAgey8qIDMuIFdhcnR1bmcgKi99XG4gICAgICAgIDxidXR0b25cbiAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVUYWJDbGljaygnTUFJTlRFTkFOQ0UnKX1cbiAgICAgICAgICBjbGFzc05hbWU9e2BmbGV4IGZsZXgtY29sIGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBzcGFjZS15LTEgaC1mdWxsIHB5LTEgdHJhbnNpdGlvbi1hbGwgZ3JvdXAgJHtcbiAgICAgICAgICAgIGlzR3BzUGFnZSAmJiBjdXJyZW50VGFiID09PSAnTUFJTlRFTkFOQ0UnXG4gICAgICAgICAgICAgID8gJ3RleHQtc2t5LTYwMCBkYXJrOnRleHQtWyMzOEJERjhdIGZvbnQtYm9sZCdcbiAgICAgICAgICAgICAgOiAndGV4dC1zbGF0ZS01MDAgZGFyazp0ZXh0LXNsYXRlLTQwMCBob3Zlcjp0ZXh0LXNsYXRlLTkwMCBkYXJrOmhvdmVyOnRleHQtd2hpdGUnXG4gICAgICAgICAgfWB9XG4gICAgICAgID5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT17YHAtMSByb3VuZGVkLXhsIHRyYW5zaXRpb24tYWxsICR7XG4gICAgICAgICAgICBpc0dwc1BhZ2UgJiYgY3VycmVudFRhYiA9PT0gJ01BSU5URU5BTkNFJ1xuICAgICAgICAgICAgICA/ICdiZy1za3ktMTAwIGRhcms6Ymctc2t5LTUwMC8yMCBzY2FsZS0xMTAgc2hhZG93LXhzJ1xuICAgICAgICAgICAgICA6ICcnXG4gICAgICAgICAgfWB9PlxuICAgICAgICAgICAgPFdyZW5jaCBjbGFzc05hbWU9XCJ3LTUgaC01XCIgLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsxMHB4XSB0cmFja2luZy10aWdodFwiPldhcnR1bmc8L3NwYW4+XG4gICAgICAgIDwvYnV0dG9uPlxuXG4gICAgICAgIHsvKiA0LiBNZW7DvCAvIFByb2ZpbCAqL31cbiAgICAgICAgPGJ1dHRvblxuICAgICAgICAgIG9uQ2xpY2s9e29uVG9nZ2xlU2lkZWJhcn1cbiAgICAgICAgICBjbGFzc05hbWU9XCJmbGV4IGZsZXgtY29sIGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBzcGFjZS15LTEgaC1mdWxsIHB5LTEgdGV4dC1zbGF0ZS01MDAgZGFyazp0ZXh0LXNsYXRlLTQwMCBob3Zlcjp0ZXh0LXNsYXRlLTkwMCBkYXJrOmhvdmVyOnRleHQtd2hpdGUgdHJhbnNpdGlvbi1hbGwgZ3JvdXBcIlxuICAgICAgICA+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTEgcm91bmRlZC14bCBncm91cC1ob3ZlcjpiZy1zbGF0ZS0xMDAgZGFyazpncm91cC1ob3ZlcjpiZy1bIzAwMkI0OV0gdHJhbnNpdGlvbi1jb2xvcnMgcmVsYXRpdmVcIj5cbiAgICAgICAgICAgIDxNZW51IGNsYXNzTmFtZT1cInctNSBoLTVcIiAvPlxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiYWJzb2x1dGUgLXRvcC0wLjUgLXJpZ2h0LTAuNSB3LTIgaC0yIHJvdW5kZWQtZnVsbCBiZy1za3ktNTAwXCI+PC9zcGFuPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIHRyYWNraW5nLXRpZ2h0XCI+TWVuw7w8L3NwYW4+XG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgPC9kaXY+XG4gICAgPC9uYXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL2xheW91dC9Nb2JpbGVCb3R0b21OYXYuanN4In0=

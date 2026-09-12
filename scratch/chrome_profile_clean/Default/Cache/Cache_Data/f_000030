@@ -1,0 +1,243 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/common/TinglevLogo.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react;
+import { useBranding } from "/src/context/BrandingContext.jsx";
+export function TinglevMark({ className = "w-8 h-8", color = "#009FE3" }) {
+  return /* @__PURE__ */ jsxDEV(
+    "svg",
+    {
+      viewBox: "0 0 100 160",
+      fill: "none",
+      xmlns: "http://www.w3.org/2000/svg",
+      className,
+      children: [
+        /* @__PURE__ */ jsxDEV(
+          "path",
+          {
+            d: "M0 0H47V102H0V0Z",
+            fill: color
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+            lineNumber: 36,
+            columnNumber: 7
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV(
+          "path",
+          {
+            d: "M0 108H47V160H35L0 125V108Z",
+            fill: color
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+            lineNumber: 41,
+            columnNumber: 7
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV(
+          "path",
+          {
+            d: "M53 0H65L100 35V52H53V0Z",
+            fill: color
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+            lineNumber: 46,
+            columnNumber: 7
+          },
+          this
+        ),
+        /* @__PURE__ */ jsxDEV(
+          "path",
+          {
+            d: "M53 58H100V160H53V58Z",
+            fill: color
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+            lineNumber: 51,
+            columnNumber: 7
+          },
+          this
+        )
+      ]
+    },
+    void 0,
+    true,
+    {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 29,
+      columnNumber: 5
+    },
+    this
+  );
+}
+_c = TinglevMark;
+export function TinglevLogo({
+  variant = "full",
+  // 'full' | 'mark' | 'horizontal'
+  theme = "light-text",
+  // 'light-text' (for dark bg) | 'dark-text' (for light bg)
+  showSubtitle = true,
+  customName = null,
+  customSuffix = null,
+  customTagline = null,
+  customLogoUrl = null,
+  className = ""
+}) {
+  _s();
+  let branding = null;
+  try {
+    branding = useBranding();
+  } catch (e) {
+  }
+  const name = customName !== null ? customName : branding?.companyName || "TINGLEV";
+  const suffix = customSuffix !== null ? customSuffix : branding?.companySuffix || "ELEMENTFABRIK";
+  const tagline = customTagline !== null ? customTagline : branding?.companyTagline || "PORTAL INTRANET";
+  const logoUrl = customLogoUrl !== null ? customLogoUrl : branding?.companyLogoUrl || "";
+  const isLightText = theme === "light-text";
+  if (variant === "mark") {
+    return /* @__PURE__ */ jsxDEV("div", { className: `relative flex items-center justify-center ${className}`, children: /* @__PURE__ */ jsxDEV("div", { className: "w-10 h-10 rounded-xl bg-[#001424]/80 border border-[#003E6B]/60 flex items-center justify-center p-2 shadow-md shadow-[#001424]/40 relative group overflow-hidden", children: logoUrl ? /* @__PURE__ */ jsxDEV("img", { src: logoUrl, alt: name, className: "w-7 h-7 object-contain rounded" }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 88,
+      columnNumber: 11
+    }, this) : /* @__PURE__ */ jsxDEV(TinglevMark, { className: "w-5 h-7 transform group-hover:scale-105 transition-transform", color: "#009FE3" }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 90,
+      columnNumber: 11
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 86,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 85,
+      columnNumber: 7
+    }, this);
+  }
+  return /* @__PURE__ */ jsxDEV("div", { className: `flex items-center space-x-3.5 select-none ${className}`, children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "relative flex items-center justify-center shrink-0", children: /* @__PURE__ */ jsxDEV("div", { className: "w-10 h-11 rounded-xl bg-gradient-to-br from-[#00243F] to-[#001424] border border-[#003E6B]/70 flex items-center justify-center p-1.5 shadow-lg shadow-[#001424]/50 relative overflow-hidden", children: logoUrl ? /* @__PURE__ */ jsxDEV("img", { src: logoUrl, alt: name, className: "w-7 h-8 object-contain rounded" }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 103,
+      columnNumber: 11
+    }, this) : /* @__PURE__ */ jsxDEV(TinglevMark, { className: "w-5 h-7", color: "#009FE3" }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 105,
+      columnNumber: 11
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 101,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 100,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col justify-center min-w-0", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1", children: [
+        /* @__PURE__ */ jsxDEV(
+          "span",
+          {
+            className: `font-black text-lg tracking-tight leading-none uppercase font-heading truncate ${isLightText ? "text-white" : "text-[#001E36]"}`,
+            children: name
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+            lineNumber: 113,
+            columnNumber: 11
+          },
+          this
+        ),
+        name.toUpperCase() === "TINGLEV" && /* @__PURE__ */ jsxDEV("span", { className: "text-[#009FE3] font-bold text-xs leading-none tracking-widest uppercase", children: "®" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+          lineNumber: 121,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+        lineNumber: 112,
+        columnNumber: 9
+      }, this),
+      suffix && /* @__PURE__ */ jsxDEV(
+        "span",
+        {
+          className: `text-[11px] font-extrabold tracking-wider leading-tight uppercase mt-0.5 truncate ${isLightText ? "text-slate-200" : "text-slate-600"}`,
+          children: suffix
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+          lineNumber: 127,
+          columnNumber: 9
+        },
+        this
+      ),
+      showSubtitle && tagline && /* @__PURE__ */ jsxDEV("span", { className: "text-[9.5px] uppercase font-bold tracking-widest text-[#009FE3] block mt-0.5 truncate", children: tagline }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+        lineNumber: 136,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+      lineNumber: 111,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx",
+    lineNumber: 98,
+    columnNumber: 5
+  }, this);
+}
+_s(TinglevLogo, "TeLcZ6dzFpT3XQK6pC8bcqvzsF8=", false, function() {
+  return [useBranding];
+});
+_c2 = TinglevLogo;
+export default TinglevLogo;
+var _c, _c2;
+$RefreshReg$(_c, "TinglevMark");
+$RefreshReg$(_c2, "TinglevLogo");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/TinglevLogo.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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Z0QsS0FKcEQ7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQU1BLEtBUEY7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQVFBO0FBQUEsSUFHQSx1QkFBQyxTQUFJLFdBQVUsd0NBQ2I7QUFBQSw2QkFBQyxTQUFJLFdBQVUsK0JBQ2I7QUFBQTtBQUFBLFVBQUM7QUFBQTtBQUFBLFlBQ0MsV0FBVyxrRkFDVFEsY0FBYyxlQUFlLGdCQUFnQjtBQUFBLFlBRzlDUjtBQUFBQTtBQUFBQSxVQUxIO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxRQU1BO0FBQUEsUUFDQ0EsS0FBS1MsWUFBWSxNQUFNLGFBQ3RCLHVCQUFDLFVBQUssV0FBVSwyRUFBeUUsaUJBQXpGO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFFQTtBQUFBLFdBWEo7QUFBQTtBQUFBO0FBQUE7QUFBQSxhQWFBO0FBQUEsTUFDQ1AsVUFDQztBQUFBLFFBQUM7QUFBQTtBQUFBLFVBQ0MsV0FBVyxxRkFDVE0sY0FBYyxtQkFBbUIsZ0JBQWdCO0FBQUEsVUFHbEROO0FBQUFBO0FBQUFBLFFBTEg7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLE1BTUE7QUFBQSxNQUVEVixnQkFBZ0JZLFdBQ2YsdUJBQUMsVUFBSyxXQUFVLHlGQUNiQSxxQkFESDtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBRUE7QUFBQSxTQTNCSjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBNkJBO0FBQUEsT0ExQ0Y7QUFBQTtBQUFBO0FBQUE7QUFBQSxTQTJDQTtBQUVKO0FBQUNQLEdBcEZlUixhQUFXO0FBQUEsVUFZWkwsV0FBVztBQUFBO0FBQUEsTUFaVks7QUFzRmhCLGVBQWVBO0FBQVksSUFBQUQsSUFBQXNCO0FBQUEsYUFBQXRCLElBQUE7QUFBQSxhQUFBc0IsS0FBQSIsIm5hbWVzIjpbIlJlYWN0IiwidXNlQnJhbmRpbmciLCJUaW5nbGV2TWFyayIsImNsYXNzTmFtZSIsImNvbG9yIiwiX2MiLCJUaW5nbGV2TG9nbyIsInZhcmlhbnQiLCJ0aGVtZSIsInNob3dTdWJ0aXRsZSIsImN1c3RvbU5hbWUiLCJjdXN0b21TdWZmaXgiLCJjdXN0b21UYWdsaW5lIiwiY3VzdG9tTG9nb1VybCIsIl9zIiwiYnJhbmRpbmciLCJlIiwibmFtZSIsImNvbXBhbnlOYW1lIiwic3VmZml4IiwiY29tcGFueVN1ZmZpeCIsInRhZ2xpbmUiLCJjb21wYW55VGFnbGluZSIsImxvZ29VcmwiLCJjb21wYW55TG9nb1VybCIsImlzTGlnaHRUZXh0IiwidG9VcHBlckNhc2UiLCJfYzIiXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiVGluZ2xldkxvZ28uanN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyB1c2VCcmFuZGluZyB9IGZyb20gJy4uLy4uL2NvbnRleHQvQnJhbmRpbmdDb250ZXh0JztcblxuLyoqXG4gKiBFeGFjdCBPZmZpY2lhbCBUaW5nbGV2IEJyYW5kbWFya1xuICogNCBpbnRlcmxvY2tpbmcgbW9kdWxhciBwcmVjYXN0IGVsZW1lbnRzIHdpdGggNDXCsCBjaGFtZmVyZWQgY29ybmVycy5cbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIFRpbmdsZXZNYXJrKHsgY2xhc3NOYW1lID0gXCJ3LTggaC04XCIsIGNvbG9yID0gXCIjMDA5RkUzXCIgfSkge1xuICByZXR1cm4gKFxuICAgIDxzdmdcbiAgICAgIHZpZXdCb3g9XCIwIDAgMTAwIDE2MFwiXG4gICAgICBmaWxsPVwibm9uZVwiXG4gICAgICB4bWxucz1cImh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnXCJcbiAgICAgIGNsYXNzTmFtZT17Y2xhc3NOYW1lfVxuICAgID5cbiAgICAgIHsvKiAxLiBUb3AtTGVmdCBNYWpvciBFbGVtZW50ICovfVxuICAgICAgPHBhdGhcbiAgICAgICAgZD1cIk0wIDBINDdWMTAySDBWMFpcIlxuICAgICAgICBmaWxsPXtjb2xvcn1cbiAgICAgIC8+XG4gICAgICB7LyogMi4gQm90dG9tLUxlZnQgQ2hhbWZlcmVkIEVsZW1lbnQgKi99XG4gICAgICA8cGF0aFxuICAgICAgICBkPVwiTTAgMTA4SDQ3VjE2MEgzNUwwIDEyNVYxMDhaXCJcbiAgICAgICAgZmlsbD17Y29sb3J9XG4gICAgICAvPlxuICAgICAgey8qIDMuIFRvcC1SaWdodCBDaGFtZmVyZWQgRWxlbWVudCAqL31cbiAgICAgIDxwYXRoXG4gICAgICAgIGQ9XCJNNTMgMEg2NUwxMDAgMzVWNTJINTNWMFpcIlxuICAgICAgICBmaWxsPXtjb2xvcn1cbiAgICAgIC8+XG4gICAgICB7LyogNC4gQm90dG9tLVJpZ2h0IE1ham9yIEVsZW1lbnQgKi99XG4gICAgICA8cGF0aFxuICAgICAgICBkPVwiTTUzIDU4SDEwMFYxNjBINTNWNThaXCJcbiAgICAgICAgZmlsbD17Y29sb3J9XG4gICAgICAvPlxuICAgIDwvc3ZnPlxuICApO1xufVxuXG5leHBvcnQgZnVuY3Rpb24gVGluZ2xldkxvZ28oe1xuICB2YXJpYW50ID0gJ2Z1bGwnLCAvLyAnZnVsbCcgfCAnbWFyaycgfCAnaG9yaXpvbnRhbCdcbiAgdGhlbWUgPSAnbGlnaHQtdGV4dCcsIC8vICdsaWdodC10ZXh0JyAoZm9yIGRhcmsgYmcpIHwgJ2RhcmstdGV4dCcgKGZvciBsaWdodCBiZylcbiAgc2hvd1N1YnRpdGxlID0gdHJ1ZSxcbiAgY3VzdG9tTmFtZSA9IG51bGwsXG4gIGN1c3RvbVN1ZmZpeCA9IG51bGwsXG4gIGN1c3RvbVRhZ2xpbmUgPSBudWxsLFxuICBjdXN0b21Mb2dvVXJsID0gbnVsbCxcbiAgY2xhc3NOYW1lID0gJydcbn0pIHtcbiAgbGV0IGJyYW5kaW5nID0gbnVsbDtcbiAgdHJ5IHtcbiAgICBicmFuZGluZyA9IHVzZUJyYW5kaW5nKCk7XG4gIH0gY2F0Y2ggKGUpIHtcbiAgICAvLyBGYWxsYmFjayBpZiByZW5kZXJlZCBvdXRzaWRlIHByb3ZpZGVyXG4gIH1cblxuICBjb25zdCBuYW1lID0gY3VzdG9tTmFtZSAhPT0gbnVsbCA/IGN1c3RvbU5hbWUgOiAoYnJhbmRpbmc/LmNvbXBhbnlOYW1lIHx8ICdUSU5HTEVWJyk7XG4gIGNvbnN0IHN1ZmZpeCA9IGN1c3RvbVN1ZmZpeCAhPT0gbnVsbCA/IGN1c3RvbVN1ZmZpeCA6IChicmFuZGluZz8uY29tcGFueVN1ZmZpeCB8fCAnRUxFTUVOVEZBQlJJSycpO1xuICBjb25zdCB0YWdsaW5lID0gY3VzdG9tVGFnbGluZSAhPT0gbnVsbCA/IGN1c3RvbVRhZ2xpbmUgOiAoYnJhbmRpbmc/LmNvbXBhbnlUYWdsaW5lIHx8ICdQT1JUQUwgSU5UUkFORVQnKTtcbiAgY29uc3QgbG9nb1VybCA9IGN1c3RvbUxvZ29VcmwgIT09IG51bGwgPyBjdXN0b21Mb2dvVXJsIDogKGJyYW5kaW5nPy5jb21wYW55TG9nb1VybCB8fCAnJyk7XG5cbiAgY29uc3QgaXNMaWdodFRleHQgPSB0aGVtZSA9PT0gJ2xpZ2h0LXRleHQnO1xuXG4gIGlmICh2YXJpYW50ID09PSAnbWFyaycpIHtcbiAgICByZXR1cm4gKFxuICAgICAgPGRpdiBjbGFzc05hbWU9e2ByZWxhdGl2ZSBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciAke2NsYXNzTmFtZX1gfT5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTEwIGgtMTAgcm91bmRlZC14bCBiZy1bIzAwMTQyNF0vODAgYm9yZGVyIGJvcmRlci1bIzAwM0U2Ql0vNjAgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgcC0yIHNoYWRvdy1tZCBzaGFkb3ctWyMwMDE0MjRdLzQwIHJlbGF0aXZlIGdyb3VwIG92ZXJmbG93LWhpZGRlblwiPlxuICAgICAgICAgIHtsb2dvVXJsID8gKFxuICAgICAgICAgICAgPGltZyBzcmM9e2xvZ29Vcmx9IGFsdD17bmFtZX0gY2xhc3NOYW1lPVwidy03IGgtNyBvYmplY3QtY29udGFpbiByb3VuZGVkXCIgLz5cbiAgICAgICAgICApIDogKFxuICAgICAgICAgICAgPFRpbmdsZXZNYXJrIGNsYXNzTmFtZT1cInctNSBoLTcgdHJhbnNmb3JtIGdyb3VwLWhvdmVyOnNjYWxlLTEwNSB0cmFuc2l0aW9uLXRyYW5zZm9ybVwiIGNvbG9yPVwiIzAwOUZFM1wiIC8+XG4gICAgICAgICAgKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cbiAgICApO1xuICB9XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT17YGZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMy41IHNlbGVjdC1ub25lICR7Y2xhc3NOYW1lfWB9PlxuICAgICAgey8qIENvbXBhbnkgRW1ibGVtIC8gTG9nbyBDb250YWluZXIgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHNocmluay0wXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy0xMCBoLTExIHJvdW5kZWQteGwgYmctZ3JhZGllbnQtdG8tYnIgZnJvbS1bIzAwMjQzRl0gdG8tWyMwMDE0MjRdIGJvcmRlciBib3JkZXItWyMwMDNFNkJdLzcwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHAtMS41IHNoYWRvdy1sZyBzaGFkb3ctWyMwMDE0MjRdLzUwIHJlbGF0aXZlIG92ZXJmbG93LWhpZGRlblwiPlxuICAgICAgICAgIHtsb2dvVXJsID8gKFxuICAgICAgICAgICAgPGltZyBzcmM9e2xvZ29Vcmx9IGFsdD17bmFtZX0gY2xhc3NOYW1lPVwidy03IGgtOCBvYmplY3QtY29udGFpbiByb3VuZGVkXCIgLz5cbiAgICAgICAgICApIDogKFxuICAgICAgICAgICAgPFRpbmdsZXZNYXJrIGNsYXNzTmFtZT1cInctNSBoLTdcIiBjb2xvcj1cIiMwMDlGRTNcIiAvPlxuICAgICAgICAgICl9XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBEeW5hbWljIENvbXBhbnkgQnJhbmQgVHlwb2dyYXBoeSAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LWNvbCBqdXN0aWZ5LWNlbnRlciBtaW4tdy0wXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0xXCI+XG4gICAgICAgICAgPHNwYW5cbiAgICAgICAgICAgIGNsYXNzTmFtZT17YGZvbnQtYmxhY2sgdGV4dC1sZyB0cmFja2luZy10aWdodCBsZWFkaW5nLW5vbmUgdXBwZXJjYXNlIGZvbnQtaGVhZGluZyB0cnVuY2F0ZSAke1xuICAgICAgICAgICAgICBpc0xpZ2h0VGV4dCA/ICd0ZXh0LXdoaXRlJyA6ICd0ZXh0LVsjMDAxRTM2XSdcbiAgICAgICAgICAgIH1gfVxuICAgICAgICAgID5cbiAgICAgICAgICAgIHtuYW1lfVxuICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICB7bmFtZS50b1VwcGVyQ2FzZSgpID09PSAnVElOR0xFVicgJiYgKFxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1bIzAwOUZFM10gZm9udC1ib2xkIHRleHQteHMgbGVhZGluZy1ub25lIHRyYWNraW5nLXdpZGVzdCB1cHBlcmNhc2VcIj5cbiAgICAgICAgICAgICAgwq5cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICApfVxuICAgICAgICA8L2Rpdj5cbiAgICAgICAge3N1ZmZpeCAmJiAoXG4gICAgICAgICAgPHNwYW5cbiAgICAgICAgICAgIGNsYXNzTmFtZT17YHRleHQtWzExcHhdIGZvbnQtZXh0cmFib2xkIHRyYWNraW5nLXdpZGVyIGxlYWRpbmctdGlnaHQgdXBwZXJjYXNlIG10LTAuNSB0cnVuY2F0ZSAke1xuICAgICAgICAgICAgICBpc0xpZ2h0VGV4dCA/ICd0ZXh0LXNsYXRlLTIwMCcgOiAndGV4dC1zbGF0ZS02MDAnXG4gICAgICAgICAgICB9YH1cbiAgICAgICAgICA+XG4gICAgICAgICAgICB7c3VmZml4fVxuICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgKX1cbiAgICAgICAge3Nob3dTdWJ0aXRsZSAmJiB0YWdsaW5lICYmIChcbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVs5LjVweF0gdXBwZXJjYXNlIGZvbnQtYm9sZCB0cmFja2luZy13aWRlc3QgdGV4dC1bIzAwOUZFM10gYmxvY2sgbXQtMC41IHRydW5jYXRlXCI+XG4gICAgICAgICAgICB7dGFnbGluZX1cbiAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICl9XG4gICAgICA8L2Rpdj5cbiAgICA8L2Rpdj5cbiAgKTtcbn1cblxuZXhwb3J0IGRlZmF1bHQgVGluZ2xldkxvZ287XG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL2NvbW1vbi9UaW5nbGV2TG9nby5qc3gifQ==

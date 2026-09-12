@@ -1,0 +1,15 @@
+{
+  "name": "tinglev-intranet-desktop",
+  "version": "1.0.0",
+  "description": "Tinglev Elementfabrik Intranet - Desktop Application",
+  "main": "main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Tinglev Elementfabrik GmbH",
+  "license": "Proprietary",
+  "devDependencies": {
+    "electron": "^29.1.0"
+  }
+}

@@ -1,0 +1,186 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/common/PWAUpdateToast.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import { RefreshCw, Sparkles, X, ArrowUpCircle } from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+export function PWAUpdateToast() {
+  _s();
+  const [showToast, setShowToast] = useState(false);
+  const [waitingWorker, setWaitingWorker] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  useEffect(() => {
+    const handleSWUpdate = (e) => {
+      const registration = e.detail?.registration;
+      if (registration && registration.waiting) {
+        setWaitingWorker(registration.waiting);
+        setShowToast(true);
+      } else {
+        setShowToast(true);
+      }
+    };
+    window.addEventListener("swUpdated", handleSWUpdate);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg && reg.waiting) {
+          setWaitingWorker(reg.waiting);
+          setShowToast(true);
+        }
+      });
+    }
+    return () => {
+      window.removeEventListener("swUpdated", handleSWUpdate);
+    };
+  }, []);
+  const handleReload = () => {
+    setIsUpdating(true);
+    if (waitingWorker) {
+      waitingWorker.postMessage({ type: "SKIP_WAITING" });
+    } else {
+      window.location.reload();
+    }
+  };
+  if (!showToast) {
+    return null;
+  }
+  return /* @__PURE__ */ jsxDEV("div", { className: "fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-[10001] animate-bounce-subtle", children: /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-900/95 dark:bg-slate-900/95 text-white p-4 rounded-3xl shadow-2xl border border-sky-500/40 backdrop-blur-xl flex items-center justify-between space-x-3.5 ring-2 ring-sky-500/30", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3 min-w-0", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shrink-0 shadow-md", children: /* @__PURE__ */ jsxDEV(RefreshCw, { className: `w-5 h-5 ${isUpdating ? "animate-spin" : ""}` }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+        lineNumber: 75,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+        lineNumber: 74,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "min-w-0", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "font-extrabold text-xs text-white", children: "App-Update verfügbar" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+            lineNumber: 80,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "px-1.5 py-0.2 rounded text-[9px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30", children: "Neu" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+            lineNumber: 81,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+          lineNumber: 79,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("p", { className: "text-[11px] text-slate-300 truncate mt-0.5", children: "Eine neue Version der Intranet-App ist verfügbar." }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+          lineNumber: 85,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+        lineNumber: 78,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+      lineNumber: 73,
+      columnNumber: 9
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5 shrink-0", children: [
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: handleReload,
+          disabled: isUpdating,
+          className: "flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 cursor-pointer",
+          children: [
+            /* @__PURE__ */ jsxDEV(RefreshCw, { className: `w-3 h-3 ${isUpdating ? "animate-spin" : ""}` }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+              lineNumber: 97,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { children: isUpdating ? "Lädt..." : "Neu laden" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+              lineNumber: 98,
+              columnNumber: 13
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+          lineNumber: 92,
+          columnNumber: 11
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => setShowToast(false),
+          className: "p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer",
+          title: "Schließen",
+          children: /* @__PURE__ */ jsxDEV(X, { className: "w-4 h-4" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+            lineNumber: 106,
+            columnNumber: 13
+          }, this)
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+          lineNumber: 101,
+          columnNumber: 11
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+      lineNumber: 91,
+      columnNumber: 9
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+    lineNumber: 72,
+    columnNumber: 7
+  }, this) }, void 0, false, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx",
+    lineNumber: 71,
+    columnNumber: 5
+  }, this);
+}
+_s(PWAUpdateToast, "Non7Y3tG7/vekugTJjQxfzUOQGA=");
+_c = PWAUpdateToast;
+var _c;
+$RefreshReg$(_c, "PWAUpdateToast");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/PWAUpdateToast.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QTtBQUFBO0FBQUEsUUFOOUM7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLE1BT0E7QUFBQSxNQUVBO0FBQUEsUUFBQztBQUFBO0FBQUEsVUFDQyxTQUFTLE1BQU1ILGFBQWEsS0FBSztBQUFBLFVBQ2pDLFdBQVU7QUFBQSxVQUNWLE9BQU07QUFBQSxVQUVOLGlDQUFDLEtBQUUsV0FBVSxhQUFiO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBQXNCO0FBQUE7QUFBQSxRQUx4QjtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsTUFNQTtBQUFBLFNBaEJGO0FBQUE7QUFBQTtBQUFBO0FBQUEsV0FpQkE7QUFBQSxPQXBDRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFNBcUNBLEtBdENGO0FBQUE7QUFBQTtBQUFBO0FBQUEsU0F1Q0E7QUFFSjtBQUFDRixHQXpGZUQsZ0JBQWM7QUFBQSxLQUFkQTtBQUFjLElBQUEwQjtBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlRWZmZWN0IiwiUmVmcmVzaEN3IiwiU3BhcmtsZXMiLCJYIiwiQXJyb3dVcENpcmNsZSIsIlBXQVVwZGF0ZVRvYXN0IiwiX3MiLCJzaG93VG9hc3QiLCJzZXRTaG93VG9hc3QiLCJ3YWl0aW5nV29ya2VyIiwic2V0V2FpdGluZ1dvcmtlciIsImlzVXBkYXRpbmciLCJzZXRJc1VwZGF0aW5nIiwiaGFuZGxlU1dVcGRhdGUiLCJlIiwicmVnaXN0cmF0aW9uIiwiZGV0YWlsIiwid2FpdGluZyIsIndpbmRvdyIsImFkZEV2ZW50TGlzdGVuZXIiLCJuYXZpZ2F0b3IiLCJzZXJ2aWNlV29ya2VyIiwiZ2V0UmVnaXN0cmF0aW9uIiwidGhlbiIsInJlZyIsInJlbW92ZUV2ZW50TGlzdGVuZXIiLCJoYW5kbGVSZWxvYWQiLCJwb3N0TWVzc2FnZSIsInR5cGUiLCJsb2NhdGlvbiIsInJlbG9hZCIsIl9jIl0sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIlBXQVVwZGF0ZVRvYXN0LmpzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgUmVhY3QsIHsgdXNlU3RhdGUsIHVzZUVmZmVjdCB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IFJlZnJlc2hDdywgU3BhcmtsZXMsIFgsIEFycm93VXBDaXJjbGUgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuXG5leHBvcnQgZnVuY3Rpb24gUFdBVXBkYXRlVG9hc3QoKSB7XG4gIGNvbnN0IFtzaG93VG9hc3QsIHNldFNob3dUb2FzdF0gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFt3YWl0aW5nV29ya2VyLCBzZXRXYWl0aW5nV29ya2VyXSA9IHVzZVN0YXRlKG51bGwpO1xuICBjb25zdCBbaXNVcGRhdGluZywgc2V0SXNVcGRhdGluZ10gPSB1c2VTdGF0ZShmYWxzZSk7XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICAvLyAxLiBMaXN0ZW4gZm9yIGN1c3RvbSBzd1VwZGF0ZWQgZXZlbnQgZW1pdHRlZCBieSBzZXJ2aWNlV29ya2VyUmVnaXN0cmF0aW9uXG4gICAgY29uc3QgaGFuZGxlU1dVcGRhdGUgPSAoZSkgPT4ge1xuICAgICAgY29uc3QgcmVnaXN0cmF0aW9uID0gZS5kZXRhaWw/LnJlZ2lzdHJhdGlvbjtcbiAgICAgIGlmIChyZWdpc3RyYXRpb24gJiYgcmVnaXN0cmF0aW9uLndhaXRpbmcpIHtcbiAgICAgICAgc2V0V2FpdGluZ1dvcmtlcihyZWdpc3RyYXRpb24ud2FpdGluZyk7XG4gICAgICAgIHNldFNob3dUb2FzdCh0cnVlKTtcbiAgICAgIH0gZWxzZSB7XG4gICAgICAgIHNldFNob3dUb2FzdCh0cnVlKTtcbiAgICAgIH1cbiAgICB9O1xuXG4gICAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ3N3VXBkYXRlZCcsIGhhbmRsZVNXVXBkYXRlKTtcblxuICAgIC8vIDIuIENoZWNrIGRpcmVjdGx5IGlmIHNlcnZpY2Ugd29ya2VyIGhhcyBhIHdhaXRpbmcgd29ya2VyXG4gICAgaWYgKCdzZXJ2aWNlV29ya2VyJyBpbiBuYXZpZ2F0b3IpIHtcbiAgICAgIG5hdmlnYXRvci5zZXJ2aWNlV29ya2VyLmdldFJlZ2lzdHJhdGlvbigpLnRoZW4oKHJlZykgPT4ge1xuICAgICAgICBpZiAocmVnICYmIHJlZy53YWl0aW5nKSB7XG4gICAgICAgICAgc2V0V2FpdGluZ1dvcmtlcihyZWcud2FpdGluZyk7XG4gICAgICAgICAgc2V0U2hvd1RvYXN0KHRydWUpO1xuICAgICAgICB9XG4gICAgICB9KTtcbiAgICB9XG5cbiAgICByZXR1cm4gKCkgPT4ge1xuICAgICAgd2luZG93LnJlbW92ZUV2ZW50TGlzdGVuZXIoJ3N3VXBkYXRlZCcsIGhhbmRsZVNXVXBkYXRlKTtcbiAgICB9O1xuICB9LCBbXSk7XG5cbiAgY29uc3QgaGFuZGxlUmVsb2FkID0gKCkgPT4ge1xuICAgIHNldElzVXBkYXRpbmcodHJ1ZSk7XG4gICAgaWYgKHdhaXRpbmdXb3JrZXIpIHtcbiAgICAgIHdhaXRpbmdXb3JrZXIucG9zdE1lc3NhZ2UoeyB0eXBlOiAnU0tJUF9XQUlUSU5HJyB9KTtcbiAgICB9IGVsc2Uge1xuICAgICAgd2luZG93LmxvY2F0aW9uLnJlbG9hZCgpO1xuICAgIH1cbiAgfTtcblxuICBpZiAoIXNob3dUb2FzdCkge1xuICAgIHJldHVybiBudWxsO1xuICB9XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cImZpeGVkIHRvcC00IGxlZnQtNCByaWdodC00IHNtOmxlZnQtYXV0byBzbTpyaWdodC02IHNtOm1heC13LW1kIHotWzEwMDAxXSBhbmltYXRlLWJvdW5jZS1zdWJ0bGVcIj5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctc2xhdGUtOTAwLzk1IGRhcms6Ymctc2xhdGUtOTAwLzk1IHRleHQtd2hpdGUgcC00IHJvdW5kZWQtM3hsIHNoYWRvdy0yeGwgYm9yZGVyIGJvcmRlci1za3ktNTAwLzQwIGJhY2tkcm9wLWJsdXIteGwgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuIHNwYWNlLXgtMy41IHJpbmctMiByaW5nLXNreS01MDAvMzBcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTMgbWluLXctMFwiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy0xMCBoLTEwIHJvdW5kZWQtMnhsIGJnLWdyYWRpZW50LXRvLXRyIGZyb20tc2t5LTUwMCB0by1ibHVlLTYwMCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciB0ZXh0LXdoaXRlIHNocmluay0wIHNoYWRvdy1tZFwiPlxuICAgICAgICAgICAgPFJlZnJlc2hDdyBjbGFzc05hbWU9e2B3LTUgaC01ICR7aXNVcGRhdGluZyA/ICdhbmltYXRlLXNwaW4nIDogJyd9YH0gLz5cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibWluLXctMFwiPlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTEuNVwiPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LWV4dHJhYm9sZCB0ZXh0LXhzIHRleHQtd2hpdGVcIj5BcHAtVXBkYXRlIHZlcmbDvGdiYXI8L3NwYW4+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInB4LTEuNSBweS0wLjIgcm91bmRlZCB0ZXh0LVs5cHhdIGZvbnQtYmxhY2sgdXBwZXJjYXNlIGJnLWVtZXJhbGQtNTAwLzIwIHRleHQtZW1lcmFsZC00MDAgYm9yZGVyIGJvcmRlci1lbWVyYWxkLTUwMC8zMFwiPlxuICAgICAgICAgICAgICAgIE5ldVxuICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtWzExcHhdIHRleHQtc2xhdGUtMzAwIHRydW5jYXRlIG10LTAuNVwiPlxuICAgICAgICAgICAgICBFaW5lIG5ldWUgVmVyc2lvbiBkZXIgSW50cmFuZXQtQXBwIGlzdCB2ZXJmw7xnYmFyLlxuICAgICAgICAgICAgPC9wPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMS41IHNocmluay0wXCI+XG4gICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgb25DbGljaz17aGFuZGxlUmVsb2FkfVxuICAgICAgICAgICAgZGlzYWJsZWQ9e2lzVXBkYXRpbmd9XG4gICAgICAgICAgICBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTEgcHgtMyBweS0xLjUgYmctZ3JhZGllbnQtdG8tciBmcm9tLXNreS01MDAgdG8tYmx1ZS02MDAgaG92ZXI6ZnJvbS1za3ktNDAwIGhvdmVyOnRvLWJsdWUtNTAwIHRleHQtd2hpdGUgdGV4dC14cyBmb250LWJvbGQgcm91bmRlZC14bCBzaGFkb3ctbWQgdHJhbnNpdGlvbi1hbGwgYWN0aXZlOnNjYWxlLTk1IGN1cnNvci1wb2ludGVyXCJcbiAgICAgICAgICA+XG4gICAgICAgICAgICA8UmVmcmVzaEN3IGNsYXNzTmFtZT17YHctMyBoLTMgJHtpc1VwZGF0aW5nID8gJ2FuaW1hdGUtc3BpbicgOiAnJ31gfSAvPlxuICAgICAgICAgICAgPHNwYW4+e2lzVXBkYXRpbmcgPyAnTMOkZHQuLi4nIDogJ05ldSBsYWRlbid9PC9zcGFuPlxuICAgICAgICAgIDwvYnV0dG9uPlxuXG4gICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0U2hvd1RvYXN0KGZhbHNlKX1cbiAgICAgICAgICAgIGNsYXNzTmFtZT1cInAtMSByb3VuZGVkLWxnIHRleHQtc2xhdGUtNDAwIGhvdmVyOnRleHQtd2hpdGUgaG92ZXI6Ymctc2xhdGUtODAwIHRyYW5zaXRpb24tY29sb3JzIGN1cnNvci1wb2ludGVyXCJcbiAgICAgICAgICAgIHRpdGxlPVwiU2NobGllw59lblwiXG4gICAgICAgICAgPlxuICAgICAgICAgICAgPFggY2xhc3NOYW1lPVwidy00IGgtNFwiIC8+XG4gICAgICAgICAgPC9idXR0b24+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL2NvbW1vbi9QV0FVcGRhdGVUb2FzdC5qc3gifQ==

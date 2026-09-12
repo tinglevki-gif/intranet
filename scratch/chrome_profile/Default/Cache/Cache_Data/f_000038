@@ -1,0 +1,221 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/orgchart/OrgChartNode.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import {
+  ChevronDown,
+  ChevronRight,
+  Users
+} from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+import { OrgCard } from "/src/components/orgchart/OrgChartColumnar.jsx";
+function matchesSearch(item, query) {
+  if (!query) return false;
+  const q = query.toLowerCase();
+  const selfMatches = item.full_name?.toLowerCase().includes(q) || item.position?.toLowerCase().includes(q) || item.department?.toLowerCase().includes(q) || item.email?.toLowerCase().includes(q) || item.phone?.toLowerCase().includes(q);
+  if (selfMatches) return true;
+  if (item.children) {
+    return item.children.some((child) => matchesSearch(child, query));
+  }
+  return false;
+}
+export function OrgChartNode({
+  node,
+  density = "detailed",
+  searchQuery = "",
+  allExpanded = null,
+  onSelectEmployee,
+  onCopyPhone
+}) {
+  _s();
+  const { t } = useLanguage();
+  const hasChildren = node.children && node.children.length > 0;
+  const [isExpanded, setIsExpanded] = useState(true);
+  useEffect(() => {
+    if (allExpanded !== null) {
+      setIsExpanded(allExpanded);
+    }
+  }, [allExpanded]);
+  useEffect(() => {
+    if (searchQuery && matchesSearch(node, searchQuery)) {
+      setIsExpanded(true);
+    }
+  }, [searchQuery]);
+  return /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col items-center relative", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "relative", children: [
+      /* @__PURE__ */ jsxDEV(
+        OrgCard,
+        {
+          node,
+          density,
+          searchQuery,
+          onSelectEmployee,
+          onCopyPhone
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+          lineNumber: 74,
+          columnNumber: 9
+        },
+        this
+      ),
+      hasChildren && /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          type: "button",
+          onClick: (e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          },
+          className: "absolute -bottom-3.5 left-1/2 -translate-x-1/2 flex items-center space-x-1 px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700 rounded-full shadow-md text-[10px] font-bold transition-all z-20 group",
+          children: [
+            /* @__PURE__ */ jsxDEV(Users, { className: "w-3 h-3 text-indigo-500" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+              lineNumber: 92,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { children: [
+              node.children.length,
+              " ",
+              t("org_chart.direct_reports")
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+              lineNumber: 93,
+              columnNumber: 13
+            }, this),
+            isExpanded ? /* @__PURE__ */ jsxDEV(ChevronDown, { className: "w-3 h-3 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+              lineNumber: 95,
+              columnNumber: 11
+            }, this) : /* @__PURE__ */ jsxDEV(ChevronRight, { className: "w-3 h-3 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+              lineNumber: 97,
+              columnNumber: 11
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+          lineNumber: 84,
+          columnNumber: 9
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+      lineNumber: 73,
+      columnNumber: 7
+    }, this),
+    hasChildren && isExpanded && /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col items-center pt-8 relative w-full", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "w-0.5 h-6 bg-slate-300 dark:bg-slate-700 absolute top-0 left-1/2 -translate-x-1/2" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+        lineNumber: 107,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-start justify-center gap-6 sm:gap-10 pt-4 relative", children: [
+        node.children.length > 1 && /* @__PURE__ */ jsxDEV(
+          "div",
+          {
+            className: "h-0.5 bg-slate-300 dark:bg-slate-700 absolute top-0",
+            style: {
+              left: `${100 / (node.children.length * 2)}%`,
+              right: `${100 / (node.children.length * 2)}%`
+            }
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+            lineNumber: 113,
+            columnNumber: 11
+          },
+          this
+        ),
+        node.children.map(
+          (child) => /* @__PURE__ */ jsxDEV("div", { className: "relative flex flex-col items-center", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "w-0.5 h-4 bg-slate-300 dark:bg-slate-700 absolute -top-4 left-1/2 -translate-x-1/2" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+              lineNumber: 125,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV(
+              OrgChartNode,
+              {
+                node: child,
+                density,
+                searchQuery,
+                allExpanded,
+                onSelectEmployee,
+                onCopyPhone
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+                lineNumber: 126,
+                columnNumber: 17
+              },
+              this
+            )
+          ] }, child.id, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+            lineNumber: 123,
+            columnNumber: 11
+          }, this)
+        )
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+        lineNumber: 110,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+      lineNumber: 105,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx",
+    lineNumber: 71,
+    columnNumber: 5
+  }, this);
+}
+_s(OrgChartNode, "orV7y0ZVO3DMBsPcxeA4VW/QCaM=", false, function() {
+  return [useLanguage];
+});
+_c = OrgChartNode;
+var _c;
+$RefreshReg$(_c, "OrgChartNode");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/orgchart/OrgChartNode.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUFZLElBQUFtQjtBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlRWZmZWN0IiwiQ2hldnJvbkRvd24iLCJDaGV2cm9uUmlnaHQiLCJVc2VycyIsInVzZUxhbmd1YWdlIiwiT3JnQ2FyZCIsIm1hdGNoZXNTZWFyY2giLCJpdGVtIiwicXVlcnkiLCJxIiwidG9Mb3dlckNhc2UiLCJzZWxmTWF0Y2hlcyIsImZ1bGxfbmFtZSIsImluY2x1ZGVzIiwicG9zaXRpb24iLCJkZXBhcnRtZW50IiwiZW1haWwiLCJwaG9uZSIsImNoaWxkcmVuIiwic29tZSIsImNoaWxkIiwiT3JnQ2hhcnROb2RlIiwibm9kZSIsImRlbnNpdHkiLCJzZWFyY2hRdWVyeSIsImFsbEV4cGFuZGVkIiwib25TZWxlY3RFbXBsb3llZSIsIm9uQ29weVBob25lIiwiX3MiLCJ0IiwiaGFzQ2hpbGRyZW4iLCJsZW5ndGgiLCJpc0V4cGFuZGVkIiwic2V0SXNFeHBhbmRlZCIsImUiLCJzdG9wUHJvcGFnYXRpb24iLCJsZWZ0IiwicmlnaHQiLCJtYXAiLCJpZCIsIl9jIl0sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIk9yZ0NoYXJ0Tm9kZS5qc3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0LCB7IHVzZVN0YXRlLCB1c2VFZmZlY3QgfSBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBcbiAgQ2hldnJvbkRvd24sIFxuICBDaGV2cm9uUmlnaHQsIFxuICBVc2VycyBcbn0gZnJvbSAnbHVjaWRlLXJlYWN0JztcbmltcG9ydCB7IHVzZUxhbmd1YWdlIH0gZnJvbSAnLi4vLi4vY29udGV4dC9MYW5ndWFnZUNvbnRleHQnO1xuaW1wb3J0IHsgT3JnQ2FyZCB9IGZyb20gJy4vT3JnQ2hhcnRDb2x1bW5hcic7XG5cbmZ1bmN0aW9uIG1hdGNoZXNTZWFyY2goaXRlbSwgcXVlcnkpIHtcbiAgaWYgKCFxdWVyeSkgcmV0dXJuIGZhbHNlO1xuICBjb25zdCBxID0gcXVlcnkudG9Mb3dlckNhc2UoKTtcbiAgY29uc3Qgc2VsZk1hdGNoZXMgPVxuICAgIGl0ZW0uZnVsbF9uYW1lPy50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKHEpIHx8XG4gICAgaXRlbS5wb3NpdGlvbj8udG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhxKSB8fFxuICAgIGl0ZW0uZGVwYXJ0bWVudD8udG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhxKSB8fFxuICAgIGl0ZW0uZW1haWw/LnRvTG93ZXJDYXNlKCkuaW5jbHVkZXMocSkgfHxcbiAgICBpdGVtLnBob25lPy50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKHEpO1xuICBpZiAoc2VsZk1hdGNoZXMpIHJldHVybiB0cnVlO1xuICBpZiAoaXRlbS5jaGlsZHJlbikge1xuICAgIHJldHVybiBpdGVtLmNoaWxkcmVuLnNvbWUoY2hpbGQgPT4gbWF0Y2hlc1NlYXJjaChjaGlsZCwgcXVlcnkpKTtcbiAgfVxuICByZXR1cm4gZmFsc2U7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBPcmdDaGFydE5vZGUoeyBcbiAgbm9kZSwgXG4gIGRlbnNpdHkgPSAnZGV0YWlsZWQnLFxuICBzZWFyY2hRdWVyeSA9ICcnLCBcbiAgYWxsRXhwYW5kZWQgPSBudWxsLFxuICBvblNlbGVjdEVtcGxveWVlLFxuICBvbkNvcHlQaG9uZVxufSkge1xuICBjb25zdCB7IHQgfSA9IHVzZUxhbmd1YWdlKCk7XG4gIGNvbnN0IGhhc0NoaWxkcmVuID0gbm9kZS5jaGlsZHJlbiAmJiBub2RlLmNoaWxkcmVuLmxlbmd0aCA+IDA7XG4gIGNvbnN0IFtpc0V4cGFuZGVkLCBzZXRJc0V4cGFuZGVkXSA9IHVzZVN0YXRlKHRydWUpO1xuXG4gIC8vIFN5bmNocm9uaXplIHdpdGggZ2xvYmFsIGV4cGFuZC9jb2xsYXBzZSB0b2dnbGVcbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBpZiAoYWxsRXhwYW5kZWQgIT09IG51bGwpIHtcbiAgICAgIHNldElzRXhwYW5kZWQoYWxsRXhwYW5kZWQpO1xuICAgIH1cbiAgfSwgW2FsbEV4cGFuZGVkXSk7XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBpZiAoc2VhcmNoUXVlcnkgJiYgbWF0Y2hlc1NlYXJjaChub2RlLCBzZWFyY2hRdWVyeSkpIHtcbiAgICAgIHNldElzRXhwYW5kZWQodHJ1ZSk7XG4gICAgfVxuICB9LCBbc2VhcmNoUXVlcnldKTtcblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIgcmVsYXRpdmVcIj5cbiAgICAgIHsvKiBOb2RlIENhcmQgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlXCI+XG4gICAgICAgIDxPcmdDYXJkXG4gICAgICAgICAgbm9kZT17bm9kZX1cbiAgICAgICAgICBkZW5zaXR5PXtkZW5zaXR5fVxuICAgICAgICAgIHNlYXJjaFF1ZXJ5PXtzZWFyY2hRdWVyeX1cbiAgICAgICAgICBvblNlbGVjdEVtcGxveWVlPXtvblNlbGVjdEVtcGxveWVlfVxuICAgICAgICAgIG9uQ29weVBob25lPXtvbkNvcHlQaG9uZX1cbiAgICAgICAgLz5cblxuICAgICAgICB7LyogRXhwYW5kIC8gQ29sbGFwc2UgUGlsbCAqL31cbiAgICAgICAge2hhc0NoaWxkcmVuICYmIChcbiAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICB0eXBlPVwiYnV0dG9uXCJcbiAgICAgICAgICAgIG9uQ2xpY2s9eyhlKSA9PiB7XG4gICAgICAgICAgICAgIGUuc3RvcFByb3BhZ2F0aW9uKCk7XG4gICAgICAgICAgICAgIHNldElzRXhwYW5kZWQoIWlzRXhwYW5kZWQpO1xuICAgICAgICAgICAgfX1cbiAgICAgICAgICAgIGNsYXNzTmFtZT1cImFic29sdXRlIC1ib3R0b20tMy41IGxlZnQtMS8yIC10cmFuc2xhdGUteC0xLzIgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0xIHB4LTMgcHktMSBiZy13aGl0ZSBkYXJrOmJnLXNsYXRlLTgwMCBob3ZlcjpiZy1zbGF0ZS01MCBkYXJrOmhvdmVyOmJnLXNsYXRlLTcwMCB0ZXh0LXNsYXRlLTcwMCBkYXJrOnRleHQtc2xhdGUtMjAwIGhvdmVyOnRleHQtaW5kaWdvLTYwMCBkYXJrOmhvdmVyOnRleHQtaW5kaWdvLTQwMCBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMCBkYXJrOmJvcmRlci1zbGF0ZS03MDAgcm91bmRlZC1mdWxsIHNoYWRvdy1tZCB0ZXh0LVsxMHB4XSBmb250LWJvbGQgdHJhbnNpdGlvbi1hbGwgei0yMCBncm91cFwiXG4gICAgICAgICAgPlxuICAgICAgICAgICAgPFVzZXJzIGNsYXNzTmFtZT1cInctMyBoLTMgdGV4dC1pbmRpZ28tNTAwXCIgLz5cbiAgICAgICAgICAgIDxzcGFuPntub2RlLmNoaWxkcmVuLmxlbmd0aH0ge3QoJ29yZ19jaGFydC5kaXJlY3RfcmVwb3J0cycpfTwvc3Bhbj5cbiAgICAgICAgICAgIHtpc0V4cGFuZGVkID8gKFxuICAgICAgICAgICAgICA8Q2hldnJvbkRvd24gY2xhc3NOYW1lPVwidy0zIGgtMyB0ZXh0LXNsYXRlLTQwMCBncm91cC1ob3Zlcjp0ZXh0LWluZGlnby02MDAgZGFyazpncm91cC1ob3Zlcjp0ZXh0LWluZGlnby00MDBcIiAvPlxuICAgICAgICAgICAgKSA6IChcbiAgICAgICAgICAgICAgPENoZXZyb25SaWdodCBjbGFzc05hbWU9XCJ3LTMgaC0zIHRleHQtc2xhdGUtNDAwIGdyb3VwLWhvdmVyOnRleHQtaW5kaWdvLTYwMCBkYXJrOmdyb3VwLWhvdmVyOnRleHQtaW5kaWdvLTQwMFwiIC8+XG4gICAgICAgICAgICApfVxuICAgICAgICAgIDwvYnV0dG9uPlxuICAgICAgICApfVxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBDaGlsZHJlbiBjb25uZWN0b3IgbGluZXMgYW5kIHJlY3Vyc2l2ZSByZW5kZXIgKi99XG4gICAgICB7aGFzQ2hpbGRyZW4gJiYgaXNFeHBhbmRlZCAmJiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIgcHQtOCByZWxhdGl2ZSB3LWZ1bGxcIj5cbiAgICAgICAgICB7LyogVmVydGljYWwgc3RlbSBsaW5lIGRvd24gZnJvbSBwYXJlbnQgY2FyZCAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMC41IGgtNiBiZy1zbGF0ZS0zMDAgZGFyazpiZy1zbGF0ZS03MDAgYWJzb2x1dGUgdG9wLTAgbGVmdC0xLzIgLXRyYW5zbGF0ZS14LTEvMlwiPjwvZGl2PlxuXG4gICAgICAgICAgey8qIENoaWxkcmVuIG5vZGVzIGNvbnRhaW5lciB3aXRoIGhvcml6b250YWwgY3Jvc3NiYXIgKi99XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLXN0YXJ0IGp1c3RpZnktY2VudGVyIGdhcC02IHNtOmdhcC0xMCBwdC00IHJlbGF0aXZlXCI+XG4gICAgICAgICAgICB7LyogSG9yaXpvbnRhbCBjb25uZWN0b3IgbGluZSBzcGFubmluZyBhbGwgY2hpbGRyZW4gKi99XG4gICAgICAgICAgICB7bm9kZS5jaGlsZHJlbi5sZW5ndGggPiAxICYmIChcbiAgICAgICAgICAgICAgPGRpdiBcbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJoLTAuNSBiZy1zbGF0ZS0zMDAgZGFyazpiZy1zbGF0ZS03MDAgYWJzb2x1dGUgdG9wLTBcIlxuICAgICAgICAgICAgICAgIHN0eWxlPXt7XG4gICAgICAgICAgICAgICAgICBsZWZ0OiBgJHsxMDAgLyAobm9kZS5jaGlsZHJlbi5sZW5ndGggKiAyKX0lYCxcbiAgICAgICAgICAgICAgICAgIHJpZ2h0OiBgJHsxMDAgLyAobm9kZS5jaGlsZHJlbi5sZW5ndGggKiAyKX0lYCxcbiAgICAgICAgICAgICAgICB9fVxuICAgICAgICAgICAgICA+PC9kaXY+XG4gICAgICAgICAgICApfVxuXG4gICAgICAgICAgICB7bm9kZS5jaGlsZHJlbi5tYXAoKGNoaWxkKSA9PiAoXG4gICAgICAgICAgICAgIDxkaXYga2V5PXtjaGlsZC5pZH0gY2xhc3NOYW1lPVwicmVsYXRpdmUgZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXJcIj5cbiAgICAgICAgICAgICAgICB7LyogVmVydGljYWwgZHJvcCBsaW5lIGRvd24gaW50byBlYWNoIGNoaWxkICovfVxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy0wLjUgaC00IGJnLXNsYXRlLTMwMCBkYXJrOmJnLXNsYXRlLTcwMCBhYnNvbHV0ZSAtdG9wLTQgbGVmdC0xLzIgLXRyYW5zbGF0ZS14LTEvMlwiPjwvZGl2PlxuICAgICAgICAgICAgICAgIDxPcmdDaGFydE5vZGUgXG4gICAgICAgICAgICAgICAgICBub2RlPXtjaGlsZH0gXG4gICAgICAgICAgICAgICAgICBkZW5zaXR5PXtkZW5zaXR5fVxuICAgICAgICAgICAgICAgICAgc2VhcmNoUXVlcnk9e3NlYXJjaFF1ZXJ5fVxuICAgICAgICAgICAgICAgICAgYWxsRXhwYW5kZWQ9e2FsbEV4cGFuZGVkfVxuICAgICAgICAgICAgICAgICAgb25TZWxlY3RFbXBsb3llZT17b25TZWxlY3RFbXBsb3llZX1cbiAgICAgICAgICAgICAgICAgIG9uQ29weVBob25lPXtvbkNvcHlQaG9uZX1cbiAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICkpfVxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgICl9XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL29yZ2NoYXJ0L09yZ0NoYXJ0Tm9kZS5qc3gifQ==

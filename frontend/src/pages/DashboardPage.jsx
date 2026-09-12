@@ -3,6 +3,7 @@ import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { HeroBanner } from '../components/dashboard/HeroBanner';
+import { TrialBanner } from '../components/dashboard/TrialBanner';
 import { ModuleQuickCards } from '../components/dashboard/ModuleQuickCards';
 import { MetricsGrid } from '../components/dashboard/MetricsGrid';
 import { AnnouncementsFeed } from '../components/dashboard/AnnouncementsFeed';
@@ -110,18 +111,24 @@ export function DashboardPage() {
         /* ========================================================= */
         /* MINIMALIST DASHBOARD VIEW                                 */
         /* ========================================================= */
-        <MinimalDashboard
-          data={data}
-          config={dashboardConfig || {}}
-          onRefresh={fetchDashboard}
-          isSuperAdmin={isSuperAdmin}
-          onOpenConfig={() => setConfigModalOpen(true)}
-        />
+        <div className="space-y-6">
+          <TrialBanner />
+          <MinimalDashboard
+            data={data}
+            config={dashboardConfig || {}}
+            onRefresh={fetchDashboard}
+            isSuperAdmin={isSuperAdmin}
+            onOpenConfig={() => setConfigModalOpen(true)}
+          />
+        </div>
       ) : (
         /* ========================================================= */
         /* STANDARD FULL DASHBOARD VIEW                              */
         /* ========================================================= */
         <div className="space-y-8">
+          {/* Active Trial Period Banner */}
+          <TrialBanner />
+
           {/* 1. Personalized Corporate Hero Banner */}
           <HeroBanner />
 

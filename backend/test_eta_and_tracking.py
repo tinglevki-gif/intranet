@@ -51,7 +51,8 @@ def test_share_eta_simulation():
     print(f"Simulated ETA Calculation Result: {result['estimated_arrival_time']}, Restdistanz: {result['distance_remaining_km']} km, Restdauer: {result['duration_remaining_minutes']} min")
 
 def test_db_persistence_and_public_endpoint():
-    from app.core.database import SessionLocal
+    from app.core.database import SessionLocal, engine, Base
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         token = "test-live-montage-2026"

@@ -1103,6 +1103,20 @@ class ApiService {
     });
   }
 
+  // Trial Edition License Status
+  async getTrialStatus() {
+    // If inside Electron with desktop wrapper bridge
+    if (typeof window !== 'undefined' && window.licenseApi && window.licenseApi.getTrialStatus) {
+      try {
+        const desktopStatus = await window.licenseApi.getTrialStatus();
+        if (desktopStatus) return desktopStatus;
+      } catch (e) {
+        console.warn('Error fetching trial status from desktop bridge, falling back to API:', e);
+      }
+    }
+    return this.request('/license/status');
+  }
+
   // Legacy/Simple Users
   getUsers(query = '', department = '') {
     const params = new URLSearchParams();
@@ -1114,4 +1128,5 @@ class ApiService {
 }
 
 export const api = new ApiService();
+
 

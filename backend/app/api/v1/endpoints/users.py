@@ -1,6 +1,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User, RoleEnum
 from app.schemas.user import UserResponse, UserDirectoryResponse, OrgChartNodeResponse, UserCreate
@@ -18,6 +19,9 @@ def get_phone_directory(
     current_user: User = Depends(get_current_user)
 ):
     """Enriched phone directory of all corporate employees with search and filters."""
+    if getattr(settings, "IS_TRIAL_BUILD", False):
+        return []
+
     q = db.query(User).filter(User.is_active == True)
     
     if department and department != "ALL" and department != "Todos":
@@ -72,6 +76,9 @@ def get_organization_chart(
     current_user: User = Depends(get_current_user)
 ):
     """Returns the hierarchical tree structure for the interactive corporate Org-Chart."""
+    if getattr(settings, "IS_TRIAL_BUILD", False):
+        return []
+
     all_users = db.query(User).filter(User.is_active == True).all()
     
     # Build lookup map
@@ -119,6 +126,9 @@ def list_directory(
     current_user: User = Depends(get_current_user)
 ):
     """Legacy/Simple directory list."""
+    if getattr(settings, "IS_TRIAL_BUILD", False):
+        return []
+
     q = db.query(User).filter(User.is_active == True)
     if department and department != "Todos" and department != "ALL":
         q = q.filter(User.department == department)

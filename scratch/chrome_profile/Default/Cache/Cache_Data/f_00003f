@@ -1,0 +1,581 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/admin/BrandingManagementCard.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const Fragment = __vite__cjsImport0_react_jsxDevRuntime["Fragment"]; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"]; const useRef = __vite__cjsImport3_react["useRef"];
+import { useBranding } from "/src/context/BrandingContext.jsx";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+import { TinglevLogo } from "/src/components/common/TinglevLogo.jsx";
+import {
+  Building2,
+  Upload,
+  RotateCcw,
+  Save,
+  CheckCircle,
+  Sparkles,
+  Image as ImageIcon,
+  AlertCircle
+} from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+export function BrandingManagementCard() {
+  _s();
+  const {
+    companyName,
+    companySuffix,
+    companyTagline,
+    companyLogoUrl,
+    updateBranding,
+    uploadLogo,
+    resetBranding
+  } = useBranding();
+  const { t } = useLanguage();
+  const [formName, setFormName] = useState(companyName || "TINGLEV");
+  const [formSuffix, setFormSuffix] = useState(companySuffix || "ELEMENTFABRIK");
+  const [formTagline, setFormTagline] = useState(companyTagline || "PORTAL INTRANET");
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const fileInputRef = useRef(null);
+  useEffect(() => {
+    setFormName(companyName || "TINGLEV");
+    setFormSuffix(companySuffix || "ELEMENTFABRIK");
+    setFormTagline(companyTagline || "PORTAL INTRANET");
+  }, [companyName, companySuffix, companyTagline]);
+  const handleSaveText = async (e) => {
+    e.preventDefault();
+    if (!formName.trim()) {
+      setErrorMsg("Der Firmenname darf nicht leer sein.");
+      return;
+    }
+    setSaving(true);
+    setErrorMsg("");
+    try {
+      await updateBranding(formName.trim(), formSuffix.trim(), formTagline.trim());
+      setSuccessMsg("Branding-Texte erfolgreich aktualisiert!");
+      setTimeout(() => setSuccessMsg(""), 3500);
+    } catch (err) {
+      setErrorMsg(err.message || "Fehler beim Speichern des Brandings.");
+    } finally {
+      setSaving(false);
+    }
+  };
+  const handleLogoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setErrorMsg("");
+    try {
+      await uploadLogo(file);
+      setSuccessMsg("Firmenlogo erfolgreich hochgeladen und angewendet!");
+      setTimeout(() => setSuccessMsg(""), 3500);
+    } catch (err) {
+      setErrorMsg(err.message || "Fehler beim Hochladen des Logos.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+  const handleReset = async () => {
+    if (!window.confirm("Möchten Sie das Branding und das Logo wirklich auf die Standardwerte von Tinglev Elementfabrik zurücksetzen?")) {
+      return;
+    }
+    setSaving(true);
+    setErrorMsg("");
+    try {
+      await resetBranding();
+      setSuccessMsg("Branding erfolgreich auf Standard zurückgesetzt!");
+      setTimeout(() => setSuccessMsg(""), 3500);
+    } catch (err) {
+      setErrorMsg(err.message || "Fehler beim Zurücksetzen des Brandings.");
+    } finally {
+      setSaving(false);
+    }
+  };
+  return /* @__PURE__ */ jsxDEV("div", { className: "bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-3", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center", children: /* @__PURE__ */ jsxDEV(Building2, { className: "w-5 h-5" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 127,
+          columnNumber: 13
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 126,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDEV("h2", { className: "text-base font-bold text-slate-900", children: "Unternehmens-Branding & Firmenlogo" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 130,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-500", children: "Passen Sie den Firmennamen, Zusatz, Untertitel und das Logo global für die gesamte Intranet-Plattform an." }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 133,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 129,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 125,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          type: "button",
+          onClick: handleReset,
+          disabled: saving || uploading,
+          className: "inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold transition-colors disabled:opacity-50",
+          children: [
+            /* @__PURE__ */ jsxDEV(RotateCcw, { className: "w-3.5 h-3.5" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 145,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { children: "Auf Standard zurücksetzen" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 146,
+              columnNumber: 11
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 139,
+          columnNumber: 9
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+      lineNumber: 124,
+      columnNumber: 7
+    }, this),
+    successMsg && /* @__PURE__ */ jsxDEV("div", { className: "p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center space-x-2 animate-fade-in", children: [
+      /* @__PURE__ */ jsxDEV(CheckCircle, { className: "w-4 h-4 text-emerald-600 shrink-0" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 153,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("span", { children: successMsg }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 154,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+      lineNumber: 152,
+      columnNumber: 7
+    }, this),
+    errorMsg && /* @__PURE__ */ jsxDEV("div", { className: "p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center space-x-2 animate-fade-in", children: [
+      /* @__PURE__ */ jsxDEV(AlertCircle, { className: "w-4 h-4 text-rose-600 shrink-0" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 160,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("span", { children: errorMsg }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 161,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+      lineNumber: 159,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-8 items-start", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "lg:col-span-7 space-y-6", children: [
+        /* @__PURE__ */ jsxDEV("form", { onSubmit: handleSaveText, className: "space-y-4", children: [
+          /* @__PURE__ */ jsxDEV("div", { children: [
+            /* @__PURE__ */ jsxDEV("label", { className: "block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5", children: "Firmenname (Hauptmarke)" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 170,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV(
+              "input",
+              {
+                type: "text",
+                value: formName,
+                onChange: (e) => setFormName(e.target.value),
+                placeholder: "z. B. TINGLEV",
+                className: "w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500",
+                required: true
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 173,
+                columnNumber: 15
+              },
+              this
+            )
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 169,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-4", children: [
+            /* @__PURE__ */ jsxDEV("div", { children: [
+              /* @__PURE__ */ jsxDEV("label", { className: "block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5", children: "Zusatz / Suffix" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 185,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV(
+                "input",
+                {
+                  type: "text",
+                  value: formSuffix,
+                  onChange: (e) => setFormSuffix(e.target.value),
+                  placeholder: "z. B. ELEMENTFABRIK",
+                  className: "w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                  lineNumber: 188,
+                  columnNumber: 17
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 184,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { children: [
+              /* @__PURE__ */ jsxDEV("label", { className: "block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5", children: "Untertitel / Tagline" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 198,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV(
+                "input",
+                {
+                  type: "text",
+                  value: formTagline,
+                  onChange: (e) => setFormTagline(e.target.value),
+                  placeholder: "z. B. PORTAL INTRANET",
+                  className: "w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-900 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                },
+                void 0,
+                false,
+                {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                  lineNumber: 201,
+                  columnNumber: 17
+                },
+                this
+              )
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 197,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 183,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              type: "submit",
+              disabled: saving,
+              className: "inline-flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-bold shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50",
+              children: [
+                /* @__PURE__ */ jsxDEV(Save, { className: "w-4 h-4" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                  lineNumber: 216,
+                  columnNumber: 15
+                }, this),
+                /* @__PURE__ */ jsxDEV("span", { children: saving ? "Wird gespeichert..." : "Branding-Texte speichern" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                  lineNumber: 217,
+                  columnNumber: 15
+                }, this)
+              ]
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 211,
+              columnNumber: 13
+            },
+            this
+          )
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 168,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "pt-5 border-t border-slate-100 space-y-3", children: [
+          /* @__PURE__ */ jsxDEV("label", { className: "block text-xs font-bold text-slate-700 uppercase tracking-wider", children: "Eigenes Firmenlogo hochladen" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 223,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-400", children: "Unterstützte Formate: PNG, JPG, SVG, WEBP (Empfohlen: quadratisch oder transparentes PNG/SVG)." }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 226,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-4", children: [
+            /* @__PURE__ */ jsxDEV(
+              "input",
+              {
+                ref: fileInputRef,
+                type: "file",
+                accept: ".png,.jpg,.jpeg,.svg,.webp,.gif",
+                onChange: handleLogoChange,
+                className: "hidden"
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 231,
+                columnNumber: 15
+              },
+              this
+            ),
+            /* @__PURE__ */ jsxDEV(
+              "button",
+              {
+                type: "button",
+                onClick: () => fileInputRef.current?.click(),
+                disabled: uploading,
+                className: "inline-flex items-center space-x-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-semibold transition-all shadow-xs disabled:opacity-50",
+                children: uploading ? /* @__PURE__ */ jsxDEV(Fragment, { children: [
+                  /* @__PURE__ */ jsxDEV("div", { className: "w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                    lineNumber: 247,
+                    columnNumber: 21
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("span", { children: "Wird hochgeladen..." }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                    lineNumber: 248,
+                    columnNumber: 21
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                  lineNumber: 246,
+                  columnNumber: 17
+                }, this) : /* @__PURE__ */ jsxDEV(Fragment, { children: [
+                  /* @__PURE__ */ jsxDEV(Upload, { className: "w-4 h-4" }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                    lineNumber: 252,
+                    columnNumber: 21
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("span", { children: "Logo auswählen & hochladen" }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                    lineNumber: 253,
+                    columnNumber: 21
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                  lineNumber: 251,
+                  columnNumber: 17
+                }, this)
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 239,
+                columnNumber: 15
+              },
+              this
+            ),
+            companyLogoUrl && /* @__PURE__ */ jsxDEV("span", { className: "text-xs text-emerald-600 font-semibold flex items-center space-x-1", children: [
+              /* @__PURE__ */ jsxDEV(CheckCircle, { className: "w-3.5 h-3.5" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 260,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { children: "Eigenes Logo aktiv" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+                lineNumber: 261,
+                columnNumber: 19
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 259,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 230,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 222,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 167,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "lg:col-span-5 space-y-3", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5 text-xs font-bold text-slate-700 uppercase tracking-wider", children: [
+          /* @__PURE__ */ jsxDEV(Sparkles, { className: "w-4 h-4 text-amber-500" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 271,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { children: "Echtzeit-Vorschau (Seitenleiste)" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 272,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 270,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "bg-[#001E36] rounded-3xl p-5 border border-[#002B49] shadow-xl space-y-4", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "pb-3 border-b border-[#002B49]/80 bg-[#001424]/60 -mx-5 -mt-5 p-5 rounded-t-3xl", children: /* @__PURE__ */ jsxDEV(
+            TinglevLogo,
+            {
+              variant: "full",
+              theme: "light-text",
+              showSubtitle: true,
+              customName: formName || "TINGLEV",
+              customSuffix: formSuffix,
+              customTagline: formTagline,
+              customLogoUrl: companyLogoUrl
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 278,
+              columnNumber: 15
+            },
+            this
+          ) }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 277,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "space-y-2 opacity-50 pointer-events-none", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "h-3 bg-[#002B49] rounded-md w-1/3" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 290,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "h-8 bg-[#002B49]/60 rounded-xl" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 291,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "h-8 bg-[#002B49]/60 rounded-xl" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 292,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 289,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 276,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-50 rounded-2xl p-4 border border-slate-200/80 shadow-xs flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[11px] font-bold text-slate-500", children: "Helle Ansicht:" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+            lineNumber: 298,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV(
+            TinglevLogo,
+            {
+              variant: "full",
+              theme: "dark-text",
+              showSubtitle: false,
+              customName: formName || "TINGLEV",
+              customSuffix: formSuffix,
+              customLogoUrl: companyLogoUrl
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+              lineNumber: 299,
+              columnNumber: 13
+            },
+            this
+          )
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+          lineNumber: 297,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+        lineNumber: 269,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+      lineNumber: 165,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx",
+    lineNumber: 122,
+    columnNumber: 5
+  }, this);
+}
+_s(BrandingManagementCard, "5DsHbC1z+LLYZV0yGLhtiFl4gGc=", false, function() {
+  return [useBranding, useLanguage];
+});
+_c = BrandingManagementCard;
+export default BrandingManagementCard;
+var _c;
+$RefreshReg$(_c, "BrandingManagementCard");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/admin/BrandingManagementCard.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJtYXBwaW5ncyI6IkFBMkdZLFNBdUhNLFVBdkhOOzs7Ozs7Ozs7Ozs7Ozs7OztBQTNHWixPQUFPQSxTQUFTQyxVQUFVQyxXQUFXQyxjQUFjO0FBQ25ELFNBQVNDLG1CQUFtQjtBQUM1QixTQUFTQyxtQkFBbUI7QUFDNUIsU0FBU0MsbUJBQW1CO0FBQzVCO0FBQUEsRUFDRUM7QUFBQUEsRUFDQUM7QUFBQUEsRUFDQUM7QUFBQUEsRUFDQUM7QUFBQUEsRUFDQUM7QUFBQUEsRUFDQUM7QUFBQUEsRUFDQUMsU0FBU0M7QUFBQUEsRUFDVEM7QUFBQUEsT0FDSztBQUVBLGdCQUFTQyx5QkFBeUI7QUFBQUMsS0FBQTtBQUN2QyxRQUFNO0FBQUEsSUFDSkM7QUFBQUEsSUFDQUM7QUFBQUEsSUFDQUM7QUFBQUEsSUFDQUM7QUFBQUEsSUFDQUM7QUFBQUEsSUFDQUM7QUFBQUEsSUFDQUM7QUFBQUEsRUFDRixJQUFJcEIsWUFBWTtBQUVoQixRQUFNLEVBQUVxQixFQUFFLElBQUlwQixZQUFZO0FBRTFCLFFBQU0sQ0FBQ3FCLFVBQVVDLFdBQVcsSUFBSTFCLFNBQVNpQixlQUFlLFNBQVM7QUFDakUsUUFBTSxDQUFDVSxZQUFZQyxhQUFhLElBQUk1QixTQUFTa0IsaUJBQWlCLGVBQWU7QUFDN0UsUUFBTSxDQUFDVyxhQUFhQyxjQUFjLElBQUk5QixTQUFTbUIsa0JBQWtCLGlCQUFpQjtBQUVsRixRQUFNLENBQUNZLFFBQVFDLFNBQVMsSUFBSWhDLFNBQVMsS0FBSztBQUMxQyxRQUFNLENBQUNpQyxXQUFXQyxZQUFZLElBQUlsQyxTQUFTLEtBQUs7QUFDaEQsUUFBTSxDQUFDbUMsWUFBWUMsYUFBYSxJQUFJcEMsU0FBUyxFQUFFO0FBQy9DLFFBQU0sQ0FBQ3FDLFVBQVVDLFdBQVcsSUFBSXRDLFNBQVMsRUFBRTtBQUUzQyxRQUFNdUMsZUFBZXJDLE9BQU8sSUFBSTtBQUVoQ0QsWUFBVSxNQUFNO0FBQ2R5QixnQkFBWVQsZUFBZSxTQUFTO0FBQ3BDVyxrQkFBY1YsaUJBQWlCLGVBQWU7QUFDOUNZLG1CQUFlWCxrQkFBa0IsaUJBQWlCO0FBQUEsRUFDcEQsR0FBRyxDQUFDRixhQUFhQyxlQUFlQyxjQUFjLENBQUM7QUFFL0MsUUFBTXFCLGlCQUFpQixPQUFPQyxNQUFNO0FBQ2xDQSxNQUFFQyxlQUFlO0FBQ2pCLFFBQUksQ0FBQ2pCLFNBQVNrQixLQUFLLEdBQUc7QUFDcEJMLGtCQUFZLHNDQUFzQztBQUNsRDtBQUFBLElBQ0Y7QUFFQU4sY0FBVSxJQUFJO0FBQ2RNLGdCQUFZLEVBQUU7QUFDZCxRQUFJO0FBQ0YsWUFBTWpCLGVBQWVJLFNBQVNrQixLQUFLLEdBQUdoQixXQUFXZ0IsS0FBSyxHQUFHZCxZQUFZYyxLQUFLLENBQUM7QUFDM0VQLG9CQUFjLDBDQUEwQztBQUN4RFEsaUJBQVcsTUFBTVIsY0FBYyxFQUFFLEdBQUcsSUFBSTtBQUFBLElBQzFDLFNBQVNTLEtBQUs7QUFDWlAsa0JBQVlPLElBQUlDLFdBQVcsc0NBQXNDO0FBQUEsSUFDbkUsVUFBQztBQUNDZCxnQkFBVSxLQUFLO0FBQUEsSUFDakI7QUFBQSxFQUNGO0FBRUEsUUFBTWUsbUJBQW1CLE9BQU9OLE1BQU07QUFDcEMsVUFBTU8sT0FBT1AsRUFBRVEsT0FBT0MsUUFBUSxDQUFDO0FBQy9CLFFBQUksQ0FBQ0YsS0FBTTtBQUVYZCxpQkFBYSxJQUFJO0FBQ2pCSSxnQkFBWSxFQUFFO0FBQ2QsUUFBSTtBQUNGLFlBQU1oQixXQUFXMEIsSUFBSTtBQUNyQlosb0JBQWMsb0RBQW9EO0FBQ2xFUSxpQkFBVyxNQUFNUixjQUFjLEVBQUUsR0FBRyxJQUFJO0FBQUEsSUFDMUMsU0FBU1MsS0FBSztBQUNaUCxrQkFBWU8sSUFBSUMsV0FBVyxrQ0FBa0M7QUFBQSxJQUMvRCxVQUFDO0FBQ0NaLG1CQUFhLEtBQUs7QUFDbEIsVUFBSUssYUFBYVksUUFBU1osY0FBYVksUUFBUUMsUUFBUTtBQUFBLElBQ3pEO0FBQUEsRUFDRjtBQUVBLFFBQU1DLGNBQWMsWUFBWTtBQUM5QixRQUFJLENBQUNDLE9BQU9DLFFBQVEsOEdBQThHLEdBQUc7QUFDbkk7QUFBQSxJQUNGO0FBRUF2QixjQUFVLElBQUk7QUFDZE0sZ0JBQVksRUFBRTtBQUNkLFFBQUk7QUFDRixZQUFNZixjQUFjO0FBQ3BCYSxvQkFBYyxrREFBa0Q7QUFDaEVRLGlCQUFXLE1BQU1SLGNBQWMsRUFBRSxHQUFHLElBQUk7QUFBQSxJQUMxQyxTQUFTUyxLQUFLO0FBQ1pQLGtCQUFZTyxJQUFJQyxXQUFXLHlDQUF5QztBQUFBLElBQ3RFLFVBQUM7QUFDQ2QsZ0JBQVUsS0FBSztBQUFBLElBQ2pCO0FBQUEsRUFDRjtBQUVBLFNBQ0UsdUJBQUMsU0FBSSxXQUFVLGlGQUViO0FBQUEsMkJBQUMsU0FBSSxXQUFVLG9GQUNiO0FBQUEsNkJBQUMsU0FBSSxXQUFVLCtCQUNiO0FBQUEsK0JBQUMsU0FBSSxXQUFVLHNGQUNiLGlDQUFDLGFBQVUsV0FBVSxhQUFyQjtBQUFBO0FBQUE7QUFBQTtBQUFBLGVBQThCLEtBRGhDO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFFQTtBQUFBLFFBQ0EsdUJBQUMsU0FDQztBQUFBLGlDQUFDLFFBQUcsV0FBVSxzQ0FBb0Msa0RBQWxEO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBRUE7QUFBQSxVQUNBLHVCQUFDLE9BQUUsV0FBVSwwQkFBd0IseUhBQXJDO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBRUE7QUFBQSxhQU5GO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFPQTtBQUFBLFdBWEY7QUFBQTtBQUFBO0FBQUE7QUFBQSxhQVlBO0FBQUEsTUFFQTtBQUFBLFFBQUM7QUFBQTtBQUFBLFVBQ0MsTUFBSztBQUFBLFVBQ0wsU0FBU3FCO0FBQUFBLFVBQ1QsVUFBVXRCLFVBQVVFO0FBQUFBLFVBQ3BCLFdBQVU7QUFBQSxVQUVWO0FBQUEsbUNBQUMsYUFBVSxXQUFVLGlCQUFyQjtBQUFBO0FBQUE7QUFBQTtBQUFBLG1CQUFrQztBQUFBLFlBQ2xDLHVCQUFDLFVBQUsseUNBQU47QUFBQTtBQUFBO0FBQUE7QUFBQSxtQkFBK0I7QUFBQTtBQUFBO0FBQUEsUUFQakM7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLE1BUUE7QUFBQSxTQXZCRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBd0JBO0FBQUEsSUFHQ0UsY0FDQyx1QkFBQyxTQUFJLFdBQVUsZ0pBQ2I7QUFBQSw2QkFBQyxlQUFZLFdBQVUsdUNBQXZCO0FBQUE7QUFBQTtBQUFBO0FBQUEsYUFBMEQ7QUFBQSxNQUMxRCx1QkFBQyxVQUFNQSx3QkFBUDtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBQWtCO0FBQUEsU0FGcEI7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQUdBO0FBQUEsSUFHREUsWUFDQyx1QkFBQyxTQUFJLFdBQVUsdUlBQ2I7QUFBQSw2QkFBQyxlQUFZLFdBQVUsb0NBQXZCO0FBQUE7QUFBQTtBQUFBO0FBQUEsYUFBdUQ7QUFBQSxNQUN2RCx1QkFBQyxVQUFNQSxzQkFBUDtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBQWdCO0FBQUEsU0FGbEI7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQUdBO0FBQUEsSUFHRix1QkFBQyxTQUFJLFdBQVUsc0RBRWI7QUFBQSw2QkFBQyxTQUFJLFdBQVUsMkJBQ2I7QUFBQSwrQkFBQyxVQUFLLFVBQVVHLGdCQUFnQixXQUFVLGFBQ3hDO0FBQUEsaUNBQUMsU0FDQztBQUFBLG1DQUFDLFdBQU0sV0FBVSwwRUFBd0UsdUNBQXpGO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBRUE7QUFBQSxZQUNBO0FBQUEsY0FBQztBQUFBO0FBQUEsZ0JBQ0MsTUFBSztBQUFBLGdCQUNMLE9BQU9mO0FBQUFBLGdCQUNQLFVBQVUsQ0FBQ2dCLE1BQU1mLFlBQVllLEVBQUVRLE9BQU9HLEtBQUs7QUFBQSxnQkFDM0MsYUFBWTtBQUFBLGdCQUNaLFdBQVU7QUFBQSxnQkFDVixVQUFRO0FBQUE7QUFBQSxjQU5WO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxZQU1VO0FBQUEsZUFWWjtBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQVlBO0FBQUEsVUFFQSx1QkFBQyxTQUFJLFdBQVUseUNBQ2I7QUFBQSxtQ0FBQyxTQUNDO0FBQUEscUNBQUMsV0FBTSxXQUFVLDBFQUF3RSwrQkFBekY7QUFBQTtBQUFBO0FBQUE7QUFBQSxxQkFFQTtBQUFBLGNBQ0E7QUFBQSxnQkFBQztBQUFBO0FBQUEsa0JBQ0MsTUFBSztBQUFBLGtCQUNMLE9BQU96QjtBQUFBQSxrQkFDUCxVQUFVLENBQUNjLE1BQU1iLGNBQWNhLEVBQUVRLE9BQU9HLEtBQUs7QUFBQSxrQkFDN0MsYUFBWTtBQUFBLGtCQUNaLFdBQVU7QUFBQTtBQUFBLGdCQUxaO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxjQUswTDtBQUFBLGlCQVQ1TDtBQUFBO0FBQUE7QUFBQTtBQUFBLG1CQVdBO0FBQUEsWUFFQSx1QkFBQyxTQUNDO0FBQUEscUNBQUMsV0FBTSxXQUFVLDBFQUF3RSxvQ0FBekY7QUFBQTtBQUFBO0FBQUE7QUFBQSxxQkFFQTtBQUFBLGNBQ0E7QUFBQSxnQkFBQztBQUFBO0FBQUEsa0JBQ0MsTUFBSztBQUFBLGtCQUNMLE9BQU92QjtBQUFBQSxrQkFDUCxVQUFVLENBQUNZLE1BQU1YLGVBQWVXLEVBQUVRLE9BQU9HLEtBQUs7QUFBQSxrQkFDOUMsYUFBWTtBQUFBLGtCQUNaLFdBQVU7QUFBQTtBQUFBLGdCQUxaO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxjQUswTDtBQUFBLGlCQVQ1TDtBQUFBO0FBQUE7QUFBQTtBQUFBLG1CQVdBO0FBQUEsZUF6QkY7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkEwQkE7QUFBQSxVQUVBO0FBQUEsWUFBQztBQUFBO0FBQUEsY0FDQyxNQUFLO0FBQUEsY0FDTCxVQUFVckI7QUFBQUEsY0FDVixXQUFVO0FBQUEsY0FFVjtBQUFBLHVDQUFDLFFBQUssV0FBVSxhQUFoQjtBQUFBO0FBQUE7QUFBQTtBQUFBLHVCQUF5QjtBQUFBLGdCQUN6Qix1QkFBQyxVQUFNQSxtQkFBUyx3QkFBd0IsOEJBQXhDO0FBQUE7QUFBQTtBQUFBO0FBQUEsdUJBQW1FO0FBQUE7QUFBQTtBQUFBLFlBTnJFO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxVQU9BO0FBQUEsYUFsREY7QUFBQTtBQUFBO0FBQUE7QUFBQSxlQW1EQTtBQUFBLFFBR0EsdUJBQUMsU0FBSSxXQUFVLDRDQUNiO0FBQUEsaUNBQUMsV0FBTSxXQUFVLG1FQUFpRSw0Q0FBbEY7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFFQTtBQUFBLFVBQ0EsdUJBQUMsT0FBRSxXQUFVLDBCQUF3Qiw4R0FBckM7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFFQTtBQUFBLFVBRUEsdUJBQUMsU0FBSSxXQUFVLCtCQUNiO0FBQUE7QUFBQSxjQUFDO0FBQUE7QUFBQSxnQkFDQyxLQUFLUTtBQUFBQSxnQkFDTCxNQUFLO0FBQUEsZ0JBQ0wsUUFBTztBQUFBLGdCQUNQLFVBQVVRO0FBQUFBLGdCQUNWLFdBQVU7QUFBQTtBQUFBLGNBTFo7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLFlBS29CO0FBQUEsWUFHcEI7QUFBQSxjQUFDO0FBQUE7QUFBQSxnQkFDQyxNQUFLO0FBQUEsZ0JBQ0wsU0FBUyxNQUFNUixhQUFhWSxTQUFTSyxNQUFNO0FBQUEsZ0JBQzNDLFVBQVV2QjtBQUFBQSxnQkFDVixXQUFVO0FBQUEsZ0JBRVRBLHNCQUNDLG1DQUNFO0FBQUEseUNBQUMsU0FBSSxXQUFVLGtGQUFmO0FBQUE7QUFBQTtBQUFBO0FBQUEseUJBQThGO0FBQUEsa0JBQzlGLHVCQUFDLFVBQUssbUNBQU47QUFBQTtBQUFBO0FBQUE7QUFBQSx5QkFBeUI7QUFBQSxxQkFGM0I7QUFBQTtBQUFBO0FBQUE7QUFBQSx1QkFHQSxJQUVBLG1DQUNFO0FBQUEseUNBQUMsVUFBTyxXQUFVLGFBQWxCO0FBQUE7QUFBQTtBQUFBO0FBQUEseUJBQTJCO0FBQUEsa0JBQzNCLHVCQUFDLFVBQUssMENBQU47QUFBQTtBQUFBO0FBQUE7QUFBQSx5QkFBZ0M7QUFBQSxxQkFGbEM7QUFBQTtBQUFBO0FBQUE7QUFBQSx1QkFHQTtBQUFBO0FBQUEsY0FmSjtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsWUFpQkE7QUFBQSxZQUVDYixrQkFDQyx1QkFBQyxVQUFLLFdBQVUsc0VBQ2Q7QUFBQSxxQ0FBQyxlQUFZLFdBQVUsaUJBQXZCO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBQW9DO0FBQUEsY0FDcEMsdUJBQUMsVUFBSyxrQ0FBTjtBQUFBO0FBQUE7QUFBQTtBQUFBLHFCQUF3QjtBQUFBLGlCQUYxQjtBQUFBO0FBQUE7QUFBQTtBQUFBLG1CQUdBO0FBQUEsZUFoQ0o7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFrQ0E7QUFBQSxhQTFDRjtBQUFBO0FBQUE7QUFBQTtBQUFBLGVBMkNBO0FBQUEsV0FsR0Y7QUFBQTtBQUFBO0FBQUE7QUFBQSxhQW1HQTtBQUFBLE1BR0EsdUJBQUMsU0FBSSxXQUFVLDJCQUNiO0FBQUEsK0JBQUMsU0FBSSxXQUFVLDJGQUNiO0FBQUEsaUNBQUMsWUFBUyxXQUFVLDRCQUFwQjtBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQUE0QztBQUFBLFVBQzVDLHVCQUFDLFVBQUssZ0RBQU47QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFBc0M7QUFBQSxhQUZ4QztBQUFBO0FBQUE7QUFBQTtBQUFBLGVBR0E7QUFBQSxRQUdBLHVCQUFDLFNBQUksV0FBVSw0RUFDYjtBQUFBLGlDQUFDLFNBQUksV0FBVSxtRkFDYjtBQUFBLFlBQUM7QUFBQTtBQUFBLGNBQ0MsU0FBUTtBQUFBLGNBQ1IsT0FBTTtBQUFBLGNBQ04sY0FBYztBQUFBLGNBQ2QsWUFBWUssWUFBWTtBQUFBLGNBQ3hCLGNBQWNFO0FBQUFBLGNBQ2QsZUFBZUU7QUFBQUEsY0FDZixlQUFlVDtBQUFBQTtBQUFBQSxZQVBqQjtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUEsVUFPZ0MsS0FSbEM7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFVQTtBQUFBLFVBRUEsdUJBQUMsU0FBSSxXQUFVLDRDQUNiO0FBQUEsbUNBQUMsU0FBSSxXQUFVLHVDQUFmO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBQW1EO0FBQUEsWUFDbkQsdUJBQUMsU0FBSSxXQUFVLG9DQUFmO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBQWdEO0FBQUEsWUFDaEQsdUJBQUMsU0FBSSxXQUFVLG9DQUFmO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBQWdEO0FBQUEsZUFIbEQ7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFJQTtBQUFBLGFBakJGO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFrQkE7QUFBQSxRQUdBLHVCQUFDLFNBQUksV0FBVSxzR0FDYjtBQUFBLGlDQUFDLFVBQUssV0FBVSx3Q0FBdUMsOEJBQXZEO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBQXFFO0FBQUEsVUFDckU7QUFBQSxZQUFDO0FBQUE7QUFBQSxjQUNDLFNBQVE7QUFBQSxjQUNSLE9BQU07QUFBQSxjQUNOLGNBQWM7QUFBQSxjQUNkLFlBQVlLLFlBQVk7QUFBQSxjQUN4QixjQUFjRTtBQUFBQSxjQUNkLGVBQWVQO0FBQUFBO0FBQUFBLFlBTmpCO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxVQU1nQztBQUFBLGFBUmxDO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFVQTtBQUFBLFdBdENGO0FBQUE7QUFBQTtBQUFBO0FBQUEsYUF1Q0E7QUFBQSxTQS9JRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBZ0pBO0FBQUEsT0EzTEY7QUFBQTtBQUFBO0FBQUE7QUFBQSxTQTRMQTtBQUVKO0FBQUNKLEdBclJlRCx3QkFBc0I7QUFBQSxVQVNoQ1osYUFFVUMsV0FBVztBQUFBO0FBQUEsS0FYWFc7QUF1UmhCLGVBQWVBO0FBQXVCLElBQUEwQztBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlRWZmZWN0IiwidXNlUmVmIiwidXNlQnJhbmRpbmciLCJ1c2VMYW5ndWFnZSIsIlRpbmdsZXZMb2dvIiwiQnVpbGRpbmcyIiwiVXBsb2FkIiwiUm90YXRlQ2N3IiwiU2F2ZSIsIkNoZWNrQ2lyY2xlIiwiU3BhcmtsZXMiLCJJbWFnZSIsIkltYWdlSWNvbiIsIkFsZXJ0Q2lyY2xlIiwiQnJhbmRpbmdNYW5hZ2VtZW50Q2FyZCIsIl9zIiwiY29tcGFueU5hbWUiLCJjb21wYW55U3VmZml4IiwiY29tcGFueVRhZ2xpbmUiLCJjb21wYW55TG9nb1VybCIsInVwZGF0ZUJyYW5kaW5nIiwidXBsb2FkTG9nbyIsInJlc2V0QnJhbmRpbmciLCJ0IiwiZm9ybU5hbWUiLCJzZXRGb3JtTmFtZSIsImZvcm1TdWZmaXgiLCJzZXRGb3JtU3VmZml4IiwiZm9ybVRhZ2xpbmUiLCJzZXRGb3JtVGFnbGluZSIsInNhdmluZyIsInNldFNhdmluZyIsInVwbG9hZGluZyIsInNldFVwbG9hZGluZyIsInN1Y2Nlc3NNc2ciLCJzZXRTdWNjZXNzTXNnIiwiZXJyb3JNc2ciLCJzZXRFcnJvck1zZyIsImZpbGVJbnB1dFJlZiIsImhhbmRsZVNhdmVUZXh0IiwiZSIsInByZXZlbnREZWZhdWx0IiwidHJpbSIsInNldFRpbWVvdXQiLCJlcnIiLCJtZXNzYWdlIiwiaGFuZGxlTG9nb0NoYW5nZSIsImZpbGUiLCJ0YXJnZXQiLCJmaWxlcyIsImN1cnJlbnQiLCJ2YWx1ZSIsImhhbmRsZVJlc2V0Iiwid2luZG93IiwiY29uZmlybSIsImNsaWNrIiwiX2MiXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiQnJhbmRpbmdNYW5hZ2VtZW50Q2FyZC5qc3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0LCB7IHVzZVN0YXRlLCB1c2VFZmZlY3QsIHVzZVJlZiB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IHVzZUJyYW5kaW5nIH0gZnJvbSAnLi4vLi4vY29udGV4dC9CcmFuZGluZ0NvbnRleHQnO1xuaW1wb3J0IHsgdXNlTGFuZ3VhZ2UgfSBmcm9tICcuLi8uLi9jb250ZXh0L0xhbmd1YWdlQ29udGV4dCc7XG5pbXBvcnQgeyBUaW5nbGV2TG9nbyB9IGZyb20gJy4uL2NvbW1vbi9UaW5nbGV2TG9nbyc7XG5pbXBvcnQgeyBcbiAgQnVpbGRpbmcyLCBcbiAgVXBsb2FkLCBcbiAgUm90YXRlQ2N3LCBcbiAgU2F2ZSwgXG4gIENoZWNrQ2lyY2xlLCBcbiAgU3BhcmtsZXMsIFxuICBJbWFnZSBhcyBJbWFnZUljb24sXG4gIEFsZXJ0Q2lyY2xlXG59IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5cbmV4cG9ydCBmdW5jdGlvbiBCcmFuZGluZ01hbmFnZW1lbnRDYXJkKCkge1xuICBjb25zdCB7IFxuICAgIGNvbXBhbnlOYW1lLCBcbiAgICBjb21wYW55U3VmZml4LCBcbiAgICBjb21wYW55VGFnbGluZSwgXG4gICAgY29tcGFueUxvZ29VcmwsIFxuICAgIHVwZGF0ZUJyYW5kaW5nLCBcbiAgICB1cGxvYWRMb2dvLCBcbiAgICByZXNldEJyYW5kaW5nIFxuICB9ID0gdXNlQnJhbmRpbmcoKTtcbiAgXG4gIGNvbnN0IHsgdCB9ID0gdXNlTGFuZ3VhZ2UoKTtcblxuICBjb25zdCBbZm9ybU5hbWUsIHNldEZvcm1OYW1lXSA9IHVzZVN0YXRlKGNvbXBhbnlOYW1lIHx8ICdUSU5HTEVWJyk7XG4gIGNvbnN0IFtmb3JtU3VmZml4LCBzZXRGb3JtU3VmZml4XSA9IHVzZVN0YXRlKGNvbXBhbnlTdWZmaXggfHwgJ0VMRU1FTlRGQUJSSUsnKTtcbiAgY29uc3QgW2Zvcm1UYWdsaW5lLCBzZXRGb3JtVGFnbGluZV0gPSB1c2VTdGF0ZShjb21wYW55VGFnbGluZSB8fCAnUE9SVEFMIElOVFJBTkVUJyk7XG5cbiAgY29uc3QgW3NhdmluZywgc2V0U2F2aW5nXSA9IHVzZVN0YXRlKGZhbHNlKTtcbiAgY29uc3QgW3VwbG9hZGluZywgc2V0VXBsb2FkaW5nXSA9IHVzZVN0YXRlKGZhbHNlKTtcbiAgY29uc3QgW3N1Y2Nlc3NNc2csIHNldFN1Y2Nlc3NNc2ddID0gdXNlU3RhdGUoJycpO1xuICBjb25zdCBbZXJyb3JNc2csIHNldEVycm9yTXNnXSA9IHVzZVN0YXRlKCcnKTtcblxuICBjb25zdCBmaWxlSW5wdXRSZWYgPSB1c2VSZWYobnVsbCk7XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBzZXRGb3JtTmFtZShjb21wYW55TmFtZSB8fCAnVElOR0xFVicpO1xuICAgIHNldEZvcm1TdWZmaXgoY29tcGFueVN1ZmZpeCB8fCAnRUxFTUVOVEZBQlJJSycpO1xuICAgIHNldEZvcm1UYWdsaW5lKGNvbXBhbnlUYWdsaW5lIHx8ICdQT1JUQUwgSU5UUkFORVQnKTtcbiAgfSwgW2NvbXBhbnlOYW1lLCBjb21wYW55U3VmZml4LCBjb21wYW55VGFnbGluZV0pO1xuXG4gIGNvbnN0IGhhbmRsZVNhdmVUZXh0ID0gYXN5bmMgKGUpID0+IHtcbiAgICBlLnByZXZlbnREZWZhdWx0KCk7XG4gICAgaWYgKCFmb3JtTmFtZS50cmltKCkpIHtcbiAgICAgIHNldEVycm9yTXNnKCdEZXIgRmlybWVubmFtZSBkYXJmIG5pY2h0IGxlZXIgc2Vpbi4nKTtcbiAgICAgIHJldHVybjtcbiAgICB9XG5cbiAgICBzZXRTYXZpbmcodHJ1ZSk7XG4gICAgc2V0RXJyb3JNc2coJycpO1xuICAgIHRyeSB7XG4gICAgICBhd2FpdCB1cGRhdGVCcmFuZGluZyhmb3JtTmFtZS50cmltKCksIGZvcm1TdWZmaXgudHJpbSgpLCBmb3JtVGFnbGluZS50cmltKCkpO1xuICAgICAgc2V0U3VjY2Vzc01zZygnQnJhbmRpbmctVGV4dGUgZXJmb2xncmVpY2ggYWt0dWFsaXNpZXJ0IScpO1xuICAgICAgc2V0VGltZW91dCgoKSA9PiBzZXRTdWNjZXNzTXNnKCcnKSwgMzUwMCk7XG4gICAgfSBjYXRjaCAoZXJyKSB7XG4gICAgICBzZXRFcnJvck1zZyhlcnIubWVzc2FnZSB8fCAnRmVobGVyIGJlaW0gU3BlaWNoZXJuIGRlcyBCcmFuZGluZ3MuJyk7XG4gICAgfSBmaW5hbGx5IHtcbiAgICAgIHNldFNhdmluZyhmYWxzZSk7XG4gICAgfVxuICB9O1xuXG4gIGNvbnN0IGhhbmRsZUxvZ29DaGFuZ2UgPSBhc3luYyAoZSkgPT4ge1xuICAgIGNvbnN0IGZpbGUgPSBlLnRhcmdldC5maWxlcz8uWzBdO1xuICAgIGlmICghZmlsZSkgcmV0dXJuO1xuXG4gICAgc2V0VXBsb2FkaW5nKHRydWUpO1xuICAgIHNldEVycm9yTXNnKCcnKTtcbiAgICB0cnkge1xuICAgICAgYXdhaXQgdXBsb2FkTG9nbyhmaWxlKTtcbiAgICAgIHNldFN1Y2Nlc3NNc2coJ0Zpcm1lbmxvZ28gZXJmb2xncmVpY2ggaG9jaGdlbGFkZW4gdW5kIGFuZ2V3ZW5kZXQhJyk7XG4gICAgICBzZXRUaW1lb3V0KCgpID0+IHNldFN1Y2Nlc3NNc2coJycpLCAzNTAwKTtcbiAgICB9IGNhdGNoIChlcnIpIHtcbiAgICAgIHNldEVycm9yTXNnKGVyci5tZXNzYWdlIHx8ICdGZWhsZXIgYmVpbSBIb2NobGFkZW4gZGVzIExvZ29zLicpO1xuICAgIH0gZmluYWxseSB7XG4gICAgICBzZXRVcGxvYWRpbmcoZmFsc2UpO1xuICAgICAgaWYgKGZpbGVJbnB1dFJlZi5jdXJyZW50KSBmaWxlSW5wdXRSZWYuY3VycmVudC52YWx1ZSA9ICcnO1xuICAgIH1cbiAgfTtcblxuICBjb25zdCBoYW5kbGVSZXNldCA9IGFzeW5jICgpID0+IHtcbiAgICBpZiAoIXdpbmRvdy5jb25maXJtKCdNw7ZjaHRlbiBTaWUgZGFzIEJyYW5kaW5nIHVuZCBkYXMgTG9nbyB3aXJrbGljaCBhdWYgZGllIFN0YW5kYXJkd2VydGUgdm9uIFRpbmdsZXYgRWxlbWVudGZhYnJpayB6dXLDvGNrc2V0emVuPycpKSB7XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgc2V0U2F2aW5nKHRydWUpO1xuICAgIHNldEVycm9yTXNnKCcnKTtcbiAgICB0cnkge1xuICAgICAgYXdhaXQgcmVzZXRCcmFuZGluZygpO1xuICAgICAgc2V0U3VjY2Vzc01zZygnQnJhbmRpbmcgZXJmb2xncmVpY2ggYXVmIFN0YW5kYXJkIHp1csO8Y2tnZXNldHp0IScpO1xuICAgICAgc2V0VGltZW91dCgoKSA9PiBzZXRTdWNjZXNzTXNnKCcnKSwgMzUwMCk7XG4gICAgfSBjYXRjaCAoZXJyKSB7XG4gICAgICBzZXRFcnJvck1zZyhlcnIubWVzc2FnZSB8fCAnRmVobGVyIGJlaW0gWnVyw7xja3NldHplbiBkZXMgQnJhbmRpbmdzLicpO1xuICAgIH0gZmluYWxseSB7XG4gICAgICBzZXRTYXZpbmcoZmFsc2UpO1xuICAgIH1cbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctd2hpdGUgcm91bmRlZC0zeGwgcC02IHNtOnAtOCBib3JkZXIgYm9yZGVyLXNsYXRlLTEwMCBzaGFkb3ctY2FyZCBzcGFjZS15LTZcIj5cbiAgICAgIHsvKiBIZWFkZXIgKi99XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiBwYi00IGJvcmRlci1iIGJvcmRlci1zbGF0ZS0xMDAgZmxleC13cmFwIGdhcC0zXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0zXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTEwIGgtMTAgcm91bmRlZC14bCBiZy1pbmRpZ28tNTAgdGV4dC1pbmRpZ28tNjAwIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyXCI+XG4gICAgICAgICAgICA8QnVpbGRpbmcyIGNsYXNzTmFtZT1cInctNSBoLTVcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwidGV4dC1iYXNlIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTkwMFwiPlxuICAgICAgICAgICAgICBVbnRlcm5laG1lbnMtQnJhbmRpbmcgJiBGaXJtZW5sb2dvXG4gICAgICAgICAgICA8L2gyPlxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LXNsYXRlLTUwMFwiPlxuICAgICAgICAgICAgICBQYXNzZW4gU2llIGRlbiBGaXJtZW5uYW1lbiwgWnVzYXR6LCBVbnRlcnRpdGVsIHVuZCBkYXMgTG9nbyBnbG9iYWwgZsO8ciBkaWUgZ2VzYW10ZSBJbnRyYW5ldC1QbGF0dGZvcm0gYW4uXG4gICAgICAgICAgICA8L3A+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIDxidXR0b25cbiAgICAgICAgICB0eXBlPVwiYnV0dG9uXCJcbiAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVSZXNldH1cbiAgICAgICAgICBkaXNhYmxlZD17c2F2aW5nIHx8IHVwbG9hZGluZ31cbiAgICAgICAgICBjbGFzc05hbWU9XCJpbmxpbmUtZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0xLjUgcHgtMyBweS0xLjUgcm91bmRlZC14bCBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMCB0ZXh0LXNsYXRlLTYwMCBob3ZlcjpiZy1zbGF0ZS01MCB0ZXh0LXhzIGZvbnQtc2VtaWJvbGQgdHJhbnNpdGlvbi1jb2xvcnMgZGlzYWJsZWQ6b3BhY2l0eS01MFwiXG4gICAgICAgID5cbiAgICAgICAgICA8Um90YXRlQ2N3IGNsYXNzTmFtZT1cInctMy41IGgtMy41XCIgLz5cbiAgICAgICAgICA8c3Bhbj5BdWYgU3RhbmRhcmQgenVyw7xja3NldHplbjwvc3Bhbj5cbiAgICAgICAgPC9idXR0b24+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIFN1Y2Nlc3MgLyBFcnJvciBBbGVydHMgKi99XG4gICAgICB7c3VjY2Vzc01zZyAmJiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0zLjUgcm91bmRlZC0yeGwgYmctZW1lcmFsZC01MCBib3JkZXIgYm9yZGVyLWVtZXJhbGQtMjAwIHRleHQtZW1lcmFsZC04MDAgdGV4dC14cyBmb250LXNlbWlib2xkIGZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBhbmltYXRlLWZhZGUtaW5cIj5cbiAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LWVtZXJhbGQtNjAwIHNocmluay0wXCIgLz5cbiAgICAgICAgICA8c3Bhbj57c3VjY2Vzc01zZ308L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgKX1cblxuICAgICAge2Vycm9yTXNnICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTMuNSByb3VuZGVkLTJ4bCBiZy1yb3NlLTUwIGJvcmRlciBib3JkZXItcm9zZS0yMDAgdGV4dC1yb3NlLTgwMCB0ZXh0LXhzIGZvbnQtc2VtaWJvbGQgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yIGFuaW1hdGUtZmFkZS1pblwiPlxuICAgICAgICAgIDxBbGVydENpcmNsZSBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtcm9zZS02MDAgc2hyaW5rLTBcIiAvPlxuICAgICAgICAgIDxzcGFuPntlcnJvck1zZ308L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgKX1cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy0xIGxnOmdyaWQtY29scy0xMiBnYXAtOCBpdGVtcy1zdGFydFwiPlxuICAgICAgICB7LyogTEVGVCBDT0xVTU4gKDcgQ29scyk6IFNldHRpbmdzIEZvcm0gKi99XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibGc6Y29sLXNwYW4tNyBzcGFjZS15LTZcIj5cbiAgICAgICAgICA8Zm9ybSBvblN1Ym1pdD17aGFuZGxlU2F2ZVRleHR9IGNsYXNzTmFtZT1cInNwYWNlLXktNFwiPlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cImJsb2NrIHRleHQteHMgZm9udC1ib2xkIHRleHQtc2xhdGUtNzAwIHVwcGVyY2FzZSB0cmFja2luZy13aWRlciBtYi0xLjVcIj5cbiAgICAgICAgICAgICAgICBGaXJtZW5uYW1lIChIYXVwdG1hcmtlKVxuICAgICAgICAgICAgICA8L2xhYmVsPlxuICAgICAgICAgICAgICA8aW5wdXRcbiAgICAgICAgICAgICAgICB0eXBlPVwidGV4dFwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2Zvcm1OYW1lfVxuICAgICAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0Rm9ybU5hbWUoZS50YXJnZXQudmFsdWUpfVxuICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiei4gQi4gVElOR0xFVlwiXG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy1mdWxsIHB4LTQgcHktMi41IHJvdW5kZWQtMnhsIGJvcmRlciBib3JkZXItc2xhdGUtMjAwIHRleHQtc2xhdGUtOTAwIHRleHQtc20gZm9udC1zZW1pYm9sZCBmb2N1czpvdXRsaW5lLW5vbmUgZm9jdXM6cmluZy0yIGZvY3VzOnJpbmctaW5kaWdvLTUwMC8yMCBmb2N1czpib3JkZXItaW5kaWdvLTUwMFwiXG4gICAgICAgICAgICAgICAgcmVxdWlyZWRcbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgc206Z3JpZC1jb2xzLTIgZ2FwLTRcIj5cbiAgICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3NOYW1lPVwiYmxvY2sgdGV4dC14cyBmb250LWJvbGQgdGV4dC1zbGF0ZS03MDAgdXBwZXJjYXNlIHRyYWNraW5nLXdpZGVyIG1iLTEuNVwiPlxuICAgICAgICAgICAgICAgICAgWnVzYXR6IC8gU3VmZml4XG4gICAgICAgICAgICAgICAgPC9sYWJlbD5cbiAgICAgICAgICAgICAgICA8aW5wdXRcbiAgICAgICAgICAgICAgICAgIHR5cGU9XCJ0ZXh0XCJcbiAgICAgICAgICAgICAgICAgIHZhbHVlPXtmb3JtU3VmZml4fVxuICAgICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRGb3JtU3VmZml4KGUudGFyZ2V0LnZhbHVlKX1cbiAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiei4gQi4gRUxFTUVOVEZBQlJJS1wiXG4gICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJ3LWZ1bGwgcHgtNCBweS0yLjUgcm91bmRlZC0yeGwgYm9yZGVyIGJvcmRlci1zbGF0ZS0yMDAgdGV4dC1zbGF0ZS05MDAgdGV4dC1zbSBmb250LXNlbWlib2xkIGZvY3VzOm91dGxpbmUtbm9uZSBmb2N1czpyaW5nLTIgZm9jdXM6cmluZy1pbmRpZ28tNTAwLzIwIGZvY3VzOmJvcmRlci1pbmRpZ28tNTAwXCJcbiAgICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgIDxsYWJlbCBjbGFzc05hbWU9XCJibG9jayB0ZXh0LXhzIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTcwMCB1cHBlcmNhc2UgdHJhY2tpbmctd2lkZXIgbWItMS41XCI+XG4gICAgICAgICAgICAgICAgICBVbnRlcnRpdGVsIC8gVGFnbGluZVxuICAgICAgICAgICAgICAgIDwvbGFiZWw+XG4gICAgICAgICAgICAgICAgPGlucHV0XG4gICAgICAgICAgICAgICAgICB0eXBlPVwidGV4dFwiXG4gICAgICAgICAgICAgICAgICB2YWx1ZT17Zm9ybVRhZ2xpbmV9XG4gICAgICAgICAgICAgICAgICBvbkNoYW5nZT17KGUpID0+IHNldEZvcm1UYWdsaW5lKGUudGFyZ2V0LnZhbHVlKX1cbiAgICAgICAgICAgICAgICAgIHBsYWNlaG9sZGVyPVwiei4gQi4gUE9SVEFMIElOVFJBTkVUXCJcbiAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbCBweC00IHB5LTIuNSByb3VuZGVkLTJ4bCBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMCB0ZXh0LXNsYXRlLTkwMCB0ZXh0LXNtIGZvbnQtc2VtaWJvbGQgZm9jdXM6b3V0bGluZS1ub25lIGZvY3VzOnJpbmctMiBmb2N1czpyaW5nLWluZGlnby01MDAvMjAgZm9jdXM6Ym9yZGVyLWluZGlnby01MDBcIlxuICAgICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgdHlwZT1cInN1Ym1pdFwiXG4gICAgICAgICAgICAgIGRpc2FibGVkPXtzYXZpbmd9XG4gICAgICAgICAgICAgIGNsYXNzTmFtZT1cImlubGluZS1mbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTIgcHgtNSBweS0yLjUgYmctaW5kaWdvLTYwMCBob3ZlcjpiZy1pbmRpZ28tNTAwIHRleHQtd2hpdGUgcm91bmRlZC0yeGwgdGV4dC14cyBmb250LWJvbGQgc2hhZG93LW1kIHNoYWRvdy1pbmRpZ28tNjAwLzIwIHRyYW5zaXRpb24tYWxsIGRpc2FibGVkOm9wYWNpdHktNTBcIlxuICAgICAgICAgICAgPlxuICAgICAgICAgICAgICA8U2F2ZSBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cbiAgICAgICAgICAgICAgPHNwYW4+e3NhdmluZyA/ICdXaXJkIGdlc3BlaWNoZXJ0Li4uJyA6ICdCcmFuZGluZy1UZXh0ZSBzcGVpY2hlcm4nfTwvc3Bhbj5cbiAgICAgICAgICAgIDwvYnV0dG9uPlxuICAgICAgICAgIDwvZm9ybT5cblxuICAgICAgICAgIHsvKiBMb2dvIFVwbG9hZCBTZWN0aW9uICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHQtNSBib3JkZXItdCBib3JkZXItc2xhdGUtMTAwIHNwYWNlLXktM1wiPlxuICAgICAgICAgICAgPGxhYmVsIGNsYXNzTmFtZT1cImJsb2NrIHRleHQteHMgZm9udC1ib2xkIHRleHQtc2xhdGUtNzAwIHVwcGVyY2FzZSB0cmFja2luZy13aWRlclwiPlxuICAgICAgICAgICAgICBFaWdlbmVzIEZpcm1lbmxvZ28gaG9jaGxhZGVuXG4gICAgICAgICAgICA8L2xhYmVsPlxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LXNsYXRlLTQwMFwiPlxuICAgICAgICAgICAgICBVbnRlcnN0w7x0enRlIEZvcm1hdGU6IFBORywgSlBHLCBTVkcsIFdFQlAgKEVtcGZvaGxlbjogcXVhZHJhdGlzY2ggb2RlciB0cmFuc3BhcmVudGVzIFBORy9TVkcpLlxuICAgICAgICAgICAgPC9wPlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtNFwiPlxuICAgICAgICAgICAgICA8aW5wdXRcbiAgICAgICAgICAgICAgICByZWY9e2ZpbGVJbnB1dFJlZn1cbiAgICAgICAgICAgICAgICB0eXBlPVwiZmlsZVwiXG4gICAgICAgICAgICAgICAgYWNjZXB0PVwiLnBuZywuanBnLC5qcGVnLC5zdmcsLndlYnAsLmdpZlwiXG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9e2hhbmRsZUxvZ29DaGFuZ2V9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPVwiaGlkZGVuXCJcbiAgICAgICAgICAgICAgLz5cblxuICAgICAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICAgICAgdHlwZT1cImJ1dHRvblwiXG4gICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gZmlsZUlucHV0UmVmLmN1cnJlbnQ/LmNsaWNrKCl9XG4gICAgICAgICAgICAgICAgZGlzYWJsZWQ9e3VwbG9hZGluZ31cbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJpbmxpbmUtZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yIHB4LTQgcHktMi41IGJnLXNsYXRlLTkwMCBob3ZlcjpiZy1zbGF0ZS04MDAgdGV4dC13aGl0ZSByb3VuZGVkLTJ4bCB0ZXh0LXhzIGZvbnQtc2VtaWJvbGQgdHJhbnNpdGlvbi1hbGwgc2hhZG93LXhzIGRpc2FibGVkOm9wYWNpdHktNTBcIlxuICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAge3VwbG9hZGluZyA/IChcbiAgICAgICAgICAgICAgICAgIDw+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy00IGgtNCBib3JkZXItMiBib3JkZXItd2hpdGUgYm9yZGVyLXQtdHJhbnNwYXJlbnQgcm91bmRlZC1mdWxsIGFuaW1hdGUtc3BpblwiPjwvZGl2PlxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5XaXJkIGhvY2hnZWxhZGVuLi4uPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPC8+XG4gICAgICAgICAgICAgICAgKSA6IChcbiAgICAgICAgICAgICAgICAgIDw+XG4gICAgICAgICAgICAgICAgICAgIDxVcGxvYWQgY2xhc3NOYW1lPVwidy00IGgtNFwiIC8+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuPkxvZ28gYXVzd8OkaGxlbiAmIGhvY2hsYWRlbjwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDwvPlxuICAgICAgICAgICAgICAgICl9XG4gICAgICAgICAgICAgIDwvYnV0dG9uPlxuXG4gICAgICAgICAgICAgIHtjb21wYW55TG9nb1VybCAmJiAoXG4gICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LWVtZXJhbGQtNjAwIGZvbnQtc2VtaWJvbGQgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0xXCI+XG4gICAgICAgICAgICAgICAgICA8Q2hlY2tDaXJjbGUgY2xhc3NOYW1lPVwidy0zLjUgaC0zLjVcIiAvPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+RWlnZW5lcyBMb2dvIGFrdGl2PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICB7LyogUklHSFQgQ09MVU1OICg1IENvbHMpOiBMaXZlIFByZXZpZXcgQm94ICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImxnOmNvbC1zcGFuLTUgc3BhY2UteS0zXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTEuNSB0ZXh0LXhzIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTcwMCB1cHBlcmNhc2UgdHJhY2tpbmctd2lkZXJcIj5cbiAgICAgICAgICAgIDxTcGFya2xlcyBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtYW1iZXItNTAwXCIgLz5cbiAgICAgICAgICAgIDxzcGFuPkVjaHR6ZWl0LVZvcnNjaGF1IChTZWl0ZW5sZWlzdGUpPC9zcGFuPlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgey8qIERhcmsgU2lkZWJhciBQcmV2aWV3IEZyYW1lICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctWyMwMDFFMzZdIHJvdW5kZWQtM3hsIHAtNSBib3JkZXIgYm9yZGVyLVsjMDAyQjQ5XSBzaGFkb3cteGwgc3BhY2UteS00XCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInBiLTMgYm9yZGVyLWIgYm9yZGVyLVsjMDAyQjQ5XS84MCBiZy1bIzAwMTQyNF0vNjAgLW14LTUgLW10LTUgcC01IHJvdW5kZWQtdC0zeGxcIj5cbiAgICAgICAgICAgICAgPFRpbmdsZXZMb2dvIFxuICAgICAgICAgICAgICAgIHZhcmlhbnQ9XCJmdWxsXCIgXG4gICAgICAgICAgICAgICAgdGhlbWU9XCJsaWdodC10ZXh0XCIgXG4gICAgICAgICAgICAgICAgc2hvd1N1YnRpdGxlPXt0cnVlfVxuICAgICAgICAgICAgICAgIGN1c3RvbU5hbWU9e2Zvcm1OYW1lIHx8ICdUSU5HTEVWJ31cbiAgICAgICAgICAgICAgICBjdXN0b21TdWZmaXg9e2Zvcm1TdWZmaXh9XG4gICAgICAgICAgICAgICAgY3VzdG9tVGFnbGluZT17Zm9ybVRhZ2xpbmV9XG4gICAgICAgICAgICAgICAgY3VzdG9tTG9nb1VybD17Y29tcGFueUxvZ29Vcmx9XG4gICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgb3BhY2l0eS01MCBwb2ludGVyLWV2ZW50cy1ub25lXCI+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaC0zIGJnLVsjMDAyQjQ5XSByb3VuZGVkLW1kIHctMS8zXCI+PC9kaXY+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaC04IGJnLVsjMDAyQjQ5XS82MCByb3VuZGVkLXhsXCI+PC9kaXY+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiaC04IGJnLVsjMDAyQjQ5XS82MCByb3VuZGVkLXhsXCI+PC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIHsvKiBMaWdodCBUaGVtZSBQcmV2aWV3IEZyYW1lICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctc2xhdGUtNTAgcm91bmRlZC0yeGwgcC00IGJvcmRlciBib3JkZXItc2xhdGUtMjAwLzgwIHNoYWRvdy14cyBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzExcHhdIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTUwMFwiPkhlbGxlIEFuc2ljaHQ6PC9zcGFuPlxuICAgICAgICAgICAgPFRpbmdsZXZMb2dvIFxuICAgICAgICAgICAgICB2YXJpYW50PVwiZnVsbFwiIFxuICAgICAgICAgICAgICB0aGVtZT1cImRhcmstdGV4dFwiIFxuICAgICAgICAgICAgICBzaG93U3VidGl0bGU9e2ZhbHNlfVxuICAgICAgICAgICAgICBjdXN0b21OYW1lPXtmb3JtTmFtZSB8fCAnVElOR0xFVid9XG4gICAgICAgICAgICAgIGN1c3RvbVN1ZmZpeD17Zm9ybVN1ZmZpeH1cbiAgICAgICAgICAgICAgY3VzdG9tTG9nb1VybD17Y29tcGFueUxvZ29Vcmx9XG4gICAgICAgICAgICAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufVxuXG5leHBvcnQgZGVmYXVsdCBCcmFuZGluZ01hbmFnZW1lbnRDYXJkO1xuIl0sImZpbGUiOiJDOi9Vc2Vycy9IdW1iZXJ0L0Rlc2t0b3AvaW50cmFuZXQtY29ycC9mcm9udGVuZC9zcmMvY29tcG9uZW50cy9hZG1pbi9CcmFuZGluZ01hbmFnZW1lbnRDYXJkLmpzeCJ9

@@ -32,6 +32,7 @@ import { TechnikPage } from './pages/TechnikPage';
 import { AbwicklungPage } from './pages/AbwicklungPage';
 import { PlanungPage } from './pages/PlanungPage';
 import { SchulungenPage } from './pages/SchulungenPage';
+import { WlanPage } from './pages/WlanPage';
 import { TicketsPage } from './pages/TicketsPage';
 import { PublicTrackingPage } from './pages/PublicTrackingPage';
 
@@ -203,6 +204,16 @@ export function App() {
                 }
               />
               <Route path="hauptbereich/schulungen" element={<Navigate to="/schulungen" replace />} />
+
+              <Route
+                path="wlan"
+                element={
+                  <ProtectedRoute requiredModule="wlan">
+                    <WlanPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="hauptbereich/wlan" element={<Navigate to="/wlan" replace />} />
 
               {/* 2. Arbeitsbereich / Workplace */}
               <Route

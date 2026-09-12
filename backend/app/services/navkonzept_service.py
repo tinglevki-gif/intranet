@@ -112,7 +112,18 @@ class NavkonzeptFleetService:
     def get_vehicles(self, force_refresh: bool = False) -> Dict[str, Any]:
         """
         Retrieves active vehicles list, using cache if within TTL (45s).
+        In trial build mode, returns empty telemetry.
         """
+        if getattr(settings, "IS_TRIAL_BUILD", False):
+            return {
+                "vehicles": [],
+                "total": 0,
+                "active_count": 0,
+                "activeCount": 0,
+                "is_live": False,
+                "cached_at": datetime.now(timezone.utc).isoformat()
+            }
+
         now = time.time()
         with self._lock:
             if not force_refresh and self._cached_vehicles is not None and (now - self._cache_timestamp) < self.CACHE_TTL_SECONDS:
@@ -128,6 +139,9 @@ class NavkonzeptFleetService:
             return self._build_response(vehicles, self._cache_timestamp, is_live)
 
     def _fetch_from_navkonzept(self) -> tuple[List[Dict[str, Any]], bool]:
+        if getattr(settings, "IS_TRIAL_BUILD", False):
+            return [], False
+
         cookie = getattr(settings, "NAVKONZEPT_COOKIE", "").strip()
         firm_id = getattr(settings, "NAVKONZEPT_FIRM_ID", 332)
         api_url = getattr(settings, "NAVKONZEPT_API_URL", "https://portal.navkonzept.com/api/map/leaflet/ajaxGetTableData")

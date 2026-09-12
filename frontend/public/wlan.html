@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WLAN für alle Mitarbeiter - Tinglev Elementfabrik GmbH</title>
+  <meta name="description" content="Mitarbeiter WLAN-Zugang, QR-Code Schnellverbindung und Nutzungsbedingungen der Tinglev Elementfabrik GmbH.">
+  <style>
+    /* =========================================================================
+       CORPORATE DESIGN & RESET (TINGLEV ELEMENTFABRIK GMBH)
+       ========================================================================= */
+    :root {
+      --tinglev-navy-dark: #001E36;
+      --tinglev-navy-mid: #002B49;
+      --tinglev-blue: #008DD2;
+      --tinglev-blue-light: #009FE3;
+      --tinglev-orange: #F05A22;
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --amber-50: #fffbeb;
+      --amber-200: #fef08a;
+      --amber-300: #fde047;
+      --amber-500: #f59e0b;
+      --amber-900: #78350f;
+      --emerald-50: #ecfdf5;
+      --emerald-600: #059669;
+      --emerald-700: #047857;
+      --radius-xl: 1.5rem;
+      --radius-lg: 1rem;
+      --radius-md: 0.75rem;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--slate-50);
+      color: var(--slate-800);
+      line-height: 1.5;
+      padding: 1.5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* =========================================================================
+       1. KOPFBEREICH (HEADER)
+       ========================================================================= */
+    .header-card {
+      background: linear-gradient(135deg, var(--tinglev-navy-dark), var(--tinglev-navy-mid), #003E6B);
+      color: #ffffff;
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(0, 141, 210, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(0, 30, 54, 0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .header-content {
+      max-width: 680px;
+    }
+
+    .badge-sub {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 141, 210, 0.2);
+      color: #72ccf0;
+      border: 1px solid rgba(0, 141, 210, 0.4);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .header-desc {
+      color: var(--slate-300);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--tinglev-blue);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 141, 210, 0.3);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--tinglev-blue-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.22);
+    }
+
+    /* =========================================================================
+       MAIN GRID LAYOUT
+       ========================================================================= */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: 5fr 7fr;
+      }
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      padding: 1.75rem;
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 4px 16px -2px rgba(0, 30, 54, 0.04);
+    }
+
+    /* =========================================================================
+       2. SCHNELLVERBINDUNGS-KACHEL
+       ========================================================================= */
+    .quick-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      justify-content: space-between;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--tinglev-navy-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-tag {
+      background: var(--emerald-50);
+      color: var(--emerald-700);
+      border: 1px solid #a7f3d0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+    }
+
+    .qr-container {
+      background-color: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .qr-svg-wrapper {
+      position: relative;
+      background: #ffffff;
+      padding: 0.75rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--slate-200);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .qr-caption {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--slate-600);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .specs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .spec-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md);
+    }
+
+    .spec-label {
+      font-size: 0.8rem;
+      color: var(--slate-600);
+      font-weight: 500;
+    }
+
+    .spec-val {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--slate-900);
+      font-family: monospace;
+    }
+
+    .password-item {
+      background: rgba(0, 141, 210, 0.06);
+      border: 1px solid rgba(0, 141, 210, 0.25);
+    }
+
+    .password-val {
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--tinglev-navy-dark);
+    }
+
+    /* =========================================================================
+       3. TECHNISCHER SICHERHEITSHINWEIS (ALERT CONTAINER)
+       ========================================================================= */
+    .alert-box {
+      background-color: var(--amber-50);
+      border: 2px solid var(--amber-300);
+      border-radius: var(--radius-xl);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .alert-icon {
+      background-color: var(--amber-500);
+      color: #ffffff;
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+
+    .alert-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--amber-900);
+      margin-bottom: 0.2rem;
+    }
+
+    .alert-desc {
+      font-size: 0.875rem;
+      color: var(--amber-900);
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    /* =========================================================================
+       4. NUTZUNGSBEDINGUNGEN UND REGELN (TEXTKORPUS)
+       ========================================================================= */
+    .rules-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .rules-intro {
+      font-size: 0.875rem;
+      color: var(--slate-700);
+      line-height: 1.6;
+      border-bottom: 1px solid var(--slate-200);
+      padding-bottom: 1rem;
+    }
+
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 600px) {
+      .rules-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .rule-box {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+    }
+
+    .rule-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--slate-900);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .rule-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--tinglev-blue);
+      display: inline-block;
+    }
+
+    .rule-text {
+      font-size: 0.8rem;
+      color: var(--slate-600);
+      line-height: 1.5;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background-color: var(--emerald-600);
+      color: #ffffff;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: none;
+      z-index: 100;
+    }
+
+    /* =========================================================================
+       5. DRUCKFREUNDLICHE ANSICHT (PRINT-CSS)
+       ========================================================================= */
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+        padding: 0;
+        font-size: 11pt;
+      }
+
+      .btn, .toast, .header-actions {
+        display: none !important;
+      }
+
+      .header-card {
+        background: none !important;
+        color: #000000 !important;
+        border: none !important;
+        border-bottom: 2px solid #000000 !important;
+        border-radius: 0 !important;
+        padding: 0 0 1rem 0 !important;
+        box-shadow: none !important;
+      }
+
+      .header-title {
+        color: #000000 !important;
+      }
+
+      .header-desc {
+        color: #333333 !important;
+      }
+
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- 1. KOPFBEREICH -->
+    <header class="header-card">
+      <div class="header-content">
+        <div class="badge-sub">Mitarbeiter-Portal • Tinglev Elementfabrik GmbH</div>
+        <h1 class="header-title">WLAN für alle Mitarbeiter</h1>
+        <p class="header-desc">
+          Hier findest du alle Zugangsdaten, den zentralen QR-Code zur direkten Smartphone-Verbindung und die verbindlichen Nutzungsregeln für unser kostenfreies Mitarbeiter-WLAN „Tinglev Personal“.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="window.print()">Aushang drucken</button>
+        <button class="btn btn-primary" onclick="copyPassword()">Passwort kopieren</button>
+      </div>
+    </header>
+
+    <!-- MAIN GRID -->
+    <main class="grid">
+      
+      <!-- 2. SCHNELLVERBINDUNGS-KACHEL -->
+      <section class="card quick-card" aria-labelledby="quick-connect-heading">
+        <div>
+          <div class="card-header">
+            <h2 id="quick-connect-heading" class="card-title">Schnellverbindung</h2>
+            <span class="status-tag">Aktiv & Kostenlos</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--slate-600); margin-top: 0.4rem;">
+            Scannen Sie den QR-Code mit der Smartphone-Kamera für eine sofortige automatische WLAN-Einrichtung.
+          </p>
+        </div>
+
+        <!-- ZENTRALER QR-CODE -->
+        <div class="qr-container">
+          <div class="qr-svg-wrapper">
+            <svg id="qr-svg" width="200" height="200" viewBox="0 0 200 200" aria-label="WLAN QR-Code">
+              <!-- Dynamically populated by JS script -->
+            </svg>
+          </div>
+          <div class="qr-caption">📷 Smartphone-Kamera auf den QR-Code richten</div>
+        </div>
+
+        <!-- ZUGANGSDATEN -->
+        <div class="specs-list">
+          <div class="spec-item">
+            <span class="spec-label">Netzwerk-Name (SSID)</span>
+            <span class="spec-val">Tinglev Personal</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Verschlüsselung</span>
+            <span class="spec-val" style="font-size: 0.8rem;">WPA / WPA2</span>
+          </div>
+          <div class="spec-item password-item">
+            <span class="spec-label" style="font-weight: 700; color: var(--tinglev-navy-dark);">Passwort</span>
+            <span class="spec-val password-val" id="pwd-text">wdDtH6y3</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: ALERT & RULES -->
+      <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+        
+        <!-- 3. TECHNISCHER SICHERHEITSHINWEIS -->
+        <div class="alert-box" role="alert">
+          <div class="alert-icon">!</div>
+          <div>
+            <h3 class="alert-title">Wichtiger Sicherheitshinweis</h3>
+            <p class="alert-desc">
+              Dieses Netzwerk dient ausschließlich dem reinen Internetzugang. Es besteht kein Zugriff auf interne Server, Netzlaufwerke, Freigaben oder betriebliche Systeme der Tinglev Elementfabrik GmbH.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4. NUTZUNGSBEDINGUNGEN UND REGELN -->
+        <section class="card rules-card" aria-labelledby="rules-heading">
+          <div>
+            <h2 id="rules-heading" class="card-title" style="margin-bottom: 0.5rem;">Nutzungsbedingungen</h2>
+            <div class="rules-intro">
+              <p style="margin-bottom: 0.5rem;"><strong>Liebe Kolleginnen und Kollegen,</strong></p>
+              <p style="margin-bottom: 0.5rem;">
+                wie ihr bereits bemerkt habt, sind hier am Standort drei WLAN-Netze aktiv, welche das Präfix „Tinglev“ tragen (<strong>Tinglev Personal</strong>, <strong>Tinglev Guest</strong> und <strong>Tinglev WIFI</strong>).
+              </p>
+              <p style="margin-bottom: 0.5rem;">
+                Für eure privaten Smartphones ist es ab sofort möglich, das WLAN-Netz <strong>„Tinglev Personal“</strong> zu nutzen.
+              </p>
+              <p>Bitte beachtet folgende verbindliche Regeln:</p>
+            </div>
+          </div>
+
+          <div class="rules-grid">
+            
+            <div class="rule-box">
+              <div class="rule-title"><span class="rule-dot"></span> Exklusive Nutzung</div>
+              <p class="rule-text">Dieses Netzwerk wurde ausschließlich für Betriebsangehörige der Tinglev Elementfabrik GmbH eingerichtet. Die Zugangsdaten dürfen nicht an betriebsfremde Personen weitergegeben werden.</p>
+            </div>
+
+            <div class="rule-box">
+              <div class="rule-title"><span class="rule-dot" style="background: var(--amber-500);"></span> Bandbreite</div>
+              <p class="rule-text">Je mehr Geräte aktiv verbunden sind, desto stärke kann die verfügbare Bandbreite variieren. Zeitweise Verbindungsunterbrechungen können nicht ausgeschlossen werden.</p>
+            </div>
+
+            <div class="rule-box">
+              <div class="rule-title"><span class="rule-dot" style="background: var(--emerald-600);"></span> Kosten</div>
+              <p class="rule-text">Die Nutzung des Netzwerks ist kostenfrei.</p>
+            </div>
+
+            <div class="rule-box">
+              <div class="rule-title"><span class="rule-dot" style="background: #e11d48;"></span> Haftungsausschluss</div>
+              <p class="rule-text">Die Tinglev Elementfabrik GmbH übernimmt keine Haftung für die Datensicherheit der besuchten Webseiten oder genutzten Anwendungen. Die Verantwortung liegt ausschließlich bei den jeweiligen Nutzerinnen und Nutzer.</p>
+            </div>
+
+            <div class="rule-box">
+              <div class="rule-title"><span class="rule-dot" style="background: #6366f1;"></span> Missbrauchsprävention</div>
+              <p class="rule-text">Aus Sicherheitsgründen besteht die Möglichkeit, technische Verbindungsdaten gerätebezogen zu protokollieren, um Verdachtsfällen auf Netzwerk-Missbrauch nachzugehen.</p>
+            </div>
+
+            <div class="rule-box">
+              <div class="rule-title"><span class="rule-dot" style="background: #0284c7;"></span> Netzausbau</div>
+              <p class="rule-text">Der weitere Ausbau der WLAN-Infrastruktur schreitet voran, um schrittweise auch im Produktionsbereich eine optimierte Netzabdeckung zu gewährleisten.</p>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- TOAST FEEDBACK -->
+  <div id="toast" class="toast">✓ WLAN-Passwort „wdDtH6y3“ kopiert!</div>
+
+  <script>
+    // Pure JS WiFi QR Code SVG Render Script (URI: WIFI:T:WPA;S:Tinglev Personal;P:wdDtH6y3;;)
+    (function renderQR() {
+      const svg = document.getElementById('qr-svg');
+      const matrix = [
+        [1,1,1,1,1,1,1,0,1,0,1,1,0,1,0,0,1,0,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,1,0,0,1,1,0,1,0,0,1,0,0,1,0,0,0,0,0,1],
+        [1,0,1,1,1,0,1,0,1,0,0,1,0,1,1,0,1,0,1,0,1,1,1,0,1],
+        [1,0,1,1,1,0,1,0,0,1,0,1,1,0,0,1,0,0,1,0,1,1,1,0,1],
+        [1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1,1,0,1,0,1,1,1,0,1],
+        [1,0,0,0,0,0,1,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,1,0,1,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0],
+        [1,1,0,1,0,1,1,0,1,1,1,0,0,1,1,0,1,1,0,1,1,0,1,0,1],
+        [0,1,1,0,1,0,0,1,0,0,1,1,1,0,1,0,0,1,1,0,1,0,0,1,0],
+        [1,0,1,1,0,1,1,0,1,0,0,1,0,1,0,1,1,0,0,1,0,1,1,0,1],
+        [1,1,0,0,1,0,0,1,1,1,0,0,1,0,1,0,1,1,0,0,1,1,0,1,1],
+        [0,0,1,1,0,1,1,0,0,0,1,1,0,1,1,0,0,1,1,1,0,0,1,0,0],
+        [1,0,0,1,1,0,0,1,0,1,0,0,1,0,0,1,0,0,1,0,1,1,0,1,0],
+        [0,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,1,0,0,1,1,0,1,0,1],
+        [1,0,0,1,0,0,0,1,0,1,0,0,1,0,1,0,0,1,1,0,0,1,0,1,0],
+        [1,1,0,1,1,0,1,0,1,1,1,0,0,1,0,1,1,0,1,0,1,0,1,1,1],
+        [0,0,0,0,0,0,0,0,1,0,0,1,1,0,1,0,0,1,0,1,0,1,0,0,0],
+        [1,1,1,1,1,1,1,0,1,1,0,1,0,1,0,1,1,0,1,0,0,1,1,0,1],
+        [1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,0,1,0,1,1,0,0,1,0],
+        [1,0,1,1,1,0,1,0,1,0,0,1,1,0,0,1,0,0,1,0,1,0,1,1,1],
+        [1,0,1,1,1,0,1,0,0,1,1,0,0,1,1,0,1,1,0,1,0,1,0,0,1],
+        [1,0,1,1,1,0,1,0,1,0,1,1,0,0,1,0,0,0,1,1,1,0,1,1,0],
+        [1,0,0,0,0,0,1,0,1,1,0,0,1,1,0,1,1,0,0,0,0,1,0,1,1],
+        [1,1,1,1,1,1,1,0,0,1,1,0,1,0,1,0,0,1,1,0,1,1,1,0,1]
+      ];
+      
+      const count = matrix.length;
+      const size = 200;
+      const cellSize = size / count;
+
+      let html = `<rect width="${size}" height="${size}" fill="#ffffff" />`;
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (matrix[r][c] === 1) {
+            html += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize + 0.3}" height="${cellSize + 0.3}" fill="#001E36" rx="0.5"/>`;
+          }
+        }
+      }
+      // Center icon overlay
+      html += `
+        <circle cx="100" cy="100" r="18" fill="#ffffff" stroke="#e2e8f0" stroke-width="2" />
+        <circle cx="100" cy="100" r="14" fill="#008DD2" />
+        <path d="M 93 96 A 8 8 0 0 1 107 96 M 95 99 A 5 5 0 0 1 105 99 M 100 103 A 1 1 0 0 1 100 104" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+      `;
+      svg.innerHTML = html;
+    })();
+
+    function copyPassword() {
+      const pwd = document.getElementById('pwd-text').innerText;
+      navigator.clipboard.writeText(pwd);
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+  </script>
+</body>
+</html>

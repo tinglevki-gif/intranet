@@ -342,8 +342,16 @@ export function OrgChartPage() {
           {error}
         </div>
       ) : filteredTreeData.length === 0 ? (
-        <div className="bg-slate-50/60 dark:bg-slate-950/80 rounded-3xl p-16 border border-slate-200/80 dark:border-slate-800 text-center text-slate-400 text-sm">
-          {t('org_chart.empty')}
+        <div className="bg-slate-50/60 dark:bg-slate-950/80 rounded-3xl p-16 border border-slate-200/80 dark:border-slate-800 text-center space-y-4">
+          <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto text-slate-400">
+            <Network className="w-8 h-8 text-[#009FE3]" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Organigramm in der Testversion deaktiviert</h3>
+            <p className="text-xs text-slate-400 dark:text-slate-500 max-w-md mx-auto mt-1">
+              Die hierarchische Unternehmensstruktur und Mitarbeiterbeziehungen sind im Trial-Build zum Schutz von Betriebsdaten deaktiviert.
+            </p>
+          </div>
         </div>
       ) : (
         <OrgChartCanvas

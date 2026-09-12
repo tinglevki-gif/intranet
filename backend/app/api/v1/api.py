@@ -18,11 +18,13 @@ from app.api.v1.endpoints import (
     perseus,
     search,
     fleet,
-    public_tracking
+    public_tracking,
+    license
 )
 
 api_router = APIRouter()
 
+api_router.include_router(license.router, prefix="/license", tags=["Lizenz- & Testphasenstatus"])
 api_router.include_router(auth.router, prefix="/auth", tags=["Authentifizierung & Anmeldung"])
 api_router.include_router(navigation.router, prefix="/navigation", tags=["Dynamische Navigation & Menüs"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Unternehmens-Dashboard"])

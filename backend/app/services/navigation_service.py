@@ -85,6 +85,13 @@ AVAILABLE_MODULES = [
         "description": "Benutzerhandbücher, Videoanleitungen und interaktiver KI-Support-Chatbot."
     },
     {
+        "key": "wlan",
+        "label": "WLAN für Mitarbeiter",
+        "category": "Hauptbereich",
+        "icon": "Wifi",
+        "description": "Zugangsdaten, QR-Code und Nutzungsbedingungen für das Mitarbeiter-WLAN (Tinglev Personal)."
+    },
+    {
         "key": "documents",
         "label": "Dokumentenablage & KI",
         "category": "Arbeitsbereich",
@@ -273,6 +280,16 @@ DEFAULT_MENUS = [
         "order": 12,
         "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
         "badge": "KI Bot",
+    },
+    {
+        "key": "wlan",
+        "label": "WLAN",
+        "path": "/wlan",
+        "icon": "Wifi",
+        "section": "Hauptbereich",
+        "order": 13,
+        "allowed_roles": ["ADMIN", "HR_MANAGER", "IT_ADMIN", "EMPLOYEE"],
+        "badge": "Hotspot",
     },
 
     # 2. Arbeitsbereich / Workplace (Alle Rollen)

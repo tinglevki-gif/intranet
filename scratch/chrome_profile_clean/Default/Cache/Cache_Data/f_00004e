@@ -1,0 +1,649 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/planung/TischplanReader.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useRef = __vite__cjsImport3_react["useRef"];
+import {
+  generateExactProductionPlan,
+  parseTischplanText,
+  getElementTextColor
+} from "/src/utils/tischplanParser.js";
+export function TischplanReader() {
+  _s();
+  const [data, setData] = useState(() => generateExactProductionPlan());
+  const [inputFilePath, setInputFilePath] = useState("P:\\Tisch_Planung\\24-08-2026.txt");
+  const fileInputRef = useRef(null);
+  const handleFileUpload = (file) => {
+    if (!file) return;
+    setInputFilePath(`p:\\Tisch_Planung\\${file.name}`);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const parsed = parseTischplanText(text, file.name);
+        setData(parsed);
+      } catch (err) {
+        console.error("Fehler beim Parsen der Datei:", err);
+      }
+    };
+    reader.readAsText(file, "ISO-8859-1");
+  };
+  const handlePrint = () => {
+    window.print();
+  };
+  return /* @__PURE__ */ jsxDEV("div", { className: "tischplan-container w-full bg-white text-slate-900 font-sans text-xs select-none", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2 p-3 bg-[#f8f9fa] border border-slate-300 rounded-t-xl print:hidden", children: [
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => fileInputRef.current?.click(),
+          className: "px-3.5 py-1.5 bg-[#f0f0f0] hover:bg-[#e4e4e4] active:bg-[#d8d8d8] text-slate-800 font-normal border border-[#999999] rounded-[3px] text-xs shadow-2xs transition-colors cursor-pointer",
+          children: "Datei laden"
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 59,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "input",
+        {
+          type: "file",
+          ref: fileInputRef,
+          accept: ".txt,.csv",
+          className: "hidden",
+          onChange: (e) => handleFileUpload(e.target.files[0])
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 67,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: handlePrint,
+          className: "px-3.5 py-1.5 bg-[#f0f0f0] hover:bg-[#e4e4e4] active:bg-[#d8d8d8] text-slate-800 font-normal border border-[#999999] rounded-[3px] text-xs shadow-2xs transition-colors cursor-pointer",
+          children: "Drucken"
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 76,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV("div", { className: "flex-1 max-w-md", children: /* @__PURE__ */ jsxDEV(
+        "input",
+        {
+          type: "text",
+          value: inputFilePath,
+          onChange: (e) => setInputFilePath(e.target.value),
+          className: "w-full px-2.5 py-1 bg-white border border-[#999999] rounded-[3px] font-mono text-[11px] text-slate-800 focus:outline-none focus:border-blue-500",
+          placeholder: "p:\\Tisch_Planung\\..."
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 85,
+          columnNumber: 11
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 84,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 57,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "p-4 sm:p-5 bg-white border border-slate-300 border-t-0 rounded-b-xl shadow-xs space-y-4 print:p-0 print:border-none print:shadow-none print:space-y-2", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col lg:flex-row items-stretch gap-3 text-[11px] print:gap-2", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "p-2 border border-[#d0d0d0] rounded-[2px] bg-[#fafafa] space-y-1 min-w-[260px] print:p-1.5", children: [
+          /* @__PURE__ */ jsxDEV("div", { children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-700", children: "Datei: " }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 103,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono text-slate-900", children: data?.filePath || "p:\\Tisch_Planung\\24-08-2026.txt" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 104,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 102,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-700", children: "Datum: " }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 107,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono text-slate-900", children: [
+              data?.date1 || "24.08.2026",
+              "      ",
+              data?.date2 || "24.08.2026"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 108,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 106,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 101,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "flex-1 p-2 border border-[#d0d0d0] rounded-[2px] bg-[#fafafa] leading-snug print:p-1.5", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-800", children: "Übersicht:" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 114,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "mt-0.5 text-[10.5px] print:text-[9.5px] font-mono text-slate-800 flex flex-wrap gap-x-1.5", children: [
+            data?.overviewVolumes?.map(
+              (item, idx) => /* @__PURE__ */ jsxDEV("span", { className: "whitespace-nowrap", children: [
+                "|| in ",
+                /* @__PURE__ */ jsxDEV("span", { className: "font-semibold", children: item.name }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                  lineNumber: 118,
+                  columnNumber: 25
+                }, this),
+                " = ",
+                /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-900", children: item.volume }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                  lineNumber: 118,
+                  columnNumber: 78
+                }, this)
+              ] }, idx, true, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 117,
+                columnNumber: 15
+              }, this)
+            ),
+            /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-950 whitespace-nowrap", children: [
+              "|| Gesamtvolumen: ",
+              data?.gesamtvolumenStr || "162,408 m³"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 121,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 115,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 113,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 99,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "p-3.5 rounded-[4px] border-[1.5px] border-[#F5C2C7] bg-[#FFF5F5] print:p-2", children: [
+        /* @__PURE__ */ jsxDEV("h3", { className: "text-sm font-bold text-[#842029] mb-3 print:mb-1.5 print:text-xs", children: "Halle 1" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 130,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-9 gap-2 mb-3 print:gap-1.5 print:mb-1.5", children: data?.halle1?.rowTop?.map(
+          (table) => /* @__PURE__ */ jsxDEV(TableGridBox, { table }, `h1-top-${table.tischNumber}`, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 137,
+            columnNumber: 13
+          }, this)
+        ) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 135,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-9 gap-2 mb-3 print:gap-1.5 print:mb-1.5", children: data?.halle1?.rowBottom?.map(
+          (table) => /* @__PURE__ */ jsxDEV(TableGridBox, { table }, `h1-bot-${table.tischNumber}`, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 144,
+            columnNumber: 13
+          }, this)
+        ) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 142,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "pt-2 border-t border-red-200/80 flex items-center space-x-6 text-[11px] font-bold print:pt-1 print:text-[10px]", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "text-slate-900", children: [
+            "Halle 1: ",
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono font-bold text-black", children: data?.halle1?.flaecheTotal || "483,553 m²" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 151,
+              columnNumber: 24
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 150,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[#004080]", children: [
+            "TROCKEN: ",
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono font-bold", children: data?.halle1?.trocken || "448,903 m²" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 154,
+              columnNumber: 24
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 153,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[#842029]", children: [
+            "NASS: ",
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono font-bold", children: data?.halle1?.nass || "34,65 m²" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 157,
+              columnNumber: 21
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 156,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 149,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 129,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "p-3.5 rounded-[4px] border-[1.5px] border-[#FFE69C] bg-[#FFFDF0] print:p-2", children: [
+        /* @__PURE__ */ jsxDEV("h3", { className: "text-sm font-bold text-[#664D03] mb-3 print:mb-1.5 print:text-xs", children: "Halle 2" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 164,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-9 gap-2 mb-3 print:gap-1.5 print:mb-1.5", children: data?.halle2?.rowTop?.map(
+          (table) => /* @__PURE__ */ jsxDEV(TableGridBox, { table }, `h2-top-${table.tischNumber}`, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 171,
+            columnNumber: 13
+          }, this)
+        ) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 169,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-9 gap-2 mb-3 print:gap-1.5 print:mb-1.5", children: data?.halle2?.rowBottom?.map(
+          (table) => /* @__PURE__ */ jsxDEV(TableGridBox, { table }, `h2-bot-${table.tischNumber}`, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 178,
+            columnNumber: 13
+          }, this)
+        ) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 176,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "pt-2 border-t border-amber-200/80 flex items-center space-x-6 text-[11px] font-bold print:pt-1 print:text-[10px]", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "text-slate-900", children: [
+            "Halle 2: ",
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono font-bold text-black", children: data?.halle2?.flaecheTotal || "425,925 m²" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 185,
+              columnNumber: 24
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 184,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[#004080]", children: [
+            "TROCKEN: ",
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono font-bold", children: data?.halle2?.trocken || "410,794 m²" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 188,
+              columnNumber: 24
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 187,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[#842029]", children: [
+            "NASS: ",
+            /* @__PURE__ */ jsxDEV("span", { className: "font-mono font-bold", children: data?.halle2?.nass || "15,131 m²" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 191,
+              columnNumber: 21
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 190,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 183,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 163,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "text-[12px] font-bold text-slate-900 px-1 print:text-[11px]", children: [
+        "Gesamt: ",
+        /* @__PURE__ */ jsxDEV("span", { className: "font-mono text-black", children: data?.gesamtFlaecheStr || "909,478 m²" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 198,
+          columnNumber: 19
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 197,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "p-3 rounded-[4px] border-[1.5px] border-[#B6D4FE] bg-[#F8FAFF] space-y-3 print:p-2 print:space-y-1.5", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-8 text-[11px] print:grid-cols-2 print:gap-4 print:text-[10px]", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "space-y-2 print:space-y-1", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "font-bold text-slate-900", children: "Halle 1" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 206,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "text-slate-700", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "font-medium", children: "Temperatur:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 208,
+                columnNumber: 17
+              }, this),
+              "    9:00 Uhr: ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-24 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 209,
+                columnNumber: 27
+              }, this),
+              "      15:00 Uhr: ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-24 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 210,
+                columnNumber: 28
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 207,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "text-slate-700", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "font-medium", children: "Probenanzahl Halle 1:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 213,
+                columnNumber: 17
+              }, this),
+              " ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-40 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 213,
+                columnNumber: 76
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 212,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "pt-2 print:pt-1 text-slate-700", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "font-medium", children: "Datum/Unterschrift:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 216,
+                columnNumber: 17
+              }, this),
+              " ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-48 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 216,
+                columnNumber: 74
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { className: "block text-[9.5px] print:text-[8.5px] text-slate-500 mt-0.5", children: "Mischmeister" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 217,
+                columnNumber: 17
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 215,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 205,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "space-y-2 print:space-y-1", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "font-bold text-slate-900", children: "Halle 2" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 223,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "text-slate-700", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "font-medium", children: "Temperatur:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 225,
+                columnNumber: 17
+              }, this),
+              "    9:00 Uhr: ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-24 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 226,
+                columnNumber: 27
+              }, this),
+              "      15:00 Uhr: ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-24 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 227,
+                columnNumber: 28
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 224,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "text-slate-700", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "font-medium", children: "Probenanzahl Halle 2:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 230,
+                columnNumber: 17
+              }, this),
+              " ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-40 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 230,
+                columnNumber: 76
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 229,
+              columnNumber: 15
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "pt-2 print:pt-1 text-slate-700", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "font-medium", children: "Datum/Unterschrift:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 233,
+                columnNumber: 17
+              }, this),
+              " ",
+              /* @__PURE__ */ jsxDEV("span", { className: "inline-block w-48 border-b border-slate-500" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 233,
+                columnNumber: 74
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { className: "block text-[9.5px] print:text-[8.5px] text-slate-500 mt-0.5", children: "Mischmeister" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+                lineNumber: 234,
+                columnNumber: 17
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+              lineNumber: 232,
+              columnNumber: 15
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+            lineNumber: 222,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 203,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "pt-2 border-t border-blue-200/60 text-[9px] print:text-[8px] italic text-slate-500 leading-tight", children: "Hinweis für Mischmeister: Temperaturen eintragen - produzierte Tische wird mit Unterschrift quittiert - Rezeptabweichungen werden auf den Tischen markiert - Nicht produzierte Tische/Elemente werden markiert" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 240,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 202,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 96,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+    lineNumber: 54,
+    columnNumber: 5
+  }, this);
+}
+_s(TischplanReader, "twCEOqHzSXfoY3yf1gIXHAxIzyc=");
+_c = TischplanReader;
+function TableGridBox({ table }) {
+  const hasElements = table?.elements && table.elements.length > 0;
+  const renderHeader = (headerText) => {
+    if (!headerText) return null;
+    const parts = headerText.split("ROT");
+    if (parts.length > 1) {
+      return /* @__PURE__ */ jsxDEV("div", { className: "text-center font-bold text-[10.5px] print:text-[9.5px] text-slate-900 truncate mb-1", children: [
+        parts[0],
+        " ",
+        /* @__PURE__ */ jsxDEV("span", { className: "text-[#D32F2F] font-extrabold", children: "ROT" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 263,
+          columnNumber: 22
+        }, this),
+        " ",
+        parts[1]
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+        lineNumber: 262,
+        columnNumber: 9
+      }, this);
+    }
+    return /* @__PURE__ */ jsxDEV("div", { className: "text-center font-bold text-[10.5px] print:text-[9.5px] text-slate-900 truncate mb-1", children: headerText }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 268,
+      columnNumber: 7
+    }, this);
+  };
+  return /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col items-center", children: [
+    renderHeader(table?.headerText),
+    /* @__PURE__ */ jsxDEV("div", { className: "w-full bg-white border border-[#b8b8b8] rounded-[2px] p-1 h-24 print:h-[78px] overflow-y-auto print:overflow-hidden overflow-x-hidden shadow-2xs", children: hasElements ? /* @__PURE__ */ jsxDEV("div", { className: "space-y-0.5 font-mono text-[8px] print:text-[7px] leading-[10px] print:leading-[8.5px]", children: table.elements.map(
+      (elText, idx) => /* @__PURE__ */ jsxDEV(
+        "div",
+        {
+          className: "truncate font-semibold",
+          style: { color: getElementTextColor(elText) },
+          title: elText,
+          children: elText
+        },
+        idx,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+          lineNumber: 284,
+          columnNumber: 11
+        },
+        this
+      )
+    ) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 282,
+      columnNumber: 9
+    }, this) : /* @__PURE__ */ jsxDEV("div", { className: "h-full flex items-center justify-center text-[9px] text-slate-300 italic" }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 295,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 280,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "text-center font-mono text-[9px] print:text-[8px] text-slate-800 mt-1 font-semibold", children: table?.flaecheStr || "0 m²" }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+      lineNumber: 302,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx",
+    lineNumber: 275,
+    columnNumber: 5
+  }, this);
+}
+_c2 = TableGridBox;
+var _c, _c2;
+$RefreshReg$(_c, "TischplanReader");
+$RefreshReg$(_c2, "TableGridBox");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/planung/TischplanReader.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUFBQTtBQUFBO0FBQUE7QUFBQSxTQThCQTtBQUVKO0FBQUNDLE1BdERRWDtBQUFZLElBQUFZLElBQUFEO0FBQUEsYUFBQUMsSUFBQTtBQUFBLGFBQUFELEtBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlUmVmIiwiZ2VuZXJhdGVFeGFjdFByb2R1Y3Rpb25QbGFuIiwicGFyc2VUaXNjaHBsYW5UZXh0IiwiZ2V0RWxlbWVudFRleHRDb2xvciIsIlRpc2NocGxhblJlYWRlciIsIl9zIiwiZGF0YSIsInNldERhdGEiLCJpbnB1dEZpbGVQYXRoIiwic2V0SW5wdXRGaWxlUGF0aCIsImZpbGVJbnB1dFJlZiIsImhhbmRsZUZpbGVVcGxvYWQiLCJmaWxlIiwibmFtZSIsInJlYWRlciIsIkZpbGVSZWFkZXIiLCJvbmxvYWQiLCJlIiwidGV4dCIsInRhcmdldCIsInJlc3VsdCIsInBhcnNlZCIsImVyciIsImNvbnNvbGUiLCJlcnJvciIsInJlYWRBc1RleHQiLCJoYW5kbGVQcmludCIsIndpbmRvdyIsInByaW50IiwiY3VycmVudCIsImNsaWNrIiwiZmlsZXMiLCJ2YWx1ZSIsImZpbGVQYXRoIiwiZGF0ZTEiLCJkYXRlMiIsIm92ZXJ2aWV3Vm9sdW1lcyIsIm1hcCIsIml0ZW0iLCJpZHgiLCJ2b2x1bWUiLCJnZXNhbXR2b2x1bWVuU3RyIiwiaGFsbGUxIiwicm93VG9wIiwidGFibGUiLCJ0aXNjaE51bWJlciIsInJvd0JvdHRvbSIsImZsYWVjaGVUb3RhbCIsInRyb2NrZW4iLCJuYXNzIiwiaGFsbGUyIiwiZ2VzYW10RmxhZWNoZVN0ciIsIlRhYmxlR3JpZEJveCIsImhhc0VsZW1lbnRzIiwiZWxlbWVudHMiLCJsZW5ndGgiLCJyZW5kZXJIZWFkZXIiLCJoZWFkZXJUZXh0IiwicGFydHMiLCJzcGxpdCIsImVsVGV4dCIsImNvbG9yIiwiZmxhZWNoZVN0ciIsIl9jMiIsIl9jIl0sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIlRpc2NocGxhblJlYWRlci5qc3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0LCB7IHVzZVN0YXRlLCB1c2VSZWYgfSBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBcbiAgZ2VuZXJhdGVFeGFjdFByb2R1Y3Rpb25QbGFuLCBcbiAgcGFyc2VUaXNjaHBsYW5UZXh0LCBcbiAgZ2V0RWxlbWVudFRleHRDb2xvciBcbn0gZnJvbSAnLi4vLi4vdXRpbHMvdGlzY2hwbGFuUGFyc2VyJztcblxuZXhwb3J0IGZ1bmN0aW9uIFRpc2NocGxhblJlYWRlcigpIHtcbiAgY29uc3QgW2RhdGEsIHNldERhdGFdID0gdXNlU3RhdGUoKCkgPT4gZ2VuZXJhdGVFeGFjdFByb2R1Y3Rpb25QbGFuKCkpO1xuICBjb25zdCBbaW5wdXRGaWxlUGF0aCwgc2V0SW5wdXRGaWxlUGF0aF0gPSB1c2VTdGF0ZSgnUDpcXFxcVGlzY2hfUGxhbnVuZ1xcXFwyNC0wOC0yMDI2LnR4dCcpO1xuICBjb25zdCBmaWxlSW5wdXRSZWYgPSB1c2VSZWYobnVsbCk7XG5cbiAgY29uc3QgaGFuZGxlRmlsZVVwbG9hZCA9IChmaWxlKSA9PiB7XG4gICAgaWYgKCFmaWxlKSByZXR1cm47XG4gICAgc2V0SW5wdXRGaWxlUGF0aChgcDpcXFxcVGlzY2hfUGxhbnVuZ1xcXFwke2ZpbGUubmFtZX1gKTtcblxuICAgIGNvbnN0IHJlYWRlciA9IG5ldyBGaWxlUmVhZGVyKCk7XG4gICAgcmVhZGVyLm9ubG9hZCA9IChlKSA9PiB7XG4gICAgICB0cnkge1xuICAgICAgICBjb25zdCB0ZXh0ID0gZS50YXJnZXQucmVzdWx0O1xuICAgICAgICBjb25zdCBwYXJzZWQgPSBwYXJzZVRpc2NocGxhblRleHQodGV4dCwgZmlsZS5uYW1lKTtcbiAgICAgICAgc2V0RGF0YShwYXJzZWQpO1xuICAgICAgfSBjYXRjaCAoZXJyKSB7XG4gICAgICAgIGNvbnNvbGUuZXJyb3IoJ0ZlaGxlciBiZWltIFBhcnNlbiBkZXIgRGF0ZWk6JywgZXJyKTtcbiAgICAgIH1cbiAgICB9O1xuICAgIHJlYWRlci5yZWFkQXNUZXh0KGZpbGUsICdJU08tODg1OS0xJyk7XG4gIH07XG5cbiAgY29uc3QgaGFuZGxlUHJpbnQgPSAoKSA9PiB7XG4gICAgd2luZG93LnByaW50KCk7XG4gIH07XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cInRpc2NocGxhbi1jb250YWluZXIgdy1mdWxsIGJnLXdoaXRlIHRleHQtc2xhdGUtOTAwIGZvbnQtc2FucyB0ZXh0LXhzIHNlbGVjdC1ub25lXCI+XG4gICAgICBcbiAgICAgIHsvKiAxLiBUT1AgQ09OVFJPTFMgQkFSIChFeGFjdCBEZXNrdG9wIFN0eWxlKSAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yIHAtMyBiZy1bI2Y4ZjlmYV0gYm9yZGVyIGJvcmRlci1zbGF0ZS0zMDAgcm91bmRlZC10LXhsIHByaW50OmhpZGRlblwiPlxuICAgICAgICB7LyogRGF0ZWkgbGFkZW4gYnV0dG9uICovfVxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgb25DbGljaz17KCkgPT4gZmlsZUlucHV0UmVmLmN1cnJlbnQ/LmNsaWNrKCl9XG4gICAgICAgICAgY2xhc3NOYW1lPVwicHgtMy41IHB5LTEuNSBiZy1bI2YwZjBmMF0gaG92ZXI6YmctWyNlNGU0ZTRdIGFjdGl2ZTpiZy1bI2Q4ZDhkOF0gdGV4dC1zbGF0ZS04MDAgZm9udC1ub3JtYWwgYm9yZGVyIGJvcmRlci1bIzk5OTk5OV0gcm91bmRlZC1bM3B4XSB0ZXh0LXhzIHNoYWRvdy0yeHMgdHJhbnNpdGlvbi1jb2xvcnMgY3Vyc29yLXBvaW50ZXJcIlxuICAgICAgICA+XG4gICAgICAgICAgRGF0ZWkgbGFkZW5cbiAgICAgICAgPC9idXR0b24+XG5cbiAgICAgICAgey8qIEhpZGRlbiBmaWxlIGlucHV0ICovfVxuICAgICAgICA8aW5wdXRcbiAgICAgICAgICB0eXBlPVwiZmlsZVwiXG4gICAgICAgICAgcmVmPXtmaWxlSW5wdXRSZWZ9XG4gICAgICAgICAgYWNjZXB0PVwiLnR4dCwuY3N2XCJcbiAgICAgICAgICBjbGFzc05hbWU9XCJoaWRkZW5cIlxuICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gaGFuZGxlRmlsZVVwbG9hZChlLnRhcmdldC5maWxlc1swXSl9XG4gICAgICAgIC8+XG5cbiAgICAgICAgey8qIERydWNrZW4gYnV0dG9uICovfVxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgb25DbGljaz17aGFuZGxlUHJpbnR9XG4gICAgICAgICAgY2xhc3NOYW1lPVwicHgtMy41IHB5LTEuNSBiZy1bI2YwZjBmMF0gaG92ZXI6YmctWyNlNGU0ZTRdIGFjdGl2ZTpiZy1bI2Q4ZDhkOF0gdGV4dC1zbGF0ZS04MDAgZm9udC1ub3JtYWwgYm9yZGVyIGJvcmRlci1bIzk5OTk5OV0gcm91bmRlZC1bM3B4XSB0ZXh0LXhzIHNoYWRvdy0yeHMgdHJhbnNpdGlvbi1jb2xvcnMgY3Vyc29yLXBvaW50ZXJcIlxuICAgICAgICA+XG4gICAgICAgICAgRHJ1Y2tlblxuICAgICAgICA8L2J1dHRvbj5cblxuICAgICAgICB7LyogRmlsZXBhdGggaW5wdXQgdGV4dCBib3ggKi99XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleC0xIG1heC13LW1kXCI+XG4gICAgICAgICAgPGlucHV0XG4gICAgICAgICAgICB0eXBlPVwidGV4dFwiXG4gICAgICAgICAgICB2YWx1ZT17aW5wdXRGaWxlUGF0aH1cbiAgICAgICAgICAgIG9uQ2hhbmdlPXsoZSkgPT4gc2V0SW5wdXRGaWxlUGF0aChlLnRhcmdldC52YWx1ZSl9XG4gICAgICAgICAgICBjbGFzc05hbWU9XCJ3LWZ1bGwgcHgtMi41IHB5LTEgYmctd2hpdGUgYm9yZGVyIGJvcmRlci1bIzk5OTk5OV0gcm91bmRlZC1bM3B4XSBmb250LW1vbm8gdGV4dC1bMTFweF0gdGV4dC1zbGF0ZS04MDAgZm9jdXM6b3V0bGluZS1ub25lIGZvY3VzOmJvcmRlci1ibHVlLTUwMFwiXG4gICAgICAgICAgICBwbGFjZWhvbGRlcj1cInA6XFxUaXNjaF9QbGFudW5nXFwuLi5cIlxuICAgICAgICAgIC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiAyLiBQUklOVEFCTEUgTUFJTiBDQU5WQVMgQ09OVEFJTkVSICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTQgc206cC01IGJnLXdoaXRlIGJvcmRlciBib3JkZXItc2xhdGUtMzAwIGJvcmRlci10LTAgcm91bmRlZC1iLXhsIHNoYWRvdy14cyBzcGFjZS15LTQgcHJpbnQ6cC0wIHByaW50OmJvcmRlci1ub25lIHByaW50OnNoYWRvdy1ub25lIHByaW50OnNwYWNlLXktMlwiPlxuICAgICAgICBcbiAgICAgICAgey8qIEZpbGUgTWV0YWRhdGEgJiBWb2x1bWUgT3ZlcnZpZXcgQm94ICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZmxleC1jb2wgbGc6ZmxleC1yb3cgaXRlbXMtc3RyZXRjaCBnYXAtMyB0ZXh0LVsxMXB4XSBwcmludDpnYXAtMlwiPlxuICAgICAgICAgIHsvKiBMZWZ0OiBEYXRlaSAmIERhdHVtICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0yIGJvcmRlciBib3JkZXItWyNkMGQwZDBdIHJvdW5kZWQtWzJweF0gYmctWyNmYWZhZmFdIHNwYWNlLXktMSBtaW4tdy1bMjYwcHhdIHByaW50OnAtMS41XCI+XG4gICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LWJvbGQgdGV4dC1zbGF0ZS03MDBcIj5EYXRlaTogPC9zcGFuPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gdGV4dC1zbGF0ZS05MDBcIj57ZGF0YT8uZmlsZVBhdGggfHwgJ3A6XFxcXFRpc2NoX1BsYW51bmdcXFxcMjQtMDgtMjAyNi50eHQnfTwvc3Bhbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtc2xhdGUtNzAwXCI+RGF0dW06IDwvc3Bhbj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tb25vIHRleHQtc2xhdGUtOTAwXCI+e2RhdGE/LmRhdGUxIHx8ICcyNC4wOC4yMDI2J30gJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7IHtkYXRhPy5kYXRlMiB8fCAnMjQuMDguMjAyNid9PC9zcGFuPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICB7LyogUmlnaHQ6IMOcYmVyc2ljaHQgVm9sdW1lIEJyZWFrZG93biAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgtMSBwLTIgYm9yZGVyIGJvcmRlci1bI2QwZDBkMF0gcm91bmRlZC1bMnB4XSBiZy1bI2ZhZmFmYV0gbGVhZGluZy1zbnVnIHByaW50OnAtMS41XCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LWJvbGQgdGV4dC1zbGF0ZS04MDBcIj7DnGJlcnNpY2h0Ojwvc3Bhbj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwibXQtMC41IHRleHQtWzEwLjVweF0gcHJpbnQ6dGV4dC1bOS41cHhdIGZvbnQtbW9ubyB0ZXh0LXNsYXRlLTgwMCBmbGV4IGZsZXgtd3JhcCBnYXAteC0xLjVcIj5cbiAgICAgICAgICAgICAge2RhdGE/Lm92ZXJ2aWV3Vm9sdW1lcz8ubWFwKChpdGVtLCBpZHgpID0+IChcbiAgICAgICAgICAgICAgICA8c3BhbiBrZXk9e2lkeH0gY2xhc3NOYW1lPVwid2hpdGVzcGFjZS1ub3dyYXBcIj5cbiAgICAgICAgICAgICAgICAgIHx8IGluIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj57aXRlbS5uYW1lfTwvc3Bhbj4gPSA8c3BhbiBjbGFzc05hbWU9XCJmb250LWJvbGQgdGV4dC1zbGF0ZS05MDBcIj57aXRlbS52b2x1bWV9PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgKSl9XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtYm9sZCB0ZXh0LXNsYXRlLTk1MCB3aGl0ZXNwYWNlLW5vd3JhcFwiPlxuICAgICAgICAgICAgICAgIHx8IEdlc2FtdHZvbHVtZW46IHtkYXRhPy5nZXNhbXR2b2x1bWVuU3RyIHx8ICcxNjIsNDA4IG3Csyd9XG4gICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICB7LyogMy4gSEFMTEUgMSBDT05UQUlORVIgKi99XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC0zLjUgcm91bmRlZC1bNHB4XSBib3JkZXItWzEuNXB4XSBib3JkZXItWyNGNUMyQzddIGJnLVsjRkZGNUY1XSBwcmludDpwLTJcIj5cbiAgICAgICAgICA8aDMgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LWJvbGQgdGV4dC1bIzg0MjAyOV0gbWItMyBwcmludDptYi0xLjUgcHJpbnQ6dGV4dC14c1wiPlxuICAgICAgICAgICAgSGFsbGUgMVxuICAgICAgICAgIDwvaDM+XG5cbiAgICAgICAgICB7LyogVG9wIFJvdzogVGlzY2hlIDEwIGJpcyAxOCAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTkgZ2FwLTIgbWItMyBwcmludDpnYXAtMS41IHByaW50Om1iLTEuNVwiPlxuICAgICAgICAgICAge2RhdGE/LmhhbGxlMT8ucm93VG9wPy5tYXAoKHRhYmxlKSA9PiAoXG4gICAgICAgICAgICAgIDxUYWJsZUdyaWRCb3gga2V5PXtgaDEtdG9wLSR7dGFibGUudGlzY2hOdW1iZXJ9YH0gdGFibGU9e3RhYmxlfSAvPlxuICAgICAgICAgICAgKSl9XG4gICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICB7LyogQm90dG9tIFJvdzogVGlzY2hlIDEgYmlzIDkgKi99XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy05IGdhcC0yIG1iLTMgcHJpbnQ6Z2FwLTEuNSBwcmludDptYi0xLjVcIj5cbiAgICAgICAgICAgIHtkYXRhPy5oYWxsZTE/LnJvd0JvdHRvbT8ubWFwKCh0YWJsZSkgPT4gKFxuICAgICAgICAgICAgICA8VGFibGVHcmlkQm94IGtleT17YGgxLWJvdC0ke3RhYmxlLnRpc2NoTnVtYmVyfWB9IHRhYmxlPXt0YWJsZX0gLz5cbiAgICAgICAgICAgICkpfVxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgey8qIEhhbGxlIDEgRm9vdGVyIFRvdGFscyAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB0LTIgYm9yZGVyLXQgYm9yZGVyLXJlZC0yMDAvODAgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC02IHRleHQtWzExcHhdIGZvbnQtYm9sZCBwcmludDpwdC0xIHByaW50OnRleHQtWzEwcHhdXCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTkwMFwiPlxuICAgICAgICAgICAgICBIYWxsZSAxOiA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gZm9udC1ib2xkIHRleHQtYmxhY2tcIj57ZGF0YT8uaGFsbGUxPy5mbGFlY2hlVG90YWwgfHwgJzQ4Myw1NTMgbcKyJ308L3NwYW4+XG4gICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsjMDA0MDgwXVwiPlxuICAgICAgICAgICAgICBUUk9DS0VOOiA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gZm9udC1ib2xkXCI+e2RhdGE/LmhhbGxlMT8udHJvY2tlbiB8fCAnNDQ4LDkwMyBtwrInfTwvc3Bhbj5cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWyM4NDIwMjldXCI+XG4gICAgICAgICAgICAgIE5BU1M6IDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbW9ubyBmb250LWJvbGRcIj57ZGF0YT8uaGFsbGUxPy5uYXNzIHx8ICczNCw2NSBtwrInfTwvc3Bhbj5cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgey8qIDQuIEhBTExFIDIgQ09OVEFJTkVSICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMy41IHJvdW5kZWQtWzRweF0gYm9yZGVyLVsxLjVweF0gYm9yZGVyLVsjRkZFNjlDXSBiZy1bI0ZGRkRGMF0gcHJpbnQ6cC0yXCI+XG4gICAgICAgICAgPGgzIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1ib2xkIHRleHQtWyM2NjREMDNdIG1iLTMgcHJpbnQ6bWItMS41IHByaW50OnRleHQteHNcIj5cbiAgICAgICAgICAgIEhhbGxlIDJcbiAgICAgICAgICA8L2gzPlxuXG4gICAgICAgICAgey8qIFRvcCBSb3c6IFRpc2NoZSAxMCBiaXMgMTggKi99XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJncmlkIGdyaWQtY29scy05IGdhcC0yIG1iLTMgcHJpbnQ6Z2FwLTEuNSBwcmludDptYi0xLjVcIj5cbiAgICAgICAgICAgIHtkYXRhPy5oYWxsZTI/LnJvd1RvcD8ubWFwKCh0YWJsZSkgPT4gKFxuICAgICAgICAgICAgICA8VGFibGVHcmlkQm94IGtleT17YGgyLXRvcC0ke3RhYmxlLnRpc2NoTnVtYmVyfWB9IHRhYmxlPXt0YWJsZX0gLz5cbiAgICAgICAgICAgICkpfVxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgey8qIEJvdHRvbSBSb3c6IFRpc2NoZSAxIGJpcyA5ICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtOSBnYXAtMiBtYi0zIHByaW50OmdhcC0xLjUgcHJpbnQ6bWItMS41XCI+XG4gICAgICAgICAgICB7ZGF0YT8uaGFsbGUyPy5yb3dCb3R0b20/Lm1hcCgodGFibGUpID0+IChcbiAgICAgICAgICAgICAgPFRhYmxlR3JpZEJveCBrZXk9e2BoMi1ib3QtJHt0YWJsZS50aXNjaE51bWJlcn1gfSB0YWJsZT17dGFibGV9IC8+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIHsvKiBIYWxsZSAyIEZvb3RlciBUb3RhbHMgKi99XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwdC0yIGJvcmRlci10IGJvcmRlci1hbWJlci0yMDAvODAgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC02IHRleHQtWzExcHhdIGZvbnQtYm9sZCBwcmludDpwdC0xIHByaW50OnRleHQtWzEwcHhdXCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTkwMFwiPlxuICAgICAgICAgICAgICBIYWxsZSAyOiA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gZm9udC1ib2xkIHRleHQtYmxhY2tcIj57ZGF0YT8uaGFsbGUyPy5mbGFlY2hlVG90YWwgfHwgJzQyNSw5MjUgbcKyJ308L3NwYW4+XG4gICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsjMDA0MDgwXVwiPlxuICAgICAgICAgICAgICBUUk9DS0VOOiA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gZm9udC1ib2xkXCI+e2RhdGE/LmhhbGxlMj8udHJvY2tlbiB8fCAnNDEwLDc5NCBtwrInfTwvc3Bhbj5cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWyM4NDIwMjldXCI+XG4gICAgICAgICAgICAgIE5BU1M6IDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbW9ubyBmb250LWJvbGRcIj57ZGF0YT8uaGFsbGUyPy5uYXNzIHx8ICcxNSwxMzEgbcKyJ308L3NwYW4+XG4gICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIHsvKiBHZXNhbXQgRm9vdGVyICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtWzEycHhdIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTkwMCBweC0xIHByaW50OnRleHQtWzExcHhdXCI+XG4gICAgICAgICAgR2VzYW10OiA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1vbm8gdGV4dC1ibGFja1wiPntkYXRhPy5nZXNhbXRGbGFlY2hlU3RyIHx8ICc5MDksNDc4IG3Csid9PC9zcGFuPlxuICAgICAgICA8L2Rpdj5cblxuICAgICAgICB7LyogNS4gUFJPVE9DT0wgJiBTSUdOQVRVUkVTIEJPWCAoTWlzY2htZWlzdGVyICYgTGFib3IpICovfVxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMyByb3VuZGVkLVs0cHhdIGJvcmRlci1bMS41cHhdIGJvcmRlci1bI0I2RDRGRV0gYmctWyNGOEZBRkZdIHNwYWNlLXktMyBwcmludDpwLTIgcHJpbnQ6c3BhY2UteS0xLjVcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbWQ6Z3JpZC1jb2xzLTIgZ2FwLTggdGV4dC1bMTFweF0gcHJpbnQ6Z3JpZC1jb2xzLTIgcHJpbnQ6Z2FwLTQgcHJpbnQ6dGV4dC1bMTBweF1cIj5cbiAgICAgICAgICAgIHsvKiBIYWxsZSAxIFByb3RvY29sICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgcHJpbnQ6c3BhY2UteS0xXCI+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtc2xhdGUtOTAwXCI+SGFsbGUgMTwvZGl2PlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtc2xhdGUtNzAwXCI+XG4gICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5UZW1wZXJhdHVyOjwvc3Bhbj4gJm5ic3A7Jm5ic3A7IFxuICAgICAgICAgICAgICAgIDk6MDAgVWhyOiA8c3BhbiBjbGFzc05hbWU9XCJpbmxpbmUtYmxvY2sgdy0yNCBib3JkZXItYiBib3JkZXItc2xhdGUtNTAwXCI+PC9zcGFuPiAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgXG4gICAgICAgICAgICAgICAgMTU6MDAgVWhyOiA8c3BhbiBjbGFzc05hbWU9XCJpbmxpbmUtYmxvY2sgdy0yNCBib3JkZXItYiBib3JkZXItc2xhdGUtNTAwXCI+PC9zcGFuPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTcwMFwiPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+UHJvYmVuYW56YWhsIEhhbGxlIDE6PC9zcGFuPiA8c3BhbiBjbGFzc05hbWU9XCJpbmxpbmUtYmxvY2sgdy00MCBib3JkZXItYiBib3JkZXItc2xhdGUtNTAwXCI+PC9zcGFuPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwdC0yIHByaW50OnB0LTEgdGV4dC1zbGF0ZS03MDBcIj5cbiAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPkRhdHVtL1VudGVyc2NocmlmdDo8L3NwYW4+IDxzcGFuIGNsYXNzTmFtZT1cImlubGluZS1ibG9jayB3LTQ4IGJvcmRlci1iIGJvcmRlci1zbGF0ZS01MDBcIj48L3NwYW4+XG4gICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiYmxvY2sgdGV4dC1bOS41cHhdIHByaW50OnRleHQtWzguNXB4XSB0ZXh0LXNsYXRlLTUwMCBtdC0wLjVcIj5NaXNjaG1laXN0ZXI8L3NwYW4+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIHsvKiBIYWxsZSAyIFByb3RvY29sICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgcHJpbnQ6c3BhY2UteS0xXCI+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtc2xhdGUtOTAwXCI+SGFsbGUgMjwvZGl2PlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtc2xhdGUtNzAwXCI+XG4gICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj5UZW1wZXJhdHVyOjwvc3Bhbj4gJm5ic3A7Jm5ic3A7IFxuICAgICAgICAgICAgICAgIDk6MDAgVWhyOiA8c3BhbiBjbGFzc05hbWU9XCJpbmxpbmUtYmxvY2sgdy0yNCBib3JkZXItYiBib3JkZXItc2xhdGUtNTAwXCI+PC9zcGFuPiAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsgXG4gICAgICAgICAgICAgICAgMTU6MDAgVWhyOiA8c3BhbiBjbGFzc05hbWU9XCJpbmxpbmUtYmxvY2sgdy0yNCBib3JkZXItYiBib3JkZXItc2xhdGUtNTAwXCI+PC9zcGFuPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTcwMFwiPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+UHJvYmVuYW56YWhsIEhhbGxlIDI6PC9zcGFuPiA8c3BhbiBjbGFzc05hbWU9XCJpbmxpbmUtYmxvY2sgdy00MCBib3JkZXItYiBib3JkZXItc2xhdGUtNTAwXCI+PC9zcGFuPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwdC0yIHByaW50OnB0LTEgdGV4dC1zbGF0ZS03MDBcIj5cbiAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LW1lZGl1bVwiPkRhdHVtL1VudGVyc2NocmlmdDo8L3NwYW4+IDxzcGFuIGNsYXNzTmFtZT1cImlubGluZS1ibG9jayB3LTQ4IGJvcmRlci1iIGJvcmRlci1zbGF0ZS01MDBcIj48L3NwYW4+XG4gICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiYmxvY2sgdGV4dC1bOS41cHhdIHByaW50OnRleHQtWzguNXB4XSB0ZXh0LXNsYXRlLTUwMCBtdC0wLjVcIj5NaXNjaG1laXN0ZXI8L3NwYW4+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICB7LyogT2ZmaWNpYWwgTWlzY2htZWlzdGVyIFNtYWxsIE5vdGUgKi99XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwdC0yIGJvcmRlci10IGJvcmRlci1ibHVlLTIwMC82MCB0ZXh0LVs5cHhdIHByaW50OnRleHQtWzhweF0gaXRhbGljIHRleHQtc2xhdGUtNTAwIGxlYWRpbmctdGlnaHRcIj5cbiAgICAgICAgICAgIEhpbndlaXMgZsO8ciBNaXNjaG1laXN0ZXI6IFRlbXBlcmF0dXJlbiBlaW50cmFnZW4gLSBwcm9kdXppZXJ0ZSBUaXNjaGUgd2lyZCBtaXQgVW50ZXJzY2hyaWZ0IHF1aXR0aWVydCAtIFJlemVwdGFid2VpY2h1bmdlbiB3ZXJkZW4gYXVmIGRlbiBUaXNjaGVuIG1hcmtpZXJ0IC0gTmljaHQgcHJvZHV6aWVydGUgVGlzY2hlL0VsZW1lbnRlIHdlcmRlbiBtYXJraWVydFxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cblxuICAgICAgPC9kaXY+XG4gICAgPC9kaXY+XG4gICk7XG59XG5cbi8qKlxuICogSW5kaXZpZHVhbCBUYWJsZSBHcmlkIEJveCAoRXhhY3QgcmVwcm9kdWN0aW9uIG9mIFdQRiB0YWJsZSBjYXJkKVxuICovXG5mdW5jdGlvbiBUYWJsZUdyaWRCb3goeyB0YWJsZSB9KSB7XG4gIGNvbnN0IGhhc0VsZW1lbnRzID0gdGFibGU/LmVsZW1lbnRzICYmIHRhYmxlLmVsZW1lbnRzLmxlbmd0aCA+IDA7XG5cbiAgLy8gRm9ybWF0IGhlYWRlciB0ZXh0IHRvIGhpZ2hsaWdodCBST1QgaW4gcmVkXG4gIGNvbnN0IHJlbmRlckhlYWRlciA9IChoZWFkZXJUZXh0KSA9PiB7XG4gICAgaWYgKCFoZWFkZXJUZXh0KSByZXR1cm4gbnVsbDtcbiAgICBjb25zdCBwYXJ0cyA9IGhlYWRlclRleHQuc3BsaXQoJ1JPVCcpO1xuICAgIGlmIChwYXJ0cy5sZW5ndGggPiAxKSB7XG4gICAgICByZXR1cm4gKFxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIGZvbnQtYm9sZCB0ZXh0LVsxMC41cHhdIHByaW50OnRleHQtWzkuNXB4XSB0ZXh0LXNsYXRlLTkwMCB0cnVuY2F0ZSBtYi0xXCI+XG4gICAgICAgICAge3BhcnRzWzBdfSA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsjRDMyRjJGXSBmb250LWV4dHJhYm9sZFwiPlJPVDwvc3Bhbj4ge3BhcnRzWzFdfVxuICAgICAgICA8L2Rpdj5cbiAgICAgICk7XG4gICAgfVxuICAgIHJldHVybiAoXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtY2VudGVyIGZvbnQtYm9sZCB0ZXh0LVsxMC41cHhdIHByaW50OnRleHQtWzkuNXB4XSB0ZXh0LXNsYXRlLTkwMCB0cnVuY2F0ZSBtYi0xXCI+XG4gICAgICAgIHtoZWFkZXJUZXh0fVxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfTtcblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXJcIj5cbiAgICAgIHsvKiBUYWJsZSBIZWFkZXIgKi99XG4gICAgICB7cmVuZGVySGVhZGVyKHRhYmxlPy5oZWFkZXJUZXh0KX1cblxuICAgICAgey8qIFRhYmxlIENvbnRlbnQgQm94ICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LWZ1bGwgYmctd2hpdGUgYm9yZGVyIGJvcmRlci1bI2I4YjhiOF0gcm91bmRlZC1bMnB4XSBwLTEgaC0yNCBwcmludDpoLVs3OHB4XSBvdmVyZmxvdy15LWF1dG8gcHJpbnQ6b3ZlcmZsb3ctaGlkZGVuIG92ZXJmbG93LXgtaGlkZGVuIHNoYWRvdy0yeHNcIj5cbiAgICAgICAge2hhc0VsZW1lbnRzID8gKFxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0wLjUgZm9udC1tb25vIHRleHQtWzhweF0gcHJpbnQ6dGV4dC1bN3B4XSBsZWFkaW5nLVsxMHB4XSBwcmludDpsZWFkaW5nLVs4LjVweF1cIj5cbiAgICAgICAgICAgIHt0YWJsZS5lbGVtZW50cy5tYXAoKGVsVGV4dCwgaWR4KSA9PiAoXG4gICAgICAgICAgICAgIDxkaXYgXG4gICAgICAgICAgICAgICAga2V5PXtpZHh9IFxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInRydW5jYXRlIGZvbnQtc2VtaWJvbGRcIlxuICAgICAgICAgICAgICAgIHN0eWxlPXt7IGNvbG9yOiBnZXRFbGVtZW50VGV4dENvbG9yKGVsVGV4dCkgfX1cbiAgICAgICAgICAgICAgICB0aXRsZT17ZWxUZXh0fVxuICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAge2VsVGV4dH1cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgKSA6IChcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImgtZnVsbCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciB0ZXh0LVs5cHhdIHRleHQtc2xhdGUtMzAwIGl0YWxpY1wiPlxuICAgICAgICAgICAgey8qIEVtcHR5IHNwYWNlICovfVxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICApfVxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBCZWxvdyBUYWJsZSBBcmVhIExhYmVsICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LWNlbnRlciBmb250LW1vbm8gdGV4dC1bOXB4XSBwcmludDp0ZXh0LVs4cHhdIHRleHQtc2xhdGUtODAwIG10LTEgZm9udC1zZW1pYm9sZFwiPlxuICAgICAgICB7dGFibGU/LmZsYWVjaGVTdHIgfHwgJzAgbcKyJ31cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufVxuXG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL3BsYW51bmcvVGlzY2hwbGFuUmVhZGVyLmpzeCJ9

@@ -253,6 +253,14 @@ html.dark .shadow-2xl {
     box-shadow: none !important;
     background: #ffffff !important;
   }
+
+  /* WLAN Poster Print Optimization */
+  .wlan-page-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: #0f172a !important;
+  }
 }
 
 /* =========================================================================

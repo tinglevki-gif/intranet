@@ -248,8 +248,9 @@ export function PhoneDirectoryPage() {
           <p className="text-xs text-slate-400">Telefonverzeichnis wird geladen...</p>
         </div>
       ) : sortedDirectory.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 text-slate-400 text-sm">
-          Keine Mitarbeiter für die ausgewählten Such- und Filterkriterien gefunden.
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-card space-y-2">
+          <p className="text-slate-700 font-bold text-base">In dieser Testversion sind keine Kontaktdaten hinterlegt.</p>
+          <p className="text-slate-400 text-xs">Telefon- und Kontaktdaten der Mitarbeiter sind im Trial-Build zum Schutz von Betriebsdaten deaktiviert.</p>
         </div>
       ) : viewMode === 'GRID' ? (
         /* GRID VIEW OF CONTACT CARDS */

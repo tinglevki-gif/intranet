@@ -99,8 +99,9 @@ export function DirectoryPage() {
           {t('common.loading')}
         </div>
       ) : users.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-3xl border border-slate-100 shadow-card">
-          <p className="text-slate-400 text-sm font-medium">{t('directory.empty')}</p>
+        <div className="p-12 text-center bg-white rounded-3xl border border-slate-100 shadow-card space-y-2">
+          <p className="text-slate-700 font-bold text-base">In dieser Testversion sind keine Kontaktdaten hinterlegt.</p>
+          <p className="text-slate-400 text-xs">Mitarbeiterprofile und Teamverzeichnisse sind im Trial-Build zum Schutz von Betriebsdaten deaktiviert.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

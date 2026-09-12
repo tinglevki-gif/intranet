@@ -1,0 +1,222 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/layout/ProtectedRoute.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react;
+import { Navigate, useLocation } from "/node_modules/.vite/deps/react-router-dom.js?v=490e586b";
+import { useAuth } from "/src/context/AuthContext.jsx";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+import { ShieldAlert, Lock, ArrowLeft } from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+export function ProtectedRoute({ children, allowedRoles, requiredModule }) {
+  _s();
+  const { isAuthenticated, user, loading, hasModulePermission } = useAuth();
+  const { t } = useLanguage();
+  const location = useLocation();
+  if (loading) {
+    return /* @__PURE__ */ jsxDEV("div", { className: "min-h-screen flex items-center justify-center bg-slate-900", children: /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col items-center space-y-4", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+        lineNumber: 35,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("p", { className: "text-sm font-medium text-slate-300", children: t("common.loading") }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+        lineNumber: 36,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+      lineNumber: 34,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+      lineNumber: 33,
+      columnNumber: 7
+    }, this);
+  }
+  if (!isAuthenticated) {
+    return /* @__PURE__ */ jsxDEV(Navigate, { to: "/login", state: { from: location }, replace: true }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+      lineNumber: 43,
+      columnNumber: 12
+    }, this);
+  }
+  if (allowedRoles && allowedRoles.length > 0) {
+    const hasRolePermission = user?.role === "ADMIN" || allowedRoles.includes(user?.role);
+    if (!hasRolePermission) {
+      return /* @__PURE__ */ jsxDEV("div", { className: "p-8 max-w-lg mx-auto text-center mt-12 bg-white rounded-3xl border border-rose-100 shadow-xl animate-fade-in", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4", children: /* @__PURE__ */ jsxDEV(ShieldAlert, { className: "w-8 h-8" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 53,
+          columnNumber: 13
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 52,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("h2", { className: "text-xl font-bold text-slate-900 mb-2", children: t("common.access_denied_title") }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 55,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("p", { className: "text-sm text-slate-600 mb-6", children: [
+          t("common.access_denied_desc"),
+          " (",
+          user?.role,
+          ")"
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 56,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV(
+          "a",
+          {
+            href: "/",
+            className: "inline-flex items-center space-x-2 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-md shadow-indigo-600/20",
+            children: [
+              /* @__PURE__ */ jsxDEV(ArrowLeft, { className: "w-4 h-4" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+                lineNumber: 63,
+                columnNumber: 13
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { children: t("common.back_to_dashboard") }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+                lineNumber: 64,
+                columnNumber: 13
+              }, this)
+            ]
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+            lineNumber: 59,
+            columnNumber: 11
+          },
+          this
+        )
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+        lineNumber: 51,
+        columnNumber: 9
+      }, this);
+    }
+  }
+  if (requiredModule) {
+    const hasModPerm = hasModulePermission(requiredModule);
+    if (!hasModPerm) {
+      return /* @__PURE__ */ jsxDEV("div", { className: "p-8 max-w-lg mx-auto text-center mt-12 bg-white rounded-3xl border border-amber-100 shadow-xl animate-fade-in", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4", children: /* @__PURE__ */ jsxDEV(Lock, { className: "w-8 h-8" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 78,
+          columnNumber: 13
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 77,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("span", { className: "px-3 py-1 rounded-full text-[11px] font-extrabold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wider mb-2 inline-block", children: "HTTP 403 • Modul gesperrt" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 80,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("h2", { className: "text-xl font-extrabold text-slate-900 mb-2", children: "Zugriff auf dieses Modul eingeschränkt" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 83,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-600 mb-6 leading-relaxed", children: [
+          "Ihr Benutzerkonto besitzt derzeit keine Freigabe für das Modul ",
+          /* @__PURE__ */ jsxDEV("strong", { className: "font-mono text-slate-900", children: [
+            '"',
+            requiredModule,
+            '"'
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+            lineNumber: 85,
+            columnNumber: 76
+          }, this),
+          ". Bitte wenden Sie sich an Ihren ",
+          /* @__PURE__ */ jsxDEV("strong", { children: "SuperAdmin" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+            lineNumber: 86,
+            columnNumber: 44
+          }, this),
+          ", um die Berechtigung freizuschalten."
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+          lineNumber: 84,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV(
+          "a",
+          {
+            href: "/",
+            className: "inline-flex items-center space-x-2 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-md shadow-indigo-600/20",
+            children: [
+              /* @__PURE__ */ jsxDEV(ArrowLeft, { className: "w-4 h-4" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+                lineNumber: 92,
+                columnNumber: 13
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { children: t("common.back_to_dashboard") }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+                lineNumber: 93,
+                columnNumber: 13
+              }, this)
+            ]
+          },
+          void 0,
+          true,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+            lineNumber: 88,
+            columnNumber: 11
+          },
+          this
+        )
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx",
+        lineNumber: 76,
+        columnNumber: 9
+      }, this);
+    }
+  }
+  return children;
+}
+_s(ProtectedRoute, "pvtS1i3xxY8x8teCZaJQXMyQXj4=", false, function() {
+  return [useAuth, useLanguage, useLocation];
+});
+_c = ProtectedRoute;
+var _c;
+$RefreshReg$(_c, "ProtectedRoute");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/ProtectedRoute.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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VSw4Q0FBNkMsc0RBQTNEO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFBaUc7QUFBQSxRQUNqRyx1QkFBQyxPQUFFLFdBQVUsK0NBQTZDO0FBQUE7QUFBQSxVQUNPLHVCQUFDLFlBQU8sV0FBVSw0QkFBMkI7QUFBQTtBQUFBLFlBQUViO0FBQUFBLFlBQWU7QUFBQSxlQUE5RDtBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQUErRDtBQUFBLFVBQVM7QUFBQSxVQUN4Ryx1QkFBQyxZQUFPLDBCQUFSO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBQWtCO0FBQUEsVUFBUztBQUFBLGFBRjVEO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFHQTtBQUFBLFFBQ0E7QUFBQSxVQUFDO0FBQUE7QUFBQSxZQUNDLE1BQUs7QUFBQSxZQUNMLFdBQVU7QUFBQSxZQUVWO0FBQUEscUNBQUMsYUFBVSxXQUFVLGFBQXJCO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBQThCO0FBQUEsY0FDOUIsdUJBQUMsVUFBTU0sWUFBRSwwQkFBMEIsS0FBbkM7QUFBQTtBQUFBO0FBQUE7QUFBQSxxQkFBcUM7QUFBQTtBQUFBO0FBQUEsVUFMdkM7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLFFBTUE7QUFBQSxXQWxCRjtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBbUJBO0FBQUEsSUFFSjtBQUFBLEVBQ0Y7QUFFQSxTQUFPUjtBQUNUO0FBQUNHLEdBM0VlSixnQkFBYztBQUFBLFVBQ29DTCxTQUNsREMsYUFDR0YsV0FBVztBQUFBO0FBQUEsS0FIZE07QUFBYyxJQUFBaUI7QUFBQSxhQUFBQSxJQUFBIiwibmFtZXMiOlsiUmVhY3QiLCJOYXZpZ2F0ZSIsInVzZUxvY2F0aW9uIiwidXNlQXV0aCIsInVzZUxhbmd1YWdlIiwiU2hpZWxkQWxlcnQiLCJMb2NrIiwiQXJyb3dMZWZ0IiwiUHJvdGVjdGVkUm91dGUiLCJjaGlsZHJlbiIsImFsbG93ZWRSb2xlcyIsInJlcXVpcmVkTW9kdWxlIiwiX3MiLCJpc0F1dGhlbnRpY2F0ZWQiLCJ1c2VyIiwibG9hZGluZyIsImhhc01vZHVsZVBlcm1pc3Npb24iLCJ0IiwibG9jYXRpb24iLCJmcm9tIiwibGVuZ3RoIiwiaGFzUm9sZVBlcm1pc3Npb24iLCJyb2xlIiwiaW5jbHVkZXMiLCJoYXNNb2RQZXJtIiwiX2MiXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiUHJvdGVjdGVkUm91dGUuanN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCc7XG5pbXBvcnQgeyBOYXZpZ2F0ZSwgdXNlTG9jYXRpb24gfSBmcm9tICdyZWFjdC1yb3V0ZXItZG9tJztcbmltcG9ydCB7IHVzZUF1dGggfSBmcm9tICcuLi8uLi9jb250ZXh0L0F1dGhDb250ZXh0JztcbmltcG9ydCB7IHVzZUxhbmd1YWdlIH0gZnJvbSAnLi4vLi4vY29udGV4dC9MYW5ndWFnZUNvbnRleHQnO1xuaW1wb3J0IHsgU2hpZWxkQWxlcnQsIExvY2ssIEFycm93TGVmdCB9IGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5cbmV4cG9ydCBmdW5jdGlvbiBQcm90ZWN0ZWRSb3V0ZSh7IGNoaWxkcmVuLCBhbGxvd2VkUm9sZXMsIHJlcXVpcmVkTW9kdWxlIH0pIHtcbiAgY29uc3QgeyBpc0F1dGhlbnRpY2F0ZWQsIHVzZXIsIGxvYWRpbmcsIGhhc01vZHVsZVBlcm1pc3Npb24gfSA9IHVzZUF1dGgoKTtcbiAgY29uc3QgeyB0IH0gPSB1c2VMYW5ndWFnZSgpO1xuICBjb25zdCBsb2NhdGlvbiA9IHVzZUxvY2F0aW9uKCk7XG5cbiAgaWYgKGxvYWRpbmcpIHtcbiAgICByZXR1cm4gKFxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJtaW4taC1zY3JlZW4gZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgYmctc2xhdGUtOTAwXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LWNvbCBpdGVtcy1jZW50ZXIgc3BhY2UteS00XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTEyIGgtMTIgYm9yZGVyLTQgYm9yZGVyLWluZGlnby01MDAgYm9yZGVyLXQtdHJhbnNwYXJlbnQgcm91bmRlZC1mdWxsIGFuaW1hdGUtc3BpblwiPjwvZGl2PlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW0gdGV4dC1zbGF0ZS0zMDBcIj57dCgnY29tbW9uLmxvYWRpbmcnKX08L3A+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIGlmICghaXNBdXRoZW50aWNhdGVkKSB7XG4gICAgcmV0dXJuIDxOYXZpZ2F0ZSB0bz1cIi9sb2dpblwiIHN0YXRlPXt7IGZyb206IGxvY2F0aW9uIH19IHJlcGxhY2UgLz47XG4gIH1cblxuICAvLyAxLiBSb2xlLWJhc2VkIGNoZWNrXG4gIGlmIChhbGxvd2VkUm9sZXMgJiYgYWxsb3dlZFJvbGVzLmxlbmd0aCA+IDApIHtcbiAgICBjb25zdCBoYXNSb2xlUGVybWlzc2lvbiA9IHVzZXI/LnJvbGUgPT09ICdBRE1JTicgfHwgYWxsb3dlZFJvbGVzLmluY2x1ZGVzKHVzZXI/LnJvbGUpO1xuICAgIGlmICghaGFzUm9sZVBlcm1pc3Npb24pIHtcbiAgICAgIHJldHVybiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicC04IG1heC13LWxnIG14LWF1dG8gdGV4dC1jZW50ZXIgbXQtMTIgYmctd2hpdGUgcm91bmRlZC0zeGwgYm9yZGVyIGJvcmRlci1yb3NlLTEwMCBzaGFkb3cteGwgYW5pbWF0ZS1mYWRlLWluXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTE2IGgtMTYgYmctcm9zZS0xMDAgdGV4dC1yb3NlLTYwMCByb3VuZGVkLTJ4bCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBteC1hdXRvIG1iLTRcIj5cbiAgICAgICAgICAgIDxTaGllbGRBbGVydCBjbGFzc05hbWU9XCJ3LTggaC04XCIgLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwidGV4dC14bCBmb250LWJvbGQgdGV4dC1zbGF0ZS05MDAgbWItMlwiPnt0KCdjb21tb24uYWNjZXNzX2RlbmllZF90aXRsZScpfTwvaDI+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSB0ZXh0LXNsYXRlLTYwMCBtYi02XCI+XG4gICAgICAgICAgICB7dCgnY29tbW9uLmFjY2Vzc19kZW5pZWRfZGVzYycpfSAoe3VzZXI/LnJvbGV9KVxuICAgICAgICAgIDwvcD5cbiAgICAgICAgICA8YVxuICAgICAgICAgICAgaHJlZj1cIi9cIlxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiaW5saW5lLWZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBweC00IHB5LTIuNSB0ZXh0LXhzIGZvbnQtYm9sZCB0ZXh0LXdoaXRlIGJnLWluZGlnby02MDAgaG92ZXI6YmctaW5kaWdvLTcwMCByb3VuZGVkLXhsIHRyYW5zaXRpb24tY29sb3JzIHNoYWRvdy1tZCBzaGFkb3ctaW5kaWdvLTYwMC8yMFwiXG4gICAgICAgICAgPlxuICAgICAgICAgICAgPEFycm93TGVmdCBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cbiAgICAgICAgICAgIDxzcGFuPnt0KCdjb21tb24uYmFja190b19kYXNoYm9hcmQnKX08L3NwYW4+XG4gICAgICAgICAgPC9hPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICk7XG4gICAgfVxuICB9XG5cbiAgLy8gMi4gR3JhbnVsYXIgTW9kdWxlIFBlcm1pc3Npb24gY2hlY2tcbiAgaWYgKHJlcXVpcmVkTW9kdWxlKSB7XG4gICAgY29uc3QgaGFzTW9kUGVybSA9IGhhc01vZHVsZVBlcm1pc3Npb24ocmVxdWlyZWRNb2R1bGUpO1xuICAgIGlmICghaGFzTW9kUGVybSkge1xuICAgICAgcmV0dXJuIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTggbWF4LXctbGcgbXgtYXV0byB0ZXh0LWNlbnRlciBtdC0xMiBiZy13aGl0ZSByb3VuZGVkLTN4bCBib3JkZXIgYm9yZGVyLWFtYmVyLTEwMCBzaGFkb3cteGwgYW5pbWF0ZS1mYWRlLWluXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ3LTE2IGgtMTYgYmctYW1iZXItMTAwIHRleHQtYW1iZXItNjAwIHJvdW5kZWQtMnhsIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIG14LWF1dG8gbWItNFwiPlxuICAgICAgICAgICAgPExvY2sgY2xhc3NOYW1lPVwidy04IGgtOFwiIC8+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwicHgtMyBweS0xIHJvdW5kZWQtZnVsbCB0ZXh0LVsxMXB4XSBmb250LWV4dHJhYm9sZCBiZy1hbWJlci01MCB0ZXh0LWFtYmVyLTgwMCBib3JkZXIgYm9yZGVyLWFtYmVyLTIwMCB1cHBlcmNhc2UgdHJhY2tpbmctd2lkZXIgbWItMiBpbmxpbmUtYmxvY2tcIj5cbiAgICAgICAgICAgIEhUVFAgNDAzIOKAoiBNb2R1bCBnZXNwZXJydFxuICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICA8aDIgY2xhc3NOYW1lPVwidGV4dC14bCBmb250LWV4dHJhYm9sZCB0ZXh0LXNsYXRlLTkwMCBtYi0yXCI+WnVncmlmZiBhdWYgZGllc2VzIE1vZHVsIGVpbmdlc2NocsOkbmt0PC9oMj5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHRleHQtc2xhdGUtNjAwIG1iLTYgbGVhZGluZy1yZWxheGVkXCI+XG4gICAgICAgICAgICBJaHIgQmVudXR6ZXJrb250byBiZXNpdHp0IGRlcnplaXQga2VpbmUgRnJlaWdhYmUgZsO8ciBkYXMgTW9kdWwgPHN0cm9uZyBjbGFzc05hbWU9XCJmb250LW1vbm8gdGV4dC1zbGF0ZS05MDBcIj5cIntyZXF1aXJlZE1vZHVsZX1cIjwvc3Ryb25nPi4gXG4gICAgICAgICAgICBCaXR0ZSB3ZW5kZW4gU2llIHNpY2ggYW4gSWhyZW4gPHN0cm9uZz5TdXBlckFkbWluPC9zdHJvbmc+LCB1bSBkaWUgQmVyZWNodGlndW5nIGZyZWl6dXNjaGFsdGVuLlxuICAgICAgICAgIDwvcD5cbiAgICAgICAgICA8YVxuICAgICAgICAgICAgaHJlZj1cIi9cIlxuICAgICAgICAgICAgY2xhc3NOYW1lPVwiaW5saW5lLWZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBweC00IHB5LTIuNSB0ZXh0LXhzIGZvbnQtYm9sZCB0ZXh0LXdoaXRlIGJnLWluZGlnby02MDAgaG92ZXI6YmctaW5kaWdvLTcwMCByb3VuZGVkLXhsIHRyYW5zaXRpb24tY29sb3JzIHNoYWRvdy1tZCBzaGFkb3ctaW5kaWdvLTYwMC8yMFwiXG4gICAgICAgICAgPlxuICAgICAgICAgICAgPEFycm93TGVmdCBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cbiAgICAgICAgICAgIDxzcGFuPnt0KCdjb21tb24uYmFja190b19kYXNoYm9hcmQnKX08L3NwYW4+XG4gICAgICAgICAgPC9hPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICk7XG4gICAgfVxuICB9XG5cbiAgcmV0dXJuIGNoaWxkcmVuO1xufVxuIl0sImZpbGUiOiJDOi9Vc2Vycy9IdW1iZXJ0L0Rlc2t0b3AvaW50cmFuZXQtY29ycC9mcm9udGVuZC9zcmMvY29tcG9uZW50cy9sYXlvdXQvUHJvdGVjdGVkUm91dGUuanN4In0=

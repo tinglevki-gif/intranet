@@ -1,0 +1,411 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/common/InstallPromptBanner.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const Fragment = __vite__cjsImport0_react_jsxDevRuntime["Fragment"]; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"];
+import { Download, X, Share, PlusSquare, Smartphone, Check, Sparkles } from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+const PWA_DISMISSED_KEY = "tinglev_pwa_dismissed";
+const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1e3;
+export function InstallPromptBanner() {
+  _s();
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showBanner, setShowBanner] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => {
+    const isStandaloneMode = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true || document.referrer.includes("android-app://");
+    setIsStandalone(isStandaloneMode);
+    if (isStandaloneMode) {
+      return;
+    }
+    const dismissedUntil = localStorage.getItem(PWA_DISMISSED_KEY);
+    if (dismissedUntil && Date.now() < Number(dismissedUntil)) {
+      return;
+    }
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isSafari = /safari/.test(userAgent) && !/chrome|crios|fxios/.test(userAgent);
+    setIsIOS(isIosDevice);
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      window.__pwaDeferredPrompt = e;
+      setShowBanner(true);
+    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    const handleAppInstalled = () => {
+      setInstalled(true);
+      setShowBanner(false);
+      setDeferredPrompt(null);
+      console.log("[PWA] Tinglev Intranet wurde erfolgreich installiert!");
+    };
+    window.addEventListener("appinstalled", handleAppInstalled);
+    if (isIosDevice && !isStandaloneMode) {
+      const timer = setTimeout(() => {
+        setShowBanner(true);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        setInstalled(true);
+        setShowBanner(false);
+      }
+      setDeferredPrompt(null);
+    } else if (isIOS) {
+      setShowIOSGuide(true);
+    }
+  };
+  const handleDismiss = () => {
+    setShowBanner(false);
+    setShowIOSGuide(false);
+    localStorage.setItem(PWA_DISMISSED_KEY, String(Date.now() + FOURTEEN_DAYS_MS));
+  };
+  if (isStandalone || !showBanner) {
+    return null;
+  }
+  return /* @__PURE__ */ jsxDEV(Fragment, { children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "fixed top-3 left-3 right-3 sm:top-auto sm:bottom-4 sm:left-auto sm:right-6 sm:max-w-md z-[9999] animate-slide-up", children: /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-900/95 dark:bg-slate-900/95 text-white p-4 rounded-3xl shadow-2xl border border-sky-500/30 backdrop-blur-xl flex items-start space-x-3.5 ring-1 ring-sky-500/20", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-600 to-blue-800 p-2 shrink-0 shadow-lg flex items-center justify-center border border-sky-400/40 relative", children: [
+        /* @__PURE__ */ jsxDEV(Smartphone, { className: "w-6 h-6 text-white" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 125,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("span", { className: "absolute -top-1 -right-1 flex h-2.5 w-2.5", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 127,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-400" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 128,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 126,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+        lineNumber: 124,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "flex-1 min-w-0 pr-1", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "font-extrabold text-sm text-white", children: "Tinglev Intranet App" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 134,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-500/30", children: "PWA" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 135,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 133,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-300 mt-1 leading-relaxed", children: isIOS ? "Tinglev Intranet als App auf Ihrem iPhone / iPad installieren für Vollbildmodus & Schnellzugriff." : "Tinglev Intranet als App installieren für schnellen Zugriff und Offline-Nutzung." }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 140,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2 mt-3", children: [
+          /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              onClick: handleInstallClick,
+              className: "flex items-center space-x-1.5 px-3.5 py-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-500/20 transition-all active:scale-95 cursor-pointer",
+              children: [
+                /* @__PURE__ */ jsxDEV(Download, { className: "w-3.5 h-3.5" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                  lineNumber: 151,
+                  columnNumber: 17
+                }, this),
+                /* @__PURE__ */ jsxDEV("span", { children: isIOS ? "Anleitung öffnen" : "Installieren" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                  lineNumber: 152,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 147,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              onClick: handleDismiss,
+              className: "px-2.5 py-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer",
+              title: "Für 14 Tage ausblenden",
+              children: "Später"
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 155,
+              columnNumber: 15
+            },
+            this
+          )
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 146,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+        lineNumber: 132,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: handleDismiss,
+          className: "p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer",
+          title: "Für 14 Tage schließen",
+          children: /* @__PURE__ */ jsxDEV(X, { className: "w-4 h-4" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 170,
+            columnNumber: 13
+          }, this)
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 165,
+          columnNumber: 11
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+      lineNumber: 122,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+      lineNumber: 121,
+      columnNumber: 7
+    }, this),
+    showIOSGuide && /* @__PURE__ */ jsxDEV("div", { className: "fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm flex items-end sm:items-center justify-center p-4", children: /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-900 border border-slate-700/80 rounded-3xl max-w-sm w-full p-6 text-white shadow-2xl space-y-4 animate-scale-in", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2", children: [
+          /* @__PURE__ */ jsxDEV(Smartphone, { className: "w-5 h-5 text-sky-400" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 181,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("h3", { className: "font-extrabold text-base", children: "Auf iOS installieren" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 182,
+            columnNumber: 17
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 180,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDEV(
+          "button",
+          {
+            onClick: () => setShowIOSGuide(false),
+            className: "p-1.5 rounded-xl hover:bg-slate-800 text-slate-400 hover:text-white transition-colors",
+            children: /* @__PURE__ */ jsxDEV(X, { className: "w-5 h-5" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 188,
+              columnNumber: 17
+            }, this)
+          },
+          void 0,
+          false,
+          {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 184,
+            columnNumber: 15
+          },
+          this
+        )
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+        lineNumber: 179,
+        columnNumber: 13
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "text-xs text-slate-300 space-y-3", children: [
+        /* @__PURE__ */ jsxDEV("p", { className: "leading-relaxed", children: "In Safari können Sie das Tinglev Intranet mit zwei einfachen Schritten als vollwertige App auf Ihren Home-Bildschirm legen:" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 193,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-800/90 p-3.5 rounded-2xl border border-slate-700/80 space-y-3", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3", children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 font-black flex items-center justify-center shrink-0 text-xs border border-sky-500/30", children: "1" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 199,
+              columnNumber: 19
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5 text-slate-200", children: [
+              /* @__PURE__ */ jsxDEV("span", { children: "Tippe auf" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 203,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV(Share, { className: "w-4 h-4 text-sky-400 inline" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 204,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("strong", { className: "text-white", children: "Teilen" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 205,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { children: "(unten im Browser)" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 206,
+                columnNumber: 21
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 202,
+              columnNumber: 19
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 198,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-3", children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 font-black flex items-center justify-center shrink-0 text-xs border border-sky-500/30", children: "2" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 211,
+              columnNumber: 19
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5 text-slate-200", children: [
+              /* @__PURE__ */ jsxDEV("span", { children: "Wähle" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 215,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV(PlusSquare, { className: "w-4 h-4 text-sky-400 inline" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 216,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("strong", { className: "text-white", children: '"Zum Home-Bildschirm"' }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+                lineNumber: 217,
+                columnNumber: 21
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+              lineNumber: 214,
+              columnNumber: 19
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+            lineNumber: 210,
+            columnNumber: 17
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 197,
+          columnNumber: 15
+        }, this),
+        /* @__PURE__ */ jsxDEV("p", { className: "text-[11px] text-slate-400 text-center leading-normal", children: "Die App startet danach direkt im nativen Vollbildmodus ohne Browser-Balken." }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 222,
+          columnNumber: 15
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+        lineNumber: 192,
+        columnNumber: 13
+      }, this),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => setShowIOSGuide(false),
+          className: "w-full py-2.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-sky-600/30 active:scale-98 cursor-pointer",
+          children: "Verstanden"
+        },
+        void 0,
+        false,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+          lineNumber: 227,
+          columnNumber: 13
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+      lineNumber: 178,
+      columnNumber: 11
+    }, this) }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+      lineNumber: 177,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx",
+    lineNumber: 119,
+    columnNumber: 5
+  }, this);
+}
+_s(InstallPromptBanner, "twOe1189Zf0HaqLItL568EiM45E=");
+_c = InstallPromptBanner;
+export const PWAInstallBanner = InstallPromptBanner;
+var _c;
+$RefreshReg$(_c, "InstallPromptBanner");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/common/InstallPromptBanner.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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LHlJQUF1SSxpQkFBdko7QUFBQTtBQUFBO0FBQUE7QUFBQSxtQkFFQTtBQUFBLFlBQ0EsdUJBQUMsU0FBSSxXQUFVLGdEQUNiO0FBQUEscUNBQUMsVUFBSyxxQkFBTjtBQUFBO0FBQUE7QUFBQTtBQUFBLHFCQUFXO0FBQUEsY0FDWCx1QkFBQyxjQUFXLFdBQVUsaUNBQXRCO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBQW1EO0FBQUEsY0FDbkQsdUJBQUMsWUFBTyxXQUFVLGNBQWEscUNBQS9CO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBQW9EO0FBQUEsaUJBSHREO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBSUE7QUFBQSxlQVJGO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBU0E7QUFBQSxhQXRCRjtBQUFBO0FBQUE7QUFBQTtBQUFBLGVBdUJBO0FBQUEsUUFFQSx1QkFBQyxPQUFFLFdBQVUseURBQXVELDJGQUFwRTtBQUFBO0FBQUE7QUFBQTtBQUFBLGVBRUE7QUFBQSxXQWhDRjtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBaUNBO0FBQUEsTUFFQTtBQUFBLFFBQUM7QUFBQTtBQUFBLFVBQ0MsU0FBUyxNQUFNQSxnQkFBZ0IsS0FBSztBQUFBLFVBQ3BDLFdBQVU7QUFBQSxVQUFnTjtBQUFBO0FBQUEsUUFGNU47QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLE1BS0E7QUFBQSxTQXRERjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBdURBLEtBeERGO0FBQUE7QUFBQTtBQUFBO0FBQUEsV0F5REE7QUFBQSxPQW5ISjtBQUFBO0FBQUE7QUFBQTtBQUFBLFNBcUhBO0FBRUo7QUFFQVYsR0F0TmdCRCxxQkFBbUI7QUFBQSxLQUFuQkE7QUF1TlQsYUFBTXFELG1CQUFtQnJEO0FBQW9CLElBQUFzRDtBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlRWZmZWN0IiwiRG93bmxvYWQiLCJYIiwiU2hhcmUiLCJQbHVzU3F1YXJlIiwiU21hcnRwaG9uZSIsIkNoZWNrIiwiU3BhcmtsZXMiLCJQV0FfRElTTUlTU0VEX0tFWSIsIkZPVVJURUVOX0RBWVNfTVMiLCJJbnN0YWxsUHJvbXB0QmFubmVyIiwiX3MiLCJkZWZlcnJlZFByb21wdCIsInNldERlZmVycmVkUHJvbXB0Iiwic2hvd0Jhbm5lciIsInNldFNob3dCYW5uZXIiLCJpc0lPUyIsInNldElzSU9TIiwiaXNTdGFuZGFsb25lIiwic2V0SXNTdGFuZGFsb25lIiwic2hvd0lPU0d1aWRlIiwic2V0U2hvd0lPU0d1aWRlIiwiaW5zdGFsbGVkIiwic2V0SW5zdGFsbGVkIiwiaXNTdGFuZGFsb25lTW9kZSIsIndpbmRvdyIsIm1hdGNoTWVkaWEiLCJtYXRjaGVzIiwibmF2aWdhdG9yIiwic3RhbmRhbG9uZSIsImRvY3VtZW50IiwicmVmZXJyZXIiLCJpbmNsdWRlcyIsImRpc21pc3NlZFVudGlsIiwibG9jYWxTdG9yYWdlIiwiZ2V0SXRlbSIsIkRhdGUiLCJub3ciLCJOdW1iZXIiLCJ1c2VyQWdlbnQiLCJ0b0xvd2VyQ2FzZSIsImlzSW9zRGV2aWNlIiwidGVzdCIsImlzU2FmYXJpIiwiaGFuZGxlQmVmb3JlSW5zdGFsbFByb21wdCIsImUiLCJwcmV2ZW50RGVmYXVsdCIsIl9fcHdhRGVmZXJyZWRQcm9tcHQiLCJhZGRFdmVudExpc3RlbmVyIiwiaGFuZGxlQXBwSW5zdGFsbGVkIiwiY29uc29sZSIsImxvZyIsInRpbWVyIiwic2V0VGltZW91dCIsImNsZWFyVGltZW91dCIsInJlbW92ZUV2ZW50TGlzdGVuZXIiLCJoYW5kbGVJbnN0YWxsQ2xpY2siLCJwcm9tcHQiLCJvdXRjb21lIiwidXNlckNob2ljZSIsImhhbmRsZURpc21pc3MiLCJzZXRJdGVtIiwiU3RyaW5nIiwiUFdBSW5zdGFsbEJhbm5lciIsIl9jIl0sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIkluc3RhbGxQcm9tcHRCYW5uZXIuanN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCwgeyB1c2VTdGF0ZSwgdXNlRWZmZWN0IH0gZnJvbSAncmVhY3QnO1xuaW1wb3J0IHsgRG93bmxvYWQsIFgsIFNoYXJlLCBQbHVzU3F1YXJlLCBTbWFydHBob25lLCBDaGVjaywgU3BhcmtsZXMgfSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuXG5jb25zdCBQV0FfRElTTUlTU0VEX0tFWSA9ICd0aW5nbGV2X3B3YV9kaXNtaXNzZWQnO1xuY29uc3QgRk9VUlRFRU5fREFZU19NUyA9IDE0ICogMjQgKiA2MCAqIDYwICogMTAwMDtcblxuZXhwb3J0IGZ1bmN0aW9uIEluc3RhbGxQcm9tcHRCYW5uZXIoKSB7XG4gIGNvbnN0IFtkZWZlcnJlZFByb21wdCwgc2V0RGVmZXJyZWRQcm9tcHRdID0gdXNlU3RhdGUobnVsbCk7XG4gIGNvbnN0IFtzaG93QmFubmVyLCBzZXRTaG93QmFubmVyXSA9IHVzZVN0YXRlKGZhbHNlKTtcbiAgY29uc3QgW2lzSU9TLCBzZXRJc0lPU10gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFtpc1N0YW5kYWxvbmUsIHNldElzU3RhbmRhbG9uZV0gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFtzaG93SU9TR3VpZGUsIHNldFNob3dJT1NHdWlkZV0gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFtpbnN0YWxsZWQsIHNldEluc3RhbGxlZF0gPSB1c2VTdGF0ZShmYWxzZSk7XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICAvLyAxLiBDaGVjayBpZiBydW5uaW5nIGluIHN0YW5kYWxvbmUgbW9kZSAoYWxyZWFkeSBpbnN0YWxsZWQgYXMgUFdBKVxuICAgIGNvbnN0IGlzU3RhbmRhbG9uZU1vZGUgPVxuICAgICAgd2luZG93Lm1hdGNoTWVkaWEoJyhkaXNwbGF5LW1vZGU6IHN0YW5kYWxvbmUpJykubWF0Y2hlcyB8fFxuICAgICAgd2luZG93Lm5hdmlnYXRvci5zdGFuZGFsb25lID09PSB0cnVlIHx8XG4gICAgICBkb2N1bWVudC5yZWZlcnJlci5pbmNsdWRlcygnYW5kcm9pZC1hcHA6Ly8nKTtcblxuICAgIHNldElzU3RhbmRhbG9uZShpc1N0YW5kYWxvbmVNb2RlKTtcblxuICAgIGlmIChpc1N0YW5kYWxvbmVNb2RlKSB7XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgLy8gMi4gQ2hlY2sgaWYgZGlzbWlzc2VkIHdpdGhpbiB0aGUgbGFzdCAxNCBkYXlzXG4gICAgY29uc3QgZGlzbWlzc2VkVW50aWwgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbShQV0FfRElTTUlTU0VEX0tFWSk7XG4gICAgaWYgKGRpc21pc3NlZFVudGlsICYmIERhdGUubm93KCkgPCBOdW1iZXIoZGlzbWlzc2VkVW50aWwpKSB7XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgLy8gMy4gRGV0ZWN0IGlPUyBkZXZpY2UgYW5kIFNhZmFyaVxuICAgIGNvbnN0IHVzZXJBZ2VudCA9IHdpbmRvdy5uYXZpZ2F0b3IudXNlckFnZW50LnRvTG93ZXJDYXNlKCk7XG4gICAgY29uc3QgaXNJb3NEZXZpY2UgPSAvaXBob25lfGlwYWR8aXBvZC8udGVzdCh1c2VyQWdlbnQpO1xuICAgIGNvbnN0IGlzU2FmYXJpID0gL3NhZmFyaS8udGVzdCh1c2VyQWdlbnQpICYmICEvY2hyb21lfGNyaW9zfGZ4aW9zLy50ZXN0KHVzZXJBZ2VudCk7XG4gICAgc2V0SXNJT1MoaXNJb3NEZXZpY2UpO1xuXG4gICAgLy8gNC4gQW5kcm9pZCAvIENocm9tZSAvIEVkZ2U6IExpc3RlbiBmb3IgYmVmb3JlaW5zdGFsbHByb21wdCBldmVudFxuICAgIGNvbnN0IGhhbmRsZUJlZm9yZUluc3RhbGxQcm9tcHQgPSAoZSkgPT4ge1xuICAgICAgZS5wcmV2ZW50RGVmYXVsdCgpO1xuICAgICAgc2V0RGVmZXJyZWRQcm9tcHQoZSk7XG4gICAgICB3aW5kb3cuX19wd2FEZWZlcnJlZFByb21wdCA9IGU7XG4gICAgICBzZXRTaG93QmFubmVyKHRydWUpO1xuICAgIH07XG5cbiAgICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignYmVmb3JlaW5zdGFsbHByb21wdCcsIGhhbmRsZUJlZm9yZUluc3RhbGxQcm9tcHQpO1xuXG4gICAgLy8gNS4gTGlzdGVuIGZvciBzdWNjZXNzZnVsIGluc3RhbGxhdGlvblxuICAgIGNvbnN0IGhhbmRsZUFwcEluc3RhbGxlZCA9ICgpID0+IHtcbiAgICAgIHNldEluc3RhbGxlZCh0cnVlKTtcbiAgICAgIHNldFNob3dCYW5uZXIoZmFsc2UpO1xuICAgICAgc2V0RGVmZXJyZWRQcm9tcHQobnVsbCk7XG4gICAgICBjb25zb2xlLmxvZygnW1BXQV0gVGluZ2xldiBJbnRyYW5ldCB3dXJkZSBlcmZvbGdyZWljaCBpbnN0YWxsaWVydCEnKTtcbiAgICB9O1xuXG4gICAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoJ2FwcGluc3RhbGxlZCcsIGhhbmRsZUFwcEluc3RhbGxlZCk7XG5cbiAgICAvLyA2LiBpT1M6IElmIG9uIGlPUyBTYWZhcmkgYW5kIG5vdCBzdGFuZGFsb25lLCBzaG93IHByb21wdCBhZnRlciAzLjVzXG4gICAgaWYgKGlzSW9zRGV2aWNlICYmICFpc1N0YW5kYWxvbmVNb2RlKSB7XG4gICAgICBjb25zdCB0aW1lciA9IHNldFRpbWVvdXQoKCkgPT4ge1xuICAgICAgICBzZXRTaG93QmFubmVyKHRydWUpO1xuICAgICAgfSwgMzUwMCk7XG4gICAgICByZXR1cm4gKCkgPT4gY2xlYXJUaW1lb3V0KHRpbWVyKTtcbiAgICB9XG5cbiAgICByZXR1cm4gKCkgPT4ge1xuICAgICAgd2luZG93LnJlbW92ZUV2ZW50TGlzdGVuZXIoJ2JlZm9yZWluc3RhbGxwcm9tcHQnLCBoYW5kbGVCZWZvcmVJbnN0YWxsUHJvbXB0KTtcbiAgICAgIHdpbmRvdy5yZW1vdmVFdmVudExpc3RlbmVyKCdhcHBpbnN0YWxsZWQnLCBoYW5kbGVBcHBJbnN0YWxsZWQpO1xuICAgIH07XG4gIH0sIFtdKTtcblxuICBjb25zdCBoYW5kbGVJbnN0YWxsQ2xpY2sgPSBhc3luYyAoKSA9PiB7XG4gICAgaWYgKGRlZmVycmVkUHJvbXB0KSB7XG4gICAgICBkZWZlcnJlZFByb21wdC5wcm9tcHQoKTtcbiAgICAgIGNvbnN0IHsgb3V0Y29tZSB9ID0gYXdhaXQgZGVmZXJyZWRQcm9tcHQudXNlckNob2ljZTtcbiAgICAgIGlmIChvdXRjb21lID09PSAnYWNjZXB0ZWQnKSB7XG4gICAgICAgIHNldEluc3RhbGxlZCh0cnVlKTtcbiAgICAgICAgc2V0U2hvd0Jhbm5lcihmYWxzZSk7XG4gICAgICB9XG4gICAgICBzZXREZWZlcnJlZFByb21wdChudWxsKTtcbiAgICB9IGVsc2UgaWYgKGlzSU9TKSB7XG4gICAgICBzZXRTaG93SU9TR3VpZGUodHJ1ZSk7XG4gICAgfVxuICB9O1xuXG4gIGNvbnN0IGhhbmRsZURpc21pc3MgPSAoKSA9PiB7XG4gICAgc2V0U2hvd0Jhbm5lcihmYWxzZSk7XG4gICAgc2V0U2hvd0lPU0d1aWRlKGZhbHNlKTtcbiAgICAvLyBEaXNtaXNzIGZvciAxNCBkYXlzIGluIGxvY2FsU3RvcmFnZVxuICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKFBXQV9ESVNNSVNTRURfS0VZLCBTdHJpbmcoRGF0ZS5ub3coKSArIEZPVVJURUVOX0RBWVNfTVMpKTtcbiAgfTtcblxuICBpZiAoaXNTdGFuZGFsb25lIHx8ICFzaG93QmFubmVyKSB7XG4gICAgcmV0dXJuIG51bGw7XG4gIH1cblxuICByZXR1cm4gKFxuICAgIDw+XG4gICAgICB7LyogRmxvYXRpbmcgSW5zdGFsbGF0aW9uIEJhbm5lciAoVG9wIC8gQm90dG9tIFJlc3BvbnNpdmUgQmFyKSAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZml4ZWQgdG9wLTMgbGVmdC0zIHJpZ2h0LTMgc206dG9wLWF1dG8gc206Ym90dG9tLTQgc206bGVmdC1hdXRvIHNtOnJpZ2h0LTYgc206bWF4LXctbWQgei1bOTk5OV0gYW5pbWF0ZS1zbGlkZS11cFwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLXNsYXRlLTkwMC85NSBkYXJrOmJnLXNsYXRlLTkwMC85NSB0ZXh0LXdoaXRlIHAtNCByb3VuZGVkLTN4bCBzaGFkb3ctMnhsIGJvcmRlciBib3JkZXItc2t5LTUwMC8zMCBiYWNrZHJvcC1ibHVyLXhsIGZsZXggaXRlbXMtc3RhcnQgc3BhY2UteC0zLjUgcmluZy0xIHJpbmctc2t5LTUwMC8yMFwiPlxuICAgICAgICAgIHsvKiBUaW5nbGV2IEFwcCBJY29uICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy0xMiBoLTEyIHJvdW5kZWQtMnhsIGJnLWdyYWRpZW50LXRvLXRyIGZyb20tc2t5LTYwMCB0by1ibHVlLTgwMCBwLTIgc2hyaW5rLTAgc2hhZG93LWxnIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIGJvcmRlciBib3JkZXItc2t5LTQwMC80MCByZWxhdGl2ZVwiPlxuICAgICAgICAgICAgPFNtYXJ0cGhvbmUgY2xhc3NOYW1lPVwidy02IGgtNiB0ZXh0LXdoaXRlXCIgLz5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImFic29sdXRlIC10b3AtMSAtcmlnaHQtMSBmbGV4IGgtMi41IHctMi41XCI+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImFuaW1hdGUtcGluZyBhYnNvbHV0ZSBpbmxpbmUtZmxleCBoLWZ1bGwgdy1mdWxsIHJvdW5kZWQtZnVsbCBiZy1za3ktNDAwIG9wYWNpdHktNzVcIj48L3NwYW4+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInJlbGF0aXZlIGlubGluZS1mbGV4IHJvdW5kZWQtZnVsbCBoLTIuNSB3LTIuNSBiZy1za3ktNDAwXCI+PC9zcGFuPlxuICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4LTEgbWluLXctMCBwci0xXCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMS41XCI+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtZXh0cmFib2xkIHRleHQtc20gdGV4dC13aGl0ZVwiPlRpbmdsZXYgSW50cmFuZXQgQXBwPC9zcGFuPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJweC0xLjUgcHktMC41IHJvdW5kZWQgdGV4dC1bOXB4XSBmb250LWJsYWNrIHVwcGVyY2FzZSB0cmFja2luZy13aWRlciBiZy1za3ktNTAwLzIwIHRleHQtc2t5LTMwMCBib3JkZXIgYm9yZGVyLXNreS01MDAvMzBcIj5cbiAgICAgICAgICAgICAgICBQV0FcbiAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICBcbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zbGF0ZS0zMDAgbXQtMSBsZWFkaW5nLXJlbGF4ZWRcIj5cbiAgICAgICAgICAgICAge2lzSU9TXG4gICAgICAgICAgICAgICAgPyAnVGluZ2xldiBJbnRyYW5ldCBhbHMgQXBwIGF1ZiBJaHJlbSBpUGhvbmUgLyBpUGFkIGluc3RhbGxpZXJlbiBmw7xyIFZvbGxiaWxkbW9kdXMgJiBTY2huZWxsenVncmlmZi4nXG4gICAgICAgICAgICAgICAgOiAnVGluZ2xldiBJbnRyYW5ldCBhbHMgQXBwIGluc3RhbGxpZXJlbiBmw7xyIHNjaG5lbGxlbiBadWdyaWZmIHVuZCBPZmZsaW5lLU51dHp1bmcuJ31cbiAgICAgICAgICAgIDwvcD5cblxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTIgbXQtM1wiPlxuICAgICAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICAgICAgb25DbGljaz17aGFuZGxlSW5zdGFsbENsaWNrfVxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMS41IHB4LTMuNSBweS0xLjUgYmctZ3JhZGllbnQtdG8tciBmcm9tLXNreS01MDAgdG8tYmx1ZS02MDAgaG92ZXI6ZnJvbS1za3ktNDAwIGhvdmVyOnRvLWJsdWUtNTAwIHRleHQtd2hpdGUgdGV4dC14cyBmb250LWJvbGQgcm91bmRlZC14bCBzaGFkb3ctbWQgc2hhZG93LXNreS01MDAvMjAgdHJhbnNpdGlvbi1hbGwgYWN0aXZlOnNjYWxlLTk1IGN1cnNvci1wb2ludGVyXCJcbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIDxEb3dubG9hZCBjbGFzc05hbWU9XCJ3LTMuNSBoLTMuNVwiIC8+XG4gICAgICAgICAgICAgICAgPHNwYW4+e2lzSU9TID8gJ0FubGVpdHVuZyDDtmZmbmVuJyA6ICdJbnN0YWxsaWVyZW4nfTwvc3Bhbj5cbiAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgIFxuICAgICAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICAgICAgb25DbGljaz17aGFuZGxlRGlzbWlzc31cbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJweC0yLjUgcHktMS41IHRleHQteHMgdGV4dC1zbGF0ZS00MDAgaG92ZXI6dGV4dC13aGl0ZSB0cmFuc2l0aW9uLWNvbG9ycyBjdXJzb3ItcG9pbnRlclwiXG4gICAgICAgICAgICAgICAgdGl0bGU9XCJGw7xyIDE0IFRhZ2UgYXVzYmxlbmRlblwiXG4gICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICBTcMOkdGVyXG4gICAgICAgICAgICAgIDwvYnV0dG9uPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICBvbkNsaWNrPXtoYW5kbGVEaXNtaXNzfVxuICAgICAgICAgICAgY2xhc3NOYW1lPVwicC0xLjUgcm91bmRlZC14bCB0ZXh0LXNsYXRlLTQwMCBob3Zlcjp0ZXh0LXdoaXRlIGhvdmVyOmJnLXNsYXRlLTgwMCB0cmFuc2l0aW9uLWNvbG9ycyBjdXJzb3ItcG9pbnRlclwiXG4gICAgICAgICAgICB0aXRsZT1cIkbDvHIgMTQgVGFnZSBzY2hsaWXDn2VuXCJcbiAgICAgICAgICA+XG4gICAgICAgICAgICA8WCBjbGFzc05hbWU9XCJ3LTQgaC00XCIgLz5cbiAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIGlPUyBTdGVwLWJ5LVN0ZXAgSW5zdGFsbGF0aW9uIE1vZGFsICovfVxuICAgICAge3Nob3dJT1NHdWlkZSAmJiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZml4ZWQgaW5zZXQtMCB6LVsxMDAwMF0gYmctYmxhY2svNzUgYmFja2Ryb3AtYmx1ci1zbSBmbGV4IGl0ZW1zLWVuZCBzbTppdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgcC00XCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1zbGF0ZS05MDAgYm9yZGVyIGJvcmRlci1zbGF0ZS03MDAvODAgcm91bmRlZC0zeGwgbWF4LXctc20gdy1mdWxsIHAtNiB0ZXh0LXdoaXRlIHNoYWRvdy0yeGwgc3BhY2UteS00IGFuaW1hdGUtc2NhbGUtaW5cIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yXCI+XG4gICAgICAgICAgICAgICAgPFNtYXJ0cGhvbmUgY2xhc3NOYW1lPVwidy01IGgtNSB0ZXh0LXNreS00MDBcIiAvPlxuICAgICAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LWV4dHJhYm9sZCB0ZXh0LWJhc2VcIj5BdWYgaU9TIGluc3RhbGxpZXJlbjwvaDM+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0U2hvd0lPU0d1aWRlKGZhbHNlKX1cbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJwLTEuNSByb3VuZGVkLXhsIGhvdmVyOmJnLXNsYXRlLTgwMCB0ZXh0LXNsYXRlLTQwMCBob3Zlcjp0ZXh0LXdoaXRlIHRyYW5zaXRpb24tY29sb3JzXCJcbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIDxYIGNsYXNzTmFtZT1cInctNSBoLTVcIiAvPlxuICAgICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zbGF0ZS0zMDAgc3BhY2UteS0zXCI+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImxlYWRpbmctcmVsYXhlZFwiPlxuICAgICAgICAgICAgICAgIEluIFNhZmFyaSBrw7ZubmVuIFNpZSBkYXMgVGluZ2xldiBJbnRyYW5ldCBtaXQgendlaSBlaW5mYWNoZW4gU2Nocml0dGVuIGFscyB2b2xsd2VydGlnZSBBcHAgYXVmIElocmVuIEhvbWUtQmlsZHNjaGlybSBsZWdlbjpcbiAgICAgICAgICAgICAgPC9wPlxuXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiYmctc2xhdGUtODAwLzkwIHAtMy41IHJvdW5kZWQtMnhsIGJvcmRlciBib3JkZXItc2xhdGUtNzAwLzgwIHNwYWNlLXktM1wiPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0zXCI+XG4gICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ3LTYgaC02IHJvdW5kZWQtZnVsbCBiZy1za3ktNTAwLzIwIHRleHQtc2t5LTQwMCBmb250LWJsYWNrIGZsZXggaXRlbXMtY2VudGVyIGp1c3RpZnktY2VudGVyIHNocmluay0wIHRleHQteHMgYm9yZGVyIGJvcmRlci1za3ktNTAwLzMwXCI+XG4gICAgICAgICAgICAgICAgICAgIDFcbiAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0xLjUgdGV4dC1zbGF0ZS0yMDBcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4+VGlwcGUgYXVmPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgICA8U2hhcmUgY2xhc3NOYW1lPVwidy00IGgtNCB0ZXh0LXNreS00MDAgaW5saW5lXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgPHN0cm9uZyBjbGFzc05hbWU9XCJ0ZXh0LXdoaXRlXCI+VGVpbGVuPC9zdHJvbmc+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuPih1bnRlbiBpbSBCcm93c2VyKTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTNcIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInctNiBoLTYgcm91bmRlZC1mdWxsIGJnLXNreS01MDAvMjAgdGV4dC1za3ktNDAwIGZvbnQtYmxhY2sgZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXIgc2hyaW5rLTAgdGV4dC14cyBib3JkZXIgYm9yZGVyLXNreS01MDAvMzBcIj5cbiAgICAgICAgICAgICAgICAgICAgMlxuICAgICAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTEuNSB0ZXh0LXNsYXRlLTIwMFwiPlxuICAgICAgICAgICAgICAgICAgICA8c3Bhbj5Xw6RobGU8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDxQbHVzU3F1YXJlIGNsYXNzTmFtZT1cInctNCBoLTQgdGV4dC1za3ktNDAwIGlubGluZVwiIC8+XG4gICAgICAgICAgICAgICAgICAgIDxzdHJvbmcgY2xhc3NOYW1lPVwidGV4dC13aGl0ZVwiPlwiWnVtIEhvbWUtQmlsZHNjaGlybVwiPC9zdHJvbmc+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1bMTFweF0gdGV4dC1zbGF0ZS00MDAgdGV4dC1jZW50ZXIgbGVhZGluZy1ub3JtYWxcIj5cbiAgICAgICAgICAgICAgICBEaWUgQXBwIHN0YXJ0ZXQgZGFuYWNoIGRpcmVrdCBpbSBuYXRpdmVuIFZvbGxiaWxkbW9kdXMgb2huZSBCcm93c2VyLUJhbGtlbi5cbiAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0U2hvd0lPU0d1aWRlKGZhbHNlKX1cbiAgICAgICAgICAgICAgY2xhc3NOYW1lPVwidy1mdWxsIHB5LTIuNSBiZy1ncmFkaWVudC10by1yIGZyb20tc2t5LTUwMCB0by1ibHVlLTYwMCBob3Zlcjpmcm9tLXNreS00MDAgaG92ZXI6dG8tYmx1ZS01MDAgdGV4dC13aGl0ZSBmb250LWJvbGQgdGV4dC14cyByb3VuZGVkLXhsIHRyYW5zaXRpb24tYWxsIHNoYWRvdy1sZyBzaGFkb3ctc2t5LTYwMC8zMCBhY3RpdmU6c2NhbGUtOTggY3Vyc29yLXBvaW50ZXJcIlxuICAgICAgICAgICAgPlxuICAgICAgICAgICAgICBWZXJzdGFuZGVuXG4gICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICApfVxuICAgIDwvPlxuICApO1xufVxuXG4vLyBOYW1lZCBhbGlhc1xuZXhwb3J0IGNvbnN0IFBXQUluc3RhbGxCYW5uZXIgPSBJbnN0YWxsUHJvbXB0QmFubmVyO1xuIl0sImZpbGUiOiJDOi9Vc2Vycy9IdW1iZXJ0L0Rlc2t0b3AvaW50cmFuZXQtY29ycC9mcm9udGVuZC9zcmMvY29tcG9uZW50cy9jb21tb24vSW5zdGFsbFByb21wdEJhbm5lci5qc3gifQ==

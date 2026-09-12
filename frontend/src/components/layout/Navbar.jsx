@@ -18,6 +18,7 @@ import { WeatherWidget } from './WeatherWidget';
 import { UserAvatar } from '../common/UserAvatar';
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { ThemeSelector } from './ThemeSelector';
+import { TrialBadge } from './TrialBadge';
 
 const NOTIFICATIONS_STORAGE_KEY = 'intranet_read_notif_ids';
 
@@ -104,8 +105,11 @@ export function Navbar({ onToggleSidebar }) {
         <GlobalSearchBar />
       </div>
 
-      {/* Right side: Weather Widget, Status, Notifications, User Menu */}
+      {/* Right side: Trial Badge, Weather Widget, Status, Notifications, User Menu */}
       <div className="flex items-center space-x-2 sm:space-x-3">
+        {/* Active Trial Time Badge */}
+        <TrialBadge />
+
         {/* Open-Meteo Weather Widget */}
         <WeatherWidget />
 

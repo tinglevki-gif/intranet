@@ -93,6 +93,9 @@ export function PlanungPage() {
         </div>
 
         <div className="flex items-center space-x-2 text-xs font-semibold">
+          <span className="px-3.5 py-1.5 rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 font-bold">
+            Testversion • Demo-Planungsdaten
+          </span>
           <span className="px-3.5 py-1.5 rounded-2xl bg-[#eef8fd] text-[#0070A8] border border-[#bce4f7] font-bold">
             36 Kipptische • 4 Fertigungslinien
           </span>

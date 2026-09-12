@@ -1,0 +1,486 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/PlanungPage.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"];
+import {
+  CalendarClock,
+  Layers,
+  Users,
+  Clock,
+  BarChart,
+  CheckCircle2,
+  Calendar,
+  ChevronRight,
+  Sliders,
+  Sparkles,
+  TrendingUp,
+  Building,
+  LayoutGrid,
+  FileSpreadsheet
+} from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+import { TischplanReader } from "/src/components/planung/TischplanReader.jsx";
+export function PlanungPage() {
+  _s();
+  const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState("TISCHPLAN");
+  const [selectedShift, setSelectedShift] = useState("FRUEH");
+  const productionLanes = [
+    {
+      name: "Fertigungslinie 1: Spannbeton-Decken",
+      hall: "Halle 1 Nord",
+      capacity: "92%",
+      capacityLabel: "Hoch ausgelastet",
+      currentProject: "Wohnquartier Hafencity HH (Charge 4)",
+      shiftLead: "Jürgen Thomsen",
+      dailyOutput: "420 m² / Tag"
+    },
+    {
+      name: "Fertigungslinie 2: Massive Wandelemente & Sandwichwände",
+      hall: "Halle 2 Süd",
+      capacity: "78%",
+      capacityLabel: "Optimal",
+      currentProject: "Bürocampus Sonderburg (DK)",
+      shiftLead: "Maik Hansen",
+      dailyOutput: "310 m² / Tag"
+    },
+    {
+      name: "Fertigungslinie 3: Sonderbauteile, Treppen & Podeste",
+      hall: "Halle 3 Manufaktur",
+      capacity: "65%",
+      capacityLabel: "Freie Kapazitäten verfügbar",
+      currentProject: "Schulzentrum Sonderburg",
+      shiftLead: "Dennis Möller",
+      dailyOutput: "18 Elemente / Tag"
+    },
+    {
+      name: "Fertigungslinie 4: Bewehrungsflechterei & Stahlbau",
+      hall: "Zentrales Biegezentrum",
+      capacity: "85%",
+      capacityLabel: "Gut ausgelastet",
+      currentProject: "Vorbereitung Gewerbepark Tinglev",
+      shiftLead: "Stefan Petersen",
+      dailyOutput: "14.5 t Stahl / Tag"
+    }
+  ];
+  const shiftPlans = {
+    FRUEH: [
+      { role: "Schichtleiter Fertigung", person: "Jürgen Thomsen", team: "Halle 1 (14 Mitarbeiter)", time: "06:00 – 14:30 Uhr" },
+      { role: "Mischanlagen-Operator", person: "Lars Christiansen", team: "Zentralmischer", time: "05:30 – 14:00 Uhr" },
+      { role: "Kranführer & Verladung", person: "Torsten Lorenzen", team: "Freilager Nord", time: "06:00 – 14:30 Uhr" },
+      { role: "QS-Prüftechniker (Labor)", person: "Dr. Anne Paulsen", team: "Baustofflabor", time: "07:00 – 15:30 Uhr" }
+    ],
+    SPAET: [
+      { role: "Schichtleiter Fertigung", person: "Maik Hansen", team: "Halle 2 & 3 (12 Mitarbeiter)", time: "14:15 – 22:45 Uhr" },
+      { role: "Ausschalarbeiten & Nachbehandlung", person: "Henning Boyens", team: "Klimakammern", time: "14:30 – 23:00 Uhr" },
+      { role: "Rüst- & Reinigungsteam", person: "Kadir Yilmaz", team: "Schalungswerkstatt", time: "15:00 – 23:30 Uhr" }
+    ]
+  };
+  return /* @__PURE__ */ jsxDEV("div", { className: "space-y-8 pb-16 animate-fade-in", children: [
+    /* @__PURE__ */ jsxDEV("div", { className: "bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-6 print:hidden", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-4", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#001E36] to-[#009FE3] text-white flex items-center justify-center shadow-md shadow-[#009FE3]/20", children: /* @__PURE__ */ jsxDEV(CalendarClock, { className: "w-6 h-6" }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 104,
+          columnNumber: 13
+        }, this) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 103,
+          columnNumber: 11
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDEV("h1", { className: "text-2xl font-bold text-slate-900", children: "Ressourcen & Planung" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 107,
+            columnNumber: 13
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs sm:text-sm text-slate-500", children: "Kipptisch-Belegung, Betonvolumen-Kalkulation (Halle 1 & 2) und Werkskapazitäten" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 108,
+            columnNumber: 13
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 106,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 102,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2 text-xs font-semibold", children: /* @__PURE__ */ jsxDEV("span", { className: "px-3.5 py-1.5 rounded-2xl bg-[#eef8fd] text-[#0070A8] border border-[#bce4f7] font-bold", children: "36 Kipptische • 4 Fertigungslinien" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 115,
+        columnNumber: 11
+      }, this) }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 114,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+      lineNumber: 101,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV("div", { className: "flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3 print:hidden", children: [
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => setActiveTab("TISCHPLAN"),
+          className: `flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${activeTab === "TISCHPLAN" ? "bg-[#001E36] text-white shadow-md shadow-[#001E36]/20" : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80"}`,
+          children: [
+            /* @__PURE__ */ jsxDEV(LayoutGrid, { className: "w-4 h-4 text-[#009FE3]" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 131,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { children: "Tischplan-Export-Reader (Halle 1 & 2)" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 132,
+              columnNumber: 11
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 123,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => setActiveTab("KAPAZITAET"),
+          className: `flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${activeTab === "KAPAZITAET" ? "bg-[#001E36] text-white shadow-md shadow-[#001E36]/20" : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80"}`,
+          children: [
+            /* @__PURE__ */ jsxDEV(BarChart, { className: "w-4 h-4 text-[#F05A22]" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 143,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { children: "Fertigungsstraßen & Kapazitäten" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 144,
+              columnNumber: 11
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 135,
+          columnNumber: 9
+        },
+        this
+      ),
+      /* @__PURE__ */ jsxDEV(
+        "button",
+        {
+          onClick: () => setActiveTab("SCHICHT"),
+          className: `flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${activeTab === "SCHICHT" ? "bg-[#001E36] text-white shadow-md shadow-[#001E36]/20" : "bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80"}`,
+          children: [
+            /* @__PURE__ */ jsxDEV(Users, { className: "w-4 h-4 text-emerald-500" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 155,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { children: "Schichtpläne & Werksbesetzung" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 156,
+              columnNumber: 11
+            }, this)
+          ]
+        },
+        void 0,
+        true,
+        {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 147,
+          columnNumber: 9
+        },
+        this
+      )
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+      lineNumber: 122,
+      columnNumber: 7
+    }, this),
+    activeTab === "TISCHPLAN" && /* @__PURE__ */ jsxDEV(TischplanReader, {}, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+      lineNumber: 162,
+      columnNumber: 7
+    }, this),
+    activeTab === "KAPAZITAET" && /* @__PURE__ */ jsxDEV("div", { className: "space-y-4 animate-fade-in", children: [
+      /* @__PURE__ */ jsxDEV("h2", { className: "text-base font-extrabold text-slate-900", children: "Kapazitätsauslastung Fertigungsstraßen" }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 168,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: productionLanes.map(
+        (lane, idx) => /* @__PURE__ */ jsxDEV("div", { className: "bg-white rounded-3xl p-6 border border-slate-100 shadow-card space-y-4", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-start justify-between", children: [
+            /* @__PURE__ */ jsxDEV("div", { children: [
+              /* @__PURE__ */ jsxDEV("h3", { className: "font-bold text-slate-900 text-sm", children: lane.name }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 174,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-400 mt-0.5", children: lane.hall }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 175,
+                columnNumber: 21
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 173,
+              columnNumber: 19
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#eef8fd] text-[#0070A8] border border-[#bce4f7]", children: lane.capacityLabel }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 177,
+              columnNumber: 19
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 172,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "space-y-1.5", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "flex justify-between text-xs font-bold", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "text-slate-500", children: "Belegung" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 185,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { className: "text-[#0070A8] font-mono", children: lane.capacity }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 186,
+                columnNumber: 21
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 184,
+              columnNumber: 19
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "w-full h-3 bg-slate-100 rounded-full overflow-hidden", children: /* @__PURE__ */ jsxDEV(
+              "div",
+              {
+                className: "h-full bg-gradient-to-r from-[#009FE3] to-[#001E36] rounded-full",
+                style: { width: lane.capacity }
+              },
+              void 0,
+              false,
+              {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 189,
+                columnNumber: 21
+              },
+              this
+            ) }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 188,
+              columnNumber: 19
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 183,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-2 gap-3 text-xs border-t border-slate-100 pt-3", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-50 p-2.5 rounded-2xl", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] text-slate-400 block", children: "Laufendes Projekt:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 198,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-800 truncate block", children: lane.currentProject }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 199,
+                columnNumber: 21
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 197,
+              columnNumber: 19
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { className: "bg-slate-50 p-2.5 rounded-2xl", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] text-slate-400 block", children: "Schichtleitung:" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 202,
+                columnNumber: 21
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-800 truncate block", children: lane.shiftLead }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+                lineNumber: 203,
+                columnNumber: 21
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 201,
+              columnNumber: 19
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 196,
+            columnNumber: 17
+          }, this)
+        ] }, idx, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 171,
+          columnNumber: 11
+        }, this)
+      ) }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 169,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+      lineNumber: 167,
+      columnNumber: 7
+    }, this),
+    activeTab === "SCHICHT" && /* @__PURE__ */ jsxDEV("div", { className: "bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-6 animate-fade-in", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "flex flex-col sm:flex-row sm:items-center justify-between gap-4", children: [
+        /* @__PURE__ */ jsxDEV("div", { children: [
+          /* @__PURE__ */ jsxDEV("h2", { className: "text-base font-extrabold text-slate-900", children: "Aktueller Schichtplan (Werk Tinglev)" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 217,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-400", children: "Personal- und Schichtzuteilung für die laufende Produktionswoche" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 218,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 216,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2", children: [
+          /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              onClick: () => setSelectedShift("FRUEH"),
+              className: `px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedShift === "FRUEH" ? "bg-[#001E36] text-white shadow-md shadow-[#001E36]/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`,
+              children: "Frühschicht (06:00 – 14:30)"
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 222,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              onClick: () => setSelectedShift("SPAET"),
+              className: `px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedShift === "SPAET" ? "bg-[#001E36] text-white shadow-md shadow-[#001E36]/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`,
+              children: "Spätschicht (14:15 – 22:45)"
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+              lineNumber: 232,
+              columnNumber: 15
+            },
+            this
+          )
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 221,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 215,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4", children: shiftPlans[selectedShift].map(
+        (plan, idx) => /* @__PURE__ */ jsxDEV("div", { className: "p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2", children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] font-mono text-[#009FE3] font-bold block", children: plan.time }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 248,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs font-bold text-slate-900", children: plan.role }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 249,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-xs text-slate-700 font-semibold", children: plan.person }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 250,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("p", { className: "text-[11px] text-slate-400", children: plan.team }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+            lineNumber: 251,
+            columnNumber: 17
+          }, this)
+        ] }, idx, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+          lineNumber: 247,
+          columnNumber: 11
+        }, this)
+      ) }, void 0, false, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+        lineNumber: 245,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+      lineNumber: 214,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx",
+    lineNumber: 99,
+    columnNumber: 5
+  }, this);
+}
+_s(PlanungPage, "IyZYVJTzy6vPRToUJ4o4jJzBLt0=", false, function() {
+  return [useLanguage];
+});
+_c = PlanungPage;
+var _c;
+$RefreshReg$(_c, "PlanungPage");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/pages/PlanungPage.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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RjtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBNEJBO0FBQUEsTUFFQSx1QkFBQyxTQUFJLFdBQVUsd0RBQ1pVLHFCQUFXVixhQUFhLEVBQUVpQjtBQUFBQSxRQUFJLENBQUNJLE1BQU1GLFFBQ3BDLHVCQUFDLFNBQWMsV0FBVSxvRUFDdkI7QUFBQSxpQ0FBQyxVQUFLLFdBQVUsd0RBQXdERSxlQUFLTixRQUE3RTtBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQUFrRjtBQUFBLFVBQ2xGLHVCQUFDLE9BQUUsV0FBVSxvQ0FBb0NNLGVBQUtULFFBQXREO0FBQUE7QUFBQTtBQUFBO0FBQUEsaUJBQTJEO0FBQUEsVUFDM0QsdUJBQUMsT0FBRSxXQUFVLHdDQUF3Q1MsZUFBS1IsVUFBMUQ7QUFBQTtBQUFBO0FBQUE7QUFBQSxpQkFBaUU7QUFBQSxVQUNqRSx1QkFBQyxPQUFFLFdBQVUsOEJBQThCUSxlQUFLUCxRQUFoRDtBQUFBO0FBQUE7QUFBQTtBQUFBLGlCQUFxRDtBQUFBLGFBSjdDSyxLQUFWO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUFLQTtBQUFBLE1BQ0QsS0FSSDtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBU0E7QUFBQSxTQXhDRjtBQUFBO0FBQUE7QUFBQTtBQUFBLFdBeUNBO0FBQUEsT0E1Sko7QUFBQTtBQUFBO0FBQUE7QUFBQSxTQThKQTtBQUVKO0FBQUN2QixHQTNOZUQsYUFBVztBQUFBLFVBQ1hGLFdBQVc7QUFBQTtBQUFBLEtBRFhFO0FBQVcsSUFBQTJCO0FBQUEsYUFBQUEsSUFBQSIsIm5hbWVzIjpbIlJlYWN0IiwidXNlU3RhdGUiLCJDYWxlbmRhckNsb2NrIiwiTGF5ZXJzIiwiVXNlcnMiLCJDbG9jayIsIkJhckNoYXJ0IiwiQ2hlY2tDaXJjbGUyIiwiQ2FsZW5kYXIiLCJDaGV2cm9uUmlnaHQiLCJTbGlkZXJzIiwiU3BhcmtsZXMiLCJUcmVuZGluZ1VwIiwiQnVpbGRpbmciLCJMYXlvdXRHcmlkIiwiRmlsZVNwcmVhZHNoZWV0IiwidXNlTGFuZ3VhZ2UiLCJUaXNjaHBsYW5SZWFkZXIiLCJQbGFudW5nUGFnZSIsIl9zIiwidCIsImFjdGl2ZVRhYiIsInNldEFjdGl2ZVRhYiIsInNlbGVjdGVkU2hpZnQiLCJzZXRTZWxlY3RlZFNoaWZ0IiwicHJvZHVjdGlvbkxhbmVzIiwibmFtZSIsImhhbGwiLCJjYXBhY2l0eSIsImNhcGFjaXR5TGFiZWwiLCJjdXJyZW50UHJvamVjdCIsInNoaWZ0TGVhZCIsImRhaWx5T3V0cHV0Iiwic2hpZnRQbGFucyIsIkZSVUVIIiwicm9sZSIsInBlcnNvbiIsInRlYW0iLCJ0aW1lIiwiU1BBRVQiLCJtYXAiLCJsYW5lIiwiaWR4Iiwid2lkdGgiLCJwbGFuIiwiX2MiXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiUGxhbnVuZ1BhZ2UuanN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBSZWFjdCwgeyB1c2VTdGF0ZSB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCB7IFxuICBDYWxlbmRhckNsb2NrLCBcbiAgTGF5ZXJzLCBcbiAgVXNlcnMsIFxuICBDbG9jaywgXG4gIEJhckNoYXJ0LCBcbiAgQ2hlY2tDaXJjbGUyLCBcbiAgQ2FsZW5kYXIsIFxuICBDaGV2cm9uUmlnaHQsIFxuICBTbGlkZXJzLCBcbiAgU3BhcmtsZXMsXG4gIFRyZW5kaW5nVXAsXG4gIEJ1aWxkaW5nLFxuICBMYXlvdXRHcmlkLFxuICBGaWxlU3ByZWFkc2hlZXRcbn0gZnJvbSAnbHVjaWRlLXJlYWN0JztcbmltcG9ydCB7IHVzZUxhbmd1YWdlIH0gZnJvbSAnLi4vY29udGV4dC9MYW5ndWFnZUNvbnRleHQnO1xuaW1wb3J0IHsgVGlzY2hwbGFuUmVhZGVyIH0gZnJvbSAnLi4vY29tcG9uZW50cy9wbGFudW5nL1Rpc2NocGxhblJlYWRlcic7XG5cbmV4cG9ydCBmdW5jdGlvbiBQbGFudW5nUGFnZSgpIHtcbiAgY29uc3QgeyB0IH0gPSB1c2VMYW5ndWFnZSgpO1xuICBjb25zdCBbYWN0aXZlVGFiLCBzZXRBY3RpdmVUYWJdID0gdXNlU3RhdGUoJ1RJU0NIUExBTicpOyAvLyAnVElTQ0hQTEFOJyB8ICdLQVBBWklUQUVUJyB8ICdTQ0hJQ0hUJ1xuICBjb25zdCBbc2VsZWN0ZWRTaGlmdCwgc2V0U2VsZWN0ZWRTaGlmdF0gPSB1c2VTdGF0ZSgnRlJVRUgnKTtcblxuICBjb25zdCBwcm9kdWN0aW9uTGFuZXMgPSBbXG4gICAge1xuICAgICAgbmFtZTogJ0ZlcnRpZ3VuZ3NsaW5pZSAxOiBTcGFubmJldG9uLURlY2tlbicsXG4gICAgICBoYWxsOiAnSGFsbGUgMSBOb3JkJyxcbiAgICAgIGNhcGFjaXR5OiAnOTIlJyxcbiAgICAgIGNhcGFjaXR5TGFiZWw6ICdIb2NoIGF1c2dlbGFzdGV0JyxcbiAgICAgIGN1cnJlbnRQcm9qZWN0OiAnV29obnF1YXJ0aWVyIEhhZmVuY2l0eSBISCAoQ2hhcmdlIDQpJyxcbiAgICAgIHNoaWZ0TGVhZDogJ0rDvHJnZW4gVGhvbXNlbicsXG4gICAgICBkYWlseU91dHB1dDogJzQyMCBtwrIgLyBUYWcnLFxuICAgIH0sXG4gICAge1xuICAgICAgbmFtZTogJ0ZlcnRpZ3VuZ3NsaW5pZSAyOiBNYXNzaXZlIFdhbmRlbGVtZW50ZSAmIFNhbmR3aWNod8OkbmRlJyxcbiAgICAgIGhhbGw6ICdIYWxsZSAyIFPDvGQnLFxuICAgICAgY2FwYWNpdHk6ICc3OCUnLFxuICAgICAgY2FwYWNpdHlMYWJlbDogJ09wdGltYWwnLFxuICAgICAgY3VycmVudFByb2plY3Q6ICdCw7xyb2NhbXB1cyBTb25kZXJidXJnIChESyknLFxuICAgICAgc2hpZnRMZWFkOiAnTWFpayBIYW5zZW4nLFxuICAgICAgZGFpbHlPdXRwdXQ6ICczMTAgbcKyIC8gVGFnJyxcbiAgICB9LFxuICAgIHtcbiAgICAgIG5hbWU6ICdGZXJ0aWd1bmdzbGluaWUgMzogU29uZGVyYmF1dGVpbGUsIFRyZXBwZW4gJiBQb2Rlc3RlJyxcbiAgICAgIGhhbGw6ICdIYWxsZSAzIE1hbnVmYWt0dXInLFxuICAgICAgY2FwYWNpdHk6ICc2NSUnLFxuICAgICAgY2FwYWNpdHlMYWJlbDogJ0ZyZWllIEthcGF6aXTDpHRlbiB2ZXJmw7xnYmFyJyxcbiAgICAgIGN1cnJlbnRQcm9qZWN0OiAnU2NodWx6ZW50cnVtIFNvbmRlcmJ1cmcnLFxuICAgICAgc2hpZnRMZWFkOiAnRGVubmlzIE3DtmxsZXInLFxuICAgICAgZGFpbHlPdXRwdXQ6ICcxOCBFbGVtZW50ZSAvIFRhZycsXG4gICAgfSxcbiAgICB7XG4gICAgICBuYW1lOiAnRmVydGlndW5nc2xpbmllIDQ6IEJld2VocnVuZ3NmbGVjaHRlcmVpICYgU3RhaGxiYXUnLFxuICAgICAgaGFsbDogJ1plbnRyYWxlcyBCaWVnZXplbnRydW0nLFxuICAgICAgY2FwYWNpdHk6ICc4NSUnLFxuICAgICAgY2FwYWNpdHlMYWJlbDogJ0d1dCBhdXNnZWxhc3RldCcsXG4gICAgICBjdXJyZW50UHJvamVjdDogJ1ZvcmJlcmVpdHVuZyBHZXdlcmJlcGFyayBUaW5nbGV2JyxcbiAgICAgIHNoaWZ0TGVhZDogJ1N0ZWZhbiBQZXRlcnNlbicsXG4gICAgICBkYWlseU91dHB1dDogJzE0LjUgdCBTdGFobCAvIFRhZycsXG4gICAgfVxuICBdO1xuXG4gIGNvbnN0IHNoaWZ0UGxhbnMgPSB7XG4gICAgRlJVRUg6IFtcbiAgICAgIHsgcm9sZTogJ1NjaGljaHRsZWl0ZXIgRmVydGlndW5nJywgcGVyc29uOiAnSsO8cmdlbiBUaG9tc2VuJywgdGVhbTogJ0hhbGxlIDEgKDE0IE1pdGFyYmVpdGVyKScsIHRpbWU6ICcwNjowMCDigJMgMTQ6MzAgVWhyJyB9LFxuICAgICAgeyByb2xlOiAnTWlzY2hhbmxhZ2VuLU9wZXJhdG9yJywgcGVyc29uOiAnTGFycyBDaHJpc3RpYW5zZW4nLCB0ZWFtOiAnWmVudHJhbG1pc2NoZXInLCB0aW1lOiAnMDU6MzAg4oCTIDE0OjAwIFVocicgfSxcbiAgICAgIHsgcm9sZTogJ0tyYW5mw7xocmVyICYgVmVybGFkdW5nJywgcGVyc29uOiAnVG9yc3RlbiBMb3JlbnplbicsIHRlYW06ICdGcmVpbGFnZXIgTm9yZCcsIHRpbWU6ICcwNjowMCDigJMgMTQ6MzAgVWhyJyB9LFxuICAgICAgeyByb2xlOiAnUVMtUHLDvGZ0ZWNobmlrZXIgKExhYm9yKScsIHBlcnNvbjogJ0RyLiBBbm5lIFBhdWxzZW4nLCB0ZWFtOiAnQmF1c3RvZmZsYWJvcicsIHRpbWU6ICcwNzowMCDigJMgMTU6MzAgVWhyJyB9LFxuICAgIF0sXG4gICAgU1BBRVQ6IFtcbiAgICAgIHsgcm9sZTogJ1NjaGljaHRsZWl0ZXIgRmVydGlndW5nJywgcGVyc29uOiAnTWFpayBIYW5zZW4nLCB0ZWFtOiAnSGFsbGUgMiAmIDMgKDEyIE1pdGFyYmVpdGVyKScsIHRpbWU6ICcxNDoxNSDigJMgMjI6NDUgVWhyJyB9LFxuICAgICAgeyByb2xlOiAnQXVzc2NoYWxhcmJlaXRlbiAmIE5hY2hiZWhhbmRsdW5nJywgcGVyc29uOiAnSGVubmluZyBCb3llbnMnLCB0ZWFtOiAnS2xpbWFrYW1tZXJuJywgdGltZTogJzE0OjMwIOKAkyAyMzowMCBVaHInIH0sXG4gICAgICB7IHJvbGU6ICdSw7xzdC0gJiBSZWluaWd1bmdzdGVhbScsIHBlcnNvbjogJ0thZGlyIFlpbG1heicsIHRlYW06ICdTY2hhbHVuZ3N3ZXJrc3RhdHQnLCB0aW1lOiAnMTU6MDAg4oCTIDIzOjMwIFVocicgfSxcbiAgICBdXG4gIH07XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktOCBwYi0xNiBhbmltYXRlLWZhZGUtaW5cIj5cbiAgICAgIHsvKiBIZWFkZXIgQmFubmVyICovfVxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy13aGl0ZSByb3VuZGVkLTN4bCBwLTYgc206cC04IGJvcmRlciBib3JkZXItc2xhdGUtMTAwIHNoYWRvdy1jYXJkIGZsZXggZmxleC1jb2wgbWQ6ZmxleC1yb3cgbWQ6aXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiBnYXAtNiBwcmludDpoaWRkZW5cIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTRcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInctMTIgaC0xMiByb3VuZGVkLTJ4bCBiZy1ncmFkaWVudC10by10ciBmcm9tLVsjMDAxRTM2XSB0by1bIzAwOUZFM10gdGV4dC13aGl0ZSBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciBzaGFkb3ctbWQgc2hhZG93LVsjMDA5RkUzXS8yMFwiPlxuICAgICAgICAgICAgPENhbGVuZGFyQ2xvY2sgY2xhc3NOYW1lPVwidy02IGgtNlwiIC8+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgIDxoMSBjbGFzc05hbWU9XCJ0ZXh0LTJ4bCBmb250LWJvbGQgdGV4dC1zbGF0ZS05MDBcIj5SZXNzb3VyY2VuICYgUGxhbnVuZzwvaDE+XG4gICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIHNtOnRleHQtc20gdGV4dC1zbGF0ZS01MDBcIj5cbiAgICAgICAgICAgICAgS2lwcHRpc2NoLUJlbGVndW5nLCBCZXRvbnZvbHVtZW4tS2Fsa3VsYXRpb24gKEhhbGxlIDEgJiAyKSB1bmQgV2Vya3NrYXBheml0w6R0ZW5cbiAgICAgICAgICAgIDwvcD5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTIgdGV4dC14cyBmb250LXNlbWlib2xkXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwicHgtMy41IHB5LTEuNSByb3VuZGVkLTJ4bCBiZy1bI2VlZjhmZF0gdGV4dC1bIzAwNzBBOF0gYm9yZGVyIGJvcmRlci1bI2JjZTRmN10gZm9udC1ib2xkXCI+XG4gICAgICAgICAgICAzNiBLaXBwdGlzY2hlIOKAoiA0IEZlcnRpZ3VuZ3NsaW5pZW5cbiAgICAgICAgICA8L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiBNYWluIE5hdmlnYXRpb24gVGFicyAqL31cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBmbGV4LXdyYXAgaXRlbXMtY2VudGVyIGdhcC0yIGJvcmRlci1iIGJvcmRlci1zbGF0ZS0yMDAgcGItMyBwcmludDpoaWRkZW5cIj5cbiAgICAgICAgPGJ1dHRvblxuICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldEFjdGl2ZVRhYignVElTQ0hQTEFOJyl9XG4gICAgICAgICAgY2xhc3NOYW1lPXtgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yIHB4LTQgcHktMi41IHJvdW5kZWQtMnhsIHRleHQteHMgZm9udC1ib2xkIHRyYW5zaXRpb24tYWxsICR7XG4gICAgICAgICAgICBhY3RpdmVUYWIgPT09ICdUSVNDSFBMQU4nXG4gICAgICAgICAgICAgID8gJ2JnLVsjMDAxRTM2XSB0ZXh0LXdoaXRlIHNoYWRvdy1tZCBzaGFkb3ctWyMwMDFFMzZdLzIwJ1xuICAgICAgICAgICAgICA6ICdiZy13aGl0ZSBob3ZlcjpiZy1zbGF0ZS0xMDAgdGV4dC1zbGF0ZS02MDAgYm9yZGVyIGJvcmRlci1zbGF0ZS0yMDAvODAnXG4gICAgICAgICAgfWB9XG4gICAgICAgID5cbiAgICAgICAgICA8TGF5b3V0R3JpZCBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtWyMwMDlGRTNdXCIgLz5cbiAgICAgICAgICA8c3Bhbj5UaXNjaHBsYW4tRXhwb3J0LVJlYWRlciAoSGFsbGUgMSAmIDIpPC9zcGFuPlxuICAgICAgICA8L2J1dHRvbj5cblxuICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0QWN0aXZlVGFiKCdLQVBBWklUQUVUJyl9XG4gICAgICAgICAgY2xhc3NOYW1lPXtgZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yIHB4LTQgcHktMi41IHJvdW5kZWQtMnhsIHRleHQteHMgZm9udC1ib2xkIHRyYW5zaXRpb24tYWxsICR7XG4gICAgICAgICAgICBhY3RpdmVUYWIgPT09ICdLQVBBWklUQUVUJ1xuICAgICAgICAgICAgICA/ICdiZy1bIzAwMUUzNl0gdGV4dC13aGl0ZSBzaGFkb3ctbWQgc2hhZG93LVsjMDAxRTM2XS8yMCdcbiAgICAgICAgICAgICAgOiAnYmctd2hpdGUgaG92ZXI6Ymctc2xhdGUtMTAwIHRleHQtc2xhdGUtNjAwIGJvcmRlciBib3JkZXItc2xhdGUtMjAwLzgwJ1xuICAgICAgICAgIH1gfVxuICAgICAgICA+XG4gICAgICAgICAgPEJhckNoYXJ0IGNsYXNzTmFtZT1cInctNCBoLTQgdGV4dC1bI0YwNUEyMl1cIiAvPlxuICAgICAgICAgIDxzcGFuPkZlcnRpZ3VuZ3NzdHJhw59lbiAmIEthcGF6aXTDpHRlbjwvc3Bhbj5cbiAgICAgICAgPC9idXR0b24+XG5cbiAgICAgICAgPGJ1dHRvblxuICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldEFjdGl2ZVRhYignU0NISUNIVCcpfVxuICAgICAgICAgIGNsYXNzTmFtZT17YGZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBweC00IHB5LTIuNSByb3VuZGVkLTJ4bCB0ZXh0LXhzIGZvbnQtYm9sZCB0cmFuc2l0aW9uLWFsbCAke1xuICAgICAgICAgICAgYWN0aXZlVGFiID09PSAnU0NISUNIVCdcbiAgICAgICAgICAgICAgPyAnYmctWyMwMDFFMzZdIHRleHQtd2hpdGUgc2hhZG93LW1kIHNoYWRvdy1bIzAwMUUzNl0vMjAnXG4gICAgICAgICAgICAgIDogJ2JnLXdoaXRlIGhvdmVyOmJnLXNsYXRlLTEwMCB0ZXh0LXNsYXRlLTYwMCBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMC84MCdcbiAgICAgICAgICB9YH1cbiAgICAgICAgPlxuICAgICAgICAgIDxVc2VycyBjbGFzc05hbWU9XCJ3LTQgaC00IHRleHQtZW1lcmFsZC01MDBcIiAvPlxuICAgICAgICAgIDxzcGFuPlNjaGljaHRwbMOkbmUgJiBXZXJrc2Jlc2V0enVuZzwvc3Bhbj5cbiAgICAgICAgPC9idXR0b24+XG4gICAgICA8L2Rpdj5cblxuICAgICAgey8qIFRBQiAxOiBGbGFnc2hpcCBUaXNjaHBsYW4tUmVhZGVyIChUaXNjaGFudGlncmF2aXR5MjEpICovfVxuICAgICAge2FjdGl2ZVRhYiA9PT0gJ1RJU0NIUExBTicgJiYgKFxuICAgICAgICA8VGlzY2hwbGFuUmVhZGVyIC8+XG4gICAgICApfVxuXG4gICAgICB7LyogVEFCIDI6IFByb2R1Y3Rpb24gTGFuZSBDYXBhY2l0eSBDYXJkcyAqL31cbiAgICAgIHthY3RpdmVUYWIgPT09ICdLQVBBWklUQUVUJyAmJiAoXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS00IGFuaW1hdGUtZmFkZS1pblwiPlxuICAgICAgICAgIDxoMiBjbGFzc05hbWU9XCJ0ZXh0LWJhc2UgZm9udC1leHRyYWJvbGQgdGV4dC1zbGF0ZS05MDBcIj5LYXBheml0w6R0c2F1c2xhc3R1bmcgRmVydGlndW5nc3N0cmHDn2VuPC9oMj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTEgbWQ6Z3JpZC1jb2xzLTIgZ2FwLTZcIj5cbiAgICAgICAgICAgIHtwcm9kdWN0aW9uTGFuZXMubWFwKChsYW5lLCBpZHgpID0+IChcbiAgICAgICAgICAgICAgPGRpdiBrZXk9e2lkeH0gY2xhc3NOYW1lPVwiYmctd2hpdGUgcm91bmRlZC0zeGwgcC02IGJvcmRlciBib3JkZXItc2xhdGUtMTAwIHNoYWRvdy1jYXJkIHNwYWNlLXktNFwiPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1zdGFydCBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICAgIDxoMyBjbGFzc05hbWU9XCJmb250LWJvbGQgdGV4dC1zbGF0ZS05MDAgdGV4dC1zbVwiPntsYW5lLm5hbWV9PC9oMz5cbiAgICAgICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC14cyB0ZXh0LXNsYXRlLTQwMCBtdC0wLjVcIj57bGFuZS5oYWxsfTwvcD5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwicHgtMi41IHB5LTEgcm91bmRlZC1mdWxsIHRleHQtWzEwcHhdIGZvbnQtYm9sZCBiZy1bI2VlZjhmZF0gdGV4dC1bIzAwNzBBOF0gYm9yZGVyIGJvcmRlci1bI2JjZTRmN11cIj5cbiAgICAgICAgICAgICAgICAgICAge2xhbmUuY2FwYWNpdHlMYWJlbH1cbiAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgIHsvKiBQcm9ncmVzcyBCYXIgKi99XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTEuNVwiPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktYmV0d2VlbiB0ZXh0LXhzIGZvbnQtYm9sZFwiPlxuICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTUwMFwiPkJlbGVndW5nPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsjMDA3MEE4XSBmb250LW1vbm9cIj57bGFuZS5jYXBhY2l0eX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidy1mdWxsIGgtMyBiZy1zbGF0ZS0xMDAgcm91bmRlZC1mdWxsIG92ZXJmbG93LWhpZGRlblwiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IFxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImgtZnVsbCBiZy1ncmFkaWVudC10by1yIGZyb20tWyMwMDlGRTNdIHRvLVsjMDAxRTM2XSByb3VuZGVkLWZ1bGxcIiBcbiAgICAgICAgICAgICAgICAgICAgICBzdHlsZT17eyB3aWR0aDogbGFuZS5jYXBhY2l0eSB9fVxuICAgICAgICAgICAgICAgICAgICA+PC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMiBnYXAtMyB0ZXh0LXhzIGJvcmRlci10IGJvcmRlci1zbGF0ZS0xMDAgcHQtM1wiPlxuICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy1zbGF0ZS01MCBwLTIuNSByb3VuZGVkLTJ4bFwiPlxuICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsxMHB4XSB0ZXh0LXNsYXRlLTQwMCBibG9ja1wiPkxhdWZlbmRlcyBQcm9qZWt0Ojwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1ib2xkIHRleHQtc2xhdGUtODAwIHRydW5jYXRlIGJsb2NrXCI+e2xhbmUuY3VycmVudFByb2plY3R9PC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLXNsYXRlLTUwIHAtMi41IHJvdW5kZWQtMnhsXCI+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIHRleHQtc2xhdGUtNDAwIGJsb2NrXCI+U2NoaWNodGxlaXR1bmc6PC9zcGFuPlxuICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJmb250LWJvbGQgdGV4dC1zbGF0ZS04MDAgdHJ1bmNhdGUgYmxvY2tcIj57bGFuZS5zaGlmdExlYWR9PC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgKSl9XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgKX1cblxuICAgICAgey8qIFRBQiAzOiBTaGlmdCBQbGFuICovfVxuICAgICAge2FjdGl2ZVRhYiA9PT0gJ1NDSElDSFQnICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJiZy13aGl0ZSByb3VuZGVkLTN4bCBwLTYgc206cC04IGJvcmRlciBib3JkZXItc2xhdGUtMTAwIHNoYWRvdy1jYXJkIHNwYWNlLXktNiBhbmltYXRlLWZhZGUtaW5cIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggZmxleC1jb2wgc206ZmxleC1yb3cgc206aXRlbXMtY2VudGVyIGp1c3RpZnktYmV0d2VlbiBnYXAtNFwiPlxuICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgPGgyIGNsYXNzTmFtZT1cInRleHQtYmFzZSBmb250LWV4dHJhYm9sZCB0ZXh0LXNsYXRlLTkwMFwiPkFrdHVlbGxlciBTY2hpY2h0cGxhbiAoV2VyayBUaW5nbGV2KTwvaDI+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zbGF0ZS00MDBcIj5QZXJzb25hbC0gdW5kIFNjaGljaHR6dXRlaWx1bmcgZsO8ciBkaWUgbGF1ZmVuZGUgUHJvZHVrdGlvbnN3b2NoZTwvcD5cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMlwiPlxuICAgICAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0U2VsZWN0ZWRTaGlmdCgnRlJVRUgnKX1cbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9e2BweC00IHB5LTIgcm91bmRlZC14bCB0ZXh0LXhzIGZvbnQtYm9sZCB0cmFuc2l0aW9uLWFsbCAke1xuICAgICAgICAgICAgICAgICAgc2VsZWN0ZWRTaGlmdCA9PT0gJ0ZSVUVIJ1xuICAgICAgICAgICAgICAgICAgICA/ICdiZy1bIzAwMUUzNl0gdGV4dC13aGl0ZSBzaGFkb3ctbWQgc2hhZG93LVsjMDAxRTM2XS8yMCdcbiAgICAgICAgICAgICAgICAgICAgOiAnYmctc2xhdGUtMTAwIHRleHQtc2xhdGUtNjAwIGhvdmVyOmJnLXNsYXRlLTIwMCdcbiAgICAgICAgICAgICAgICB9YH1cbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIEZyw7xoc2NoaWNodCAoMDY6MDAg4oCTIDE0OjMwKVxuICAgICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldFNlbGVjdGVkU2hpZnQoJ1NQQUVUJyl9XG4gICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgcHgtNCBweS0yIHJvdW5kZWQteGwgdGV4dC14cyBmb250LWJvbGQgdHJhbnNpdGlvbi1hbGwgJHtcbiAgICAgICAgICAgICAgICAgIHNlbGVjdGVkU2hpZnQgPT09ICdTUEFFVCdcbiAgICAgICAgICAgICAgICAgICAgPyAnYmctWyMwMDFFMzZdIHRleHQtd2hpdGUgc2hhZG93LW1kIHNoYWRvdy1bIzAwMUUzNl0vMjAnXG4gICAgICAgICAgICAgICAgICAgIDogJ2JnLXNsYXRlLTEwMCB0ZXh0LXNsYXRlLTYwMCBob3ZlcjpiZy1zbGF0ZS0yMDAnXG4gICAgICAgICAgICAgICAgfWB9XG4gICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICBTcMOkdHNjaGljaHQgKDE0OjE1IOKAkyAyMjo0NSlcbiAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBncmlkLWNvbHMtMSBzbTpncmlkLWNvbHMtMiBsZzpncmlkLWNvbHMtNCBnYXAtNFwiPlxuICAgICAgICAgICAge3NoaWZ0UGxhbnNbc2VsZWN0ZWRTaGlmdF0ubWFwKChwbGFuLCBpZHgpID0+IChcbiAgICAgICAgICAgICAgPGRpdiBrZXk9e2lkeH0gY2xhc3NOYW1lPVwicC00IHJvdW5kZWQtMnhsIGJnLXNsYXRlLTUwIGJvcmRlciBib3JkZXItc2xhdGUtMjAwLzgwIHNwYWNlLXktMlwiPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIGZvbnQtbW9ubyB0ZXh0LVsjMDA5RkUzXSBmb250LWJvbGQgYmxvY2tcIj57cGxhbi50aW1lfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LXhzIGZvbnQtYm9sZCB0ZXh0LXNsYXRlLTkwMFwiPntwbGFuLnJvbGV9PC9wPlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQteHMgdGV4dC1zbGF0ZS03MDAgZm9udC1zZW1pYm9sZFwiPntwbGFuLnBlcnNvbn08L3A+XG4gICAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1bMTFweF0gdGV4dC1zbGF0ZS00MDBcIj57cGxhbi50ZWFtfTwvcD5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICApfVxuICAgIDwvZGl2PlxuICApO1xufVxuXG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9wYWdlcy9QbGFudW5nUGFnZS5qc3gifQ==

@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.event import Event, EventCategory
 from app.models.calendar_source import ExternalCalendarSource
@@ -30,6 +31,8 @@ def get_active_calendar_sources(
     current_user: User = Depends(get_current_user)
 ):
     """Returns list of active external calendar sources (e.g. Outlook Feeds) for filtering."""
+    if getattr(settings, "IS_TRIAL_BUILD", False):
+        return []
     sources = db.query(ExternalCalendarSource).filter(ExternalCalendarSource.ist_aktiv == True).all()
     return sources
 
@@ -47,6 +50,9 @@ def get_calendar_events(
     Returns calendar events filtered by date range and category.
     Merges internal database events and dynamically parsed Outlook .ics feeds.
     """
+    if getattr(settings, "IS_TRIAL_BUILD", False):
+        return []
+
     q = db.query(Event)
     
     if start:

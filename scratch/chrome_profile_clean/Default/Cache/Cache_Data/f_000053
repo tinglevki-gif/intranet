@@ -1,0 +1,610 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/components/layout/WeatherWidget.jsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=5a3fb924"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=5a3fb924"; const React = __vite__cjsImport3_react.__esModule ? __vite__cjsImport3_react.default : __vite__cjsImport3_react; const useState = __vite__cjsImport3_react["useState"]; const useEffect = __vite__cjsImport3_react["useEffect"]; const useRef = __vite__cjsImport3_react["useRef"];
+import * as LucideIcons from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+import {
+  ChevronDown,
+  Droplets,
+  Wind,
+  MapPin,
+  RefreshCw,
+  Search,
+  Navigation,
+  Check,
+  AlertCircle,
+  X
+} from "/node_modules/.vite/deps/lucide-react.js?v=7420d060";
+import {
+  COMPANY_LOCATIONS,
+  fetchLocationWeather,
+  searchGeocodingLocations
+} from "/src/services/weatherService.js";
+import { useLanguage } from "/src/context/LanguageContext.jsx";
+const WEATHER_STORAGE_KEY = "tiglev_weather_selected_location";
+export function WeatherWidget() {
+  _s();
+  const { t } = useLanguage();
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    try {
+      const saved = localStorage.getItem(WEATHER_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.name && !parsed.name.toLowerCase().includes("tinglev") && !parsed.name.toLowerCase().includes("tiglev") && parsed.lat !== void 0 && parsed.lon !== void 0) {
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.warn("Could not read saved weather location:", err);
+    }
+    return COMPANY_LOCATIONS[0];
+  });
+  const [weatherData, setWeatherData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [geoError, setGeoError] = useState(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const loadWeather = async (loc) => {
+    if (!loc) return;
+    setLoading(true);
+    try {
+      const data = await fetchLocationWeather(loc);
+      setWeatherData(data);
+    } catch (err) {
+      console.error("Weather widget error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (selectedLocation) {
+      try {
+        localStorage.setItem(WEATHER_STORAGE_KEY, JSON.stringify(selectedLocation));
+      } catch (e) {
+        console.warn("Failed to save weather location to localStorage", e);
+      }
+      loadWeather(selectedLocation);
+    }
+  }, [selectedLocation]);
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    const timer = setTimeout(async () => {
+      const results = await searchGeocodingLocations(searchQuery);
+      setSearchResults(results);
+      setIsSearching(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+  const renderIcon = (iconName, className = "w-4 h-4") => {
+    const IconComponent = LucideIcons[iconName] || LucideIcons.Sun;
+    return /* @__PURE__ */ jsxDEV(IconComponent, { className }, void 0, false, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+      lineNumber: 137,
+      columnNumber: 12
+    }, this);
+  };
+  const handleSelectLocation = (loc) => {
+    setSelectedLocation(loc);
+    setSearchQuery("");
+    setSearchResults([]);
+    setDropdownOpen(false);
+  };
+  const handleDetectGPS = () => {
+    if (!navigator.geolocation) {
+      setGeoError("GPS-Ortung wird von diesem Browser nicht unterstützt.");
+      setTimeout(() => setGeoError(null), 4e3);
+      return;
+    }
+    setIsLocating(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        setIsLocating(false);
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const gpsLocation = {
+          id: `gps-${lat.toFixed(3)}-${lon.toFixed(3)}`,
+          name: "Mein Standort",
+          displayName: `Mein Standort (${lat.toFixed(2)}°, ${lon.toFixed(2)}°)`,
+          country: "GPS",
+          countryCode: "GPS",
+          flag: "📍",
+          lat,
+          lon,
+          isHQ: false
+        };
+        handleSelectLocation(gpsLocation);
+      },
+      (error) => {
+        setIsLocating(false);
+        console.warn("Geolocation error:", error);
+        setGeoError("Standortzugriff verweigert oder nicht ermittelbar.");
+        setTimeout(() => setGeoError(null), 4e3);
+      },
+      { timeout: 1e4, enableHighAccuracy: false }
+    );
+  };
+  const conditionText = weatherData?.conditionKey ? t(`weather.${weatherData.conditionKey}`, weatherData.conditionKey) : t("weather.clear");
+  return /* @__PURE__ */ jsxDEV("div", { className: "relative", ref: dropdownRef, children: [
+    /* @__PURE__ */ jsxDEV(
+      "button",
+      {
+        onClick: () => setDropdownOpen(!dropdownOpen),
+        className: "flex items-center space-x-2 px-3 py-1.5 rounded-full bg-slate-100/90 hover:bg-slate-200/80 text-slate-700 border border-slate-200/70 text-xs font-semibold transition-all group shadow-2xs hover:border-indigo-300",
+        title: t("weather.weather"),
+        children: [
+          /* @__PURE__ */ jsxDEV("span", { className: "text-sm leading-none", children: selectedLocation.flag }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 200,
+            columnNumber: 9
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-slate-700 font-medium hidden sm:inline max-w-[110px] truncate", children: selectedLocation.name }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 201,
+            columnNumber: 9
+          }, this),
+          loading ? /* @__PURE__ */ jsxDEV(RefreshCw, { className: "w-3.5 h-3.5 text-indigo-500 animate-spin" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 206,
+            columnNumber: 9
+          }, this) : /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1", children: [
+            /* @__PURE__ */ jsxDEV("span", { className: weatherData?.iconColor || "text-amber-500", children: renderIcon(weatherData?.iconName || "Sun") }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 209,
+              columnNumber: 13
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "font-bold text-slate-800 font-mono", children: weatherData?.temperature !== void 0 ? `${weatherData.temperature}°C` : "--" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 212,
+              columnNumber: 13
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 208,
+            columnNumber: 9
+          }, this),
+          /* @__PURE__ */ jsxDEV(ChevronDown, { className: `w-3.5 h-3.5 text-slate-400 transition-transform ${dropdownOpen ? "rotate-180 text-indigo-600" : "group-hover:text-slate-600"}` }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 218,
+            columnNumber: 9
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+        lineNumber: 195,
+        columnNumber: 7
+      },
+      this
+    ),
+    dropdownOpen && /* @__PURE__ */ jsxDEV("div", { className: "absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-100 py-3 z-50 animate-fade-in divide-y divide-slate-100 overflow-hidden", children: [
+      /* @__PURE__ */ jsxDEV("div", { className: "px-5 py-4 bg-gradient-to-br from-indigo-50/80 via-white to-slate-50/80 rounded-t-2xl", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2.5", children: [
+            /* @__PURE__ */ jsxDEV("span", { className: "text-2xl", children: selectedLocation.flag }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 228,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("div", { children: [
+              /* @__PURE__ */ jsxDEV("h4", { className: "text-sm font-extrabold text-slate-900 leading-tight", children: selectedLocation.displayName || selectedLocation.name }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                lineNumber: 230,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] uppercase font-bold tracking-wider text-indigo-600", children: selectedLocation.isHQ ? `${t("weather.hq")} • Altlandsberg` : selectedLocation.country || "Standort" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                lineNumber: 233,
+                columnNumber: 19
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 229,
+              columnNumber: 17
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 227,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "text-right", children: [
+            /* @__PURE__ */ jsxDEV("div", { className: "text-xl font-extrabold text-slate-900 font-mono flex items-center justify-end space-x-1.5", children: [
+              /* @__PURE__ */ jsxDEV("span", { className: weatherData?.iconColor || "text-amber-500", children: renderIcon(weatherData?.iconName || "Sun", "w-5 h-5") }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                lineNumber: 241,
+                columnNumber: 19
+              }, this),
+              /* @__PURE__ */ jsxDEV("span", { children: weatherData?.temperature !== void 0 ? `${weatherData.temperature}°C` : "--" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                lineNumber: 244,
+                columnNumber: 19
+              }, this)
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 240,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("p", { className: "text-[11px] text-slate-500 font-medium capitalize mt-0.5", children: conditionText }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 246,
+              columnNumber: 17
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 239,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 226,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "mt-3 pt-3 border-t border-slate-200/60 grid grid-cols-2 gap-2 text-xs text-slate-600", children: [
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5", children: [
+            /* @__PURE__ */ jsxDEV(Droplets, { className: "w-3.5 h-3.5 text-blue-500" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 255,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "text-slate-400", children: [
+              t("weather.humidity"),
+              ":"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 256,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "font-semibold text-slate-800", children: [
+              weatherData?.humidity || 0,
+              "%"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 257,
+              columnNumber: 17
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 254,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-1.5", children: [
+            /* @__PURE__ */ jsxDEV(Wind, { className: "w-3.5 h-3.5 text-teal-500" }, void 0, false, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 260,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "text-slate-400", children: [
+              t("weather.wind"),
+              ":"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 261,
+              columnNumber: 17
+            }, this),
+            /* @__PURE__ */ jsxDEV("span", { className: "font-semibold text-slate-800", children: [
+              weatherData?.windSpeed || 0,
+              " km/h"
+            ] }, void 0, true, {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 262,
+              columnNumber: 17
+            }, this)
+          ] }, void 0, true, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 259,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 253,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+        lineNumber: 225,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "p-3 space-y-2 bg-slate-50/50", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "relative", children: [
+          /* @__PURE__ */ jsxDEV(Search, { className: "absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 271,
+            columnNumber: 15
+          }, this),
+          /* @__PURE__ */ jsxDEV(
+            "input",
+            {
+              type: "text",
+              value: searchQuery,
+              onChange: (e) => setSearchQuery(e.target.value),
+              placeholder: "Stadt oder Adresse suchen (z. B. Hamburg, Tinglev, Paris)...",
+              className: "w-full pl-9 pr-8 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium"
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 272,
+              columnNumber: 15
+            },
+            this
+          ),
+          searchQuery && /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              onClick: () => setSearchQuery(""),
+              className: "absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600",
+              children: /* @__PURE__ */ jsxDEV(X, { className: "w-3.5 h-3.5" }, void 0, false, {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                lineNumber: 284,
+                columnNumber: 19
+              }, this)
+            },
+            void 0,
+            false,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 280,
+              columnNumber: 13
+            },
+            this
+          )
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 270,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              type: "button",
+              onClick: handleDetectGPS,
+              disabled: isLocating,
+              className: "flex items-center space-x-1.5 text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded-lg transition-colors",
+              children: [
+                isLocating ? /* @__PURE__ */ jsxDEV(RefreshCw, { className: "w-3 h-3 animate-spin text-indigo-600" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                  lineNumber: 298,
+                  columnNumber: 15
+                }, this) : /* @__PURE__ */ jsxDEV(Navigation, { className: "w-3 h-3 text-indigo-600" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                  lineNumber: 300,
+                  columnNumber: 15
+                }, this),
+                /* @__PURE__ */ jsxDEV("span", { children: "Meinen Standort ermitteln (GPS)" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                  lineNumber: 302,
+                  columnNumber: 17
+                }, this)
+              ]
+            },
+            void 0,
+            true,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 291,
+              columnNumber: 15
+            },
+            this
+          ),
+          /* @__PURE__ */ jsxDEV("span", { className: "text-[10px] text-slate-400 font-mono", children: "Open-Meteo Live" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 305,
+            columnNumber: 15
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 290,
+          columnNumber: 13
+        }, this),
+        geoError && /* @__PURE__ */ jsxDEV("div", { className: "p-2 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-[11px] flex items-center space-x-1.5", children: [
+          /* @__PURE__ */ jsxDEV(AlertCircle, { className: "w-3.5 h-3.5 shrink-0" }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 310,
+            columnNumber: 17
+          }, this),
+          /* @__PURE__ */ jsxDEV("span", { children: geoError }, void 0, false, {
+            fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+            lineNumber: 311,
+            columnNumber: 17
+          }, this)
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 309,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+        lineNumber: 268,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV("div", { className: "py-2", children: [
+        /* @__PURE__ */ jsxDEV("div", { className: "px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400", children: searchQuery.trim().length >= 2 ? isSearching ? "Suche läuft..." : `Gefundene Orte (${searchResults.length})` : t("weather.standorte") }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 318,
+          columnNumber: 13
+        }, this),
+        /* @__PURE__ */ jsxDEV("div", { className: "max-h-52 overflow-y-auto px-2 space-y-0.5 mt-1", children: searchQuery.trim().length >= 2 ? searchResults.length === 0 && !isSearching ? /* @__PURE__ */ jsxDEV("div", { className: "p-3 text-center text-xs text-slate-400", children: [
+          "Keine Städte oder Orte für „",
+          searchQuery,
+          "“ gefunden."
+        ] }, void 0, true, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 328,
+          columnNumber: 13
+        }, this) : searchResults.map(
+          (loc) => /* @__PURE__ */ jsxDEV(
+            "button",
+            {
+              onClick: () => handleSelectLocation(loc),
+              className: "w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors text-left",
+              children: [
+                /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2.5 truncate", children: [
+                  /* @__PURE__ */ jsxDEV("span", { className: "text-base shrink-0", children: loc.flag }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                    lineNumber: 339,
+                    columnNumber: 25
+                  }, this),
+                  /* @__PURE__ */ jsxDEV("div", { className: "truncate", children: [
+                    /* @__PURE__ */ jsxDEV("p", { className: "font-bold text-slate-800 truncate", children: loc.name }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                      lineNumber: 341,
+                      columnNumber: 27
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("p", { className: "text-[10px] text-slate-400 truncate", children: loc.displayName }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                      lineNumber: 342,
+                      columnNumber: 27
+                    }, this)
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                    lineNumber: 340,
+                    columnNumber: 25
+                  }, this)
+                ] }, void 0, true, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                  lineNumber: 338,
+                  columnNumber: 23
+                }, this),
+                /* @__PURE__ */ jsxDEV(ChevronDown, { className: "w-3.5 h-3.5 -rotate-90 text-slate-300 shrink-0 ml-2" }, void 0, false, {
+                  fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                  lineNumber: 345,
+                  columnNumber: 23
+                }, this)
+              ]
+            },
+            loc.id,
+            true,
+            {
+              fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+              lineNumber: 333,
+              columnNumber: 13
+            },
+            this
+          )
+        ) : (
+          /* Otherwise show Company Locations */
+          COMPANY_LOCATIONS.map((loc) => {
+            const isCurrent = loc.id === selectedLocation.id || Number(loc.lat).toFixed(2) === Number(selectedLocation.lat).toFixed(2) && Number(loc.lon).toFixed(2) === Number(selectedLocation.lon).toFixed(2);
+            return /* @__PURE__ */ jsxDEV(
+              "button",
+              {
+                onClick: () => handleSelectLocation(loc),
+                className: `w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${isCurrent ? "bg-indigo-50 text-indigo-700 font-bold border border-indigo-100 shadow-2xs" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`,
+                children: [
+                  /* @__PURE__ */ jsxDEV("div", { className: "flex items-center space-x-2.5", children: [
+                    /* @__PURE__ */ jsxDEV("span", { className: "text-base", children: loc.flag }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                      lineNumber: 368,
+                      columnNumber: 25
+                    }, this),
+                    /* @__PURE__ */ jsxDEV("span", { children: loc.name }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                      lineNumber: 369,
+                      columnNumber: 25
+                    }, this),
+                    loc.isHQ && /* @__PURE__ */ jsxDEV("span", { className: "px-1.5 py-0.5 text-[9px] font-extrabold rounded-md bg-indigo-100 text-indigo-700", children: "HQ" }, void 0, false, {
+                      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                      lineNumber: 371,
+                      columnNumber: 21
+                    }, this)
+                  ] }, void 0, true, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                    lineNumber: 367,
+                    columnNumber: 23
+                  }, this),
+                  isCurrent && /* @__PURE__ */ jsxDEV(Check, { className: "w-3.5 h-3.5 text-indigo-600 shrink-0" }, void 0, false, {
+                    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                    lineNumber: 377,
+                    columnNumber: 19
+                  }, this)
+                ]
+              },
+              loc.id,
+              true,
+              {
+                fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+                lineNumber: 358,
+                columnNumber: 17
+              },
+              this
+            );
+          })
+        ) }, void 0, false, {
+          fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+          lineNumber: 324,
+          columnNumber: 13
+        }, this)
+      ] }, void 0, true, {
+        fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+        lineNumber: 317,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+      lineNumber: 223,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, true, {
+    fileName: "C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx",
+    lineNumber: 193,
+    columnNumber: 5
+  }, this);
+}
+_s(WeatherWidget, "zvXCBtnano/Jyg5hb8dnLwWHIoA=", false, function() {
+  return [useLanguage];
+});
+_c = WeatherWidget;
+var _c;
+$RefreshReg$(_c, "WeatherWidget");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/Humbert/Desktop/intranet-corp/frontend/src/components/layout/WeatherWidget.jsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUFBLGFBekRMO0FBQUE7QUFBQTtBQUFBO0FBQUEsZUEyREE7QUFBQSxXQWxFRjtBQUFBO0FBQUE7QUFBQTtBQUFBLGFBbUVBO0FBQUEsU0FqS0Y7QUFBQTtBQUFBO0FBQUE7QUFBQSxXQWtLQTtBQUFBLE9BaE1KO0FBQUE7QUFBQTtBQUFBO0FBQUEsU0FrTUE7QUFFSjtBQUFDdkUsR0ExVmVELGVBQWE7QUFBQSxVQUNiRixXQUFXO0FBQUE7QUFBQSxLQURYRTtBQUFhLElBQUEyRjtBQUFBLGFBQUFBLElBQUEiLCJuYW1lcyI6WyJSZWFjdCIsInVzZVN0YXRlIiwidXNlRWZmZWN0IiwidXNlUmVmIiwiTHVjaWRlSWNvbnMiLCJDaGV2cm9uRG93biIsIkRyb3BsZXRzIiwiV2luZCIsIk1hcFBpbiIsIlJlZnJlc2hDdyIsIlNlYXJjaCIsIk5hdmlnYXRpb24iLCJDaGVjayIsIkFsZXJ0Q2lyY2xlIiwiWCIsIkNPTVBBTllfTE9DQVRJT05TIiwiZmV0Y2hMb2NhdGlvbldlYXRoZXIiLCJzZWFyY2hHZW9jb2RpbmdMb2NhdGlvbnMiLCJ1c2VMYW5ndWFnZSIsIldFQVRIRVJfU1RPUkFHRV9LRVkiLCJXZWF0aGVyV2lkZ2V0IiwiX3MiLCJ0Iiwic2VsZWN0ZWRMb2NhdGlvbiIsInNldFNlbGVjdGVkTG9jYXRpb24iLCJzYXZlZCIsImxvY2FsU3RvcmFnZSIsImdldEl0ZW0iLCJwYXJzZWQiLCJKU09OIiwicGFyc2UiLCJuYW1lIiwidG9Mb3dlckNhc2UiLCJpbmNsdWRlcyIsImxhdCIsInVuZGVmaW5lZCIsImxvbiIsImVyciIsImNvbnNvbGUiLCJ3YXJuIiwid2VhdGhlckRhdGEiLCJzZXRXZWF0aGVyRGF0YSIsImxvYWRpbmciLCJzZXRMb2FkaW5nIiwiZHJvcGRvd25PcGVuIiwic2V0RHJvcGRvd25PcGVuIiwiZHJvcGRvd25SZWYiLCJzZWFyY2hRdWVyeSIsInNldFNlYXJjaFF1ZXJ5Iiwic2VhcmNoUmVzdWx0cyIsInNldFNlYXJjaFJlc3VsdHMiLCJpc1NlYXJjaGluZyIsInNldElzU2VhcmNoaW5nIiwiZ2VvRXJyb3IiLCJzZXRHZW9FcnJvciIsImlzTG9jYXRpbmciLCJzZXRJc0xvY2F0aW5nIiwibG9hZFdlYXRoZXIiLCJsb2MiLCJkYXRhIiwiZXJyb3IiLCJzZXRJdGVtIiwic3RyaW5naWZ5IiwiZSIsInRyaW0iLCJsZW5ndGgiLCJ0aW1lciIsInNldFRpbWVvdXQiLCJyZXN1bHRzIiwiY2xlYXJUaW1lb3V0IiwiaGFuZGxlQ2xpY2tPdXRzaWRlIiwiY3VycmVudCIsImNvbnRhaW5zIiwidGFyZ2V0IiwiZG9jdW1lbnQiLCJhZGRFdmVudExpc3RlbmVyIiwicmVtb3ZlRXZlbnRMaXN0ZW5lciIsInJlbmRlckljb24iLCJpY29uTmFtZSIsImNsYXNzTmFtZSIsIkljb25Db21wb25lbnQiLCJTdW4iLCJoYW5kbGVTZWxlY3RMb2NhdGlvbiIsImhhbmRsZURldGVjdEdQUyIsIm5hdmlnYXRvciIsImdlb2xvY2F0aW9uIiwiZ2V0Q3VycmVudFBvc2l0aW9uIiwicG9zaXRpb24iLCJjb29yZHMiLCJsYXRpdHVkZSIsImxvbmdpdHVkZSIsImdwc0xvY2F0aW9uIiwiaWQiLCJ0b0ZpeGVkIiwiZGlzcGxheU5hbWUiLCJjb3VudHJ5IiwiY291bnRyeUNvZGUiLCJmbGFnIiwiaXNIUSIsInRpbWVvdXQiLCJlbmFibGVIaWdoQWNjdXJhY3kiLCJjb25kaXRpb25UZXh0IiwiY29uZGl0aW9uS2V5IiwiaWNvbkNvbG9yIiwidGVtcGVyYXR1cmUiLCJodW1pZGl0eSIsIndpbmRTcGVlZCIsInZhbHVlIiwibWFwIiwiaXNDdXJyZW50IiwiTnVtYmVyIiwiX2MiXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiV2VhdGhlcldpZGdldC5qc3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IFJlYWN0LCB7IHVzZVN0YXRlLCB1c2VFZmZlY3QsIHVzZVJlZiB9IGZyb20gJ3JlYWN0JztcbmltcG9ydCAqIGFzIEx1Y2lkZUljb25zIGZyb20gJ2x1Y2lkZS1yZWFjdCc7XG5pbXBvcnQgeyBcbiAgQ2hldnJvbkRvd24sIFxuICBEcm9wbGV0cywgXG4gIFdpbmQsIFxuICBNYXBQaW4sIFxuICBSZWZyZXNoQ3csIFxuICBTZWFyY2gsIFxuICBOYXZpZ2F0aW9uLCBcbiAgQ2hlY2ssIFxuICBBbGVydENpcmNsZSxcbiAgWFxufSBmcm9tICdsdWNpZGUtcmVhY3QnO1xuaW1wb3J0IHsgXG4gIENPTVBBTllfTE9DQVRJT05TLCBcbiAgZmV0Y2hMb2NhdGlvbldlYXRoZXIsIFxuICBzZWFyY2hHZW9jb2RpbmdMb2NhdGlvbnMgXG59IGZyb20gJy4uLy4uL3NlcnZpY2VzL3dlYXRoZXJTZXJ2aWNlJztcbmltcG9ydCB7IHVzZUxhbmd1YWdlIH0gZnJvbSAnLi4vLi4vY29udGV4dC9MYW5ndWFnZUNvbnRleHQnO1xuXG5jb25zdCBXRUFUSEVSX1NUT1JBR0VfS0VZID0gJ3RpZ2xldl93ZWF0aGVyX3NlbGVjdGVkX2xvY2F0aW9uJztcblxuZXhwb3J0IGZ1bmN0aW9uIFdlYXRoZXJXaWRnZXQoKSB7XG4gIGNvbnN0IHsgdCB9ID0gdXNlTGFuZ3VhZ2UoKTtcbiAgXG4gIC8vIFBlcnNpc3RlbnQgc2VsZWN0ZWQgbG9jYXRpb24gbG9hZGVkIGZyb20gTG9jYWxTdG9yYWdlXG4gIGNvbnN0IFtzZWxlY3RlZExvY2F0aW9uLCBzZXRTZWxlY3RlZExvY2F0aW9uXSA9IHVzZVN0YXRlKCgpID0+IHtcbiAgICB0cnkge1xuICAgICAgY29uc3Qgc2F2ZWQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbShXRUFUSEVSX1NUT1JBR0VfS0VZKTtcbiAgICAgIGlmIChzYXZlZCkge1xuICAgICAgICBjb25zdCBwYXJzZWQgPSBKU09OLnBhcnNlKHNhdmVkKTtcbiAgICAgICAgaWYgKFxuICAgICAgICAgIHBhcnNlZCAmJiBcbiAgICAgICAgICBwYXJzZWQubmFtZSAmJiBcbiAgICAgICAgICAhcGFyc2VkLm5hbWUudG9Mb3dlckNhc2UoKS5pbmNsdWRlcygndGluZ2xldicpICYmIFxuICAgICAgICAgICFwYXJzZWQubmFtZS50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKCd0aWdsZXYnKSAmJlxuICAgICAgICAgIHBhcnNlZC5sYXQgIT09IHVuZGVmaW5lZCAmJiBcbiAgICAgICAgICBwYXJzZWQubG9uICE9PSB1bmRlZmluZWRcbiAgICAgICAgKSB7XG4gICAgICAgICAgcmV0dXJuIHBhcnNlZDtcbiAgICAgICAgfVxuICAgICAgfVxuICAgIH0gY2F0Y2ggKGVycikge1xuICAgICAgY29uc29sZS53YXJuKCdDb3VsZCBub3QgcmVhZCBzYXZlZCB3ZWF0aGVyIGxvY2F0aW9uOicsIGVycik7XG4gICAgfVxuICAgIHJldHVybiBDT01QQU5ZX0xPQ0FUSU9OU1swXTsgLy8gRGVmYXVsdCB0byBBbHRsYW5kc2JlcmcgSFFcbiAgfSk7XG5cbiAgY29uc3QgW3dlYXRoZXJEYXRhLCBzZXRXZWF0aGVyRGF0YV0gPSB1c2VTdGF0ZShudWxsKTtcbiAgY29uc3QgW2xvYWRpbmcsIHNldExvYWRpbmddID0gdXNlU3RhdGUodHJ1ZSk7XG4gIGNvbnN0IFtkcm9wZG93bk9wZW4sIHNldERyb3Bkb3duT3Blbl0gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IGRyb3Bkb3duUmVmID0gdXNlUmVmKG51bGwpO1xuXG4gIC8vIFNlYXJjaCAmIEdlb2NvZGluZyBTdGF0ZVxuICBjb25zdCBbc2VhcmNoUXVlcnksIHNldFNlYXJjaFF1ZXJ5XSA9IHVzZVN0YXRlKCcnKTtcbiAgY29uc3QgW3NlYXJjaFJlc3VsdHMsIHNldFNlYXJjaFJlc3VsdHNdID0gdXNlU3RhdGUoW10pO1xuICBjb25zdCBbaXNTZWFyY2hpbmcsIHNldElzU2VhcmNoaW5nXSA9IHVzZVN0YXRlKGZhbHNlKTtcbiAgY29uc3QgW2dlb0Vycm9yLCBzZXRHZW9FcnJvcl0gPSB1c2VTdGF0ZShudWxsKTtcbiAgY29uc3QgW2lzTG9jYXRpbmcsIHNldElzTG9jYXRpbmddID0gdXNlU3RhdGUoZmFsc2UpO1xuXG4gIGNvbnN0IGxvYWRXZWF0aGVyID0gYXN5bmMgKGxvYykgPT4ge1xuICAgIGlmICghbG9jKSByZXR1cm47XG4gICAgc2V0TG9hZGluZyh0cnVlKTtcbiAgICB0cnkge1xuICAgICAgY29uc3QgZGF0YSA9IGF3YWl0IGZldGNoTG9jYXRpb25XZWF0aGVyKGxvYyk7XG4gICAgICBzZXRXZWF0aGVyRGF0YShkYXRhKTtcbiAgICB9IGNhdGNoIChlcnIpIHtcbiAgICAgIGNvbnNvbGUuZXJyb3IoJ1dlYXRoZXIgd2lkZ2V0IGVycm9yOicsIGVycik7XG4gICAgfSBmaW5hbGx5IHtcbiAgICAgIHNldExvYWRpbmcoZmFsc2UpO1xuICAgIH1cbiAgfTtcblxuICAvLyBMb2FkIHdlYXRoZXIgd2hlbiBzZWxlY3RlZExvY2F0aW9uIGNoYW5nZXMgYW5kIHBlcnNpc3QgdG8gbG9jYWxTdG9yYWdlXG4gIHVzZUVmZmVjdCgoKSA9PiB7XG4gICAgaWYgKHNlbGVjdGVkTG9jYXRpb24pIHtcbiAgICAgIHRyeSB7XG4gICAgICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKFdFQVRIRVJfU1RPUkFHRV9LRVksIEpTT04uc3RyaW5naWZ5KHNlbGVjdGVkTG9jYXRpb24pKTtcbiAgICAgIH0gY2F0Y2ggKGUpIHtcbiAgICAgICAgY29uc29sZS53YXJuKCdGYWlsZWQgdG8gc2F2ZSB3ZWF0aGVyIGxvY2F0aW9uIHRvIGxvY2FsU3RvcmFnZScsIGUpO1xuICAgICAgfVxuICAgICAgbG9hZFdlYXRoZXIoc2VsZWN0ZWRMb2NhdGlvbik7XG4gICAgfVxuICB9LCBbc2VsZWN0ZWRMb2NhdGlvbl0pO1xuXG4gIC8vIERlYm91bmNlZCBkeW5hbWljIGdlb2NvZGluZyBzZWFyY2hcbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBpZiAoIXNlYXJjaFF1ZXJ5IHx8IHNlYXJjaFF1ZXJ5LnRyaW0oKS5sZW5ndGggPCAyKSB7XG4gICAgICBzZXRTZWFyY2hSZXN1bHRzKFtdKTtcbiAgICAgIHNldElzU2VhcmNoaW5nKGZhbHNlKTtcbiAgICAgIHJldHVybjtcbiAgICB9XG5cbiAgICBzZXRJc1NlYXJjaGluZyh0cnVlKTtcbiAgICBjb25zdCB0aW1lciA9IHNldFRpbWVvdXQoYXN5bmMgKCkgPT4ge1xuICAgICAgY29uc3QgcmVzdWx0cyA9IGF3YWl0IHNlYXJjaEdlb2NvZGluZ0xvY2F0aW9ucyhzZWFyY2hRdWVyeSk7XG4gICAgICBzZXRTZWFyY2hSZXN1bHRzKHJlc3VsdHMpO1xuICAgICAgc2V0SXNTZWFyY2hpbmcoZmFsc2UpO1xuICAgIH0sIDMwMCk7XG5cbiAgICByZXR1cm4gKCkgPT4gY2xlYXJUaW1lb3V0KHRpbWVyKTtcbiAgfSwgW3NlYXJjaFF1ZXJ5XSk7XG5cbiAgLy8gT3V0c2lkZSBjbGljayBsaXN0ZW5lclxuICB1c2VFZmZlY3QoKCkgPT4ge1xuICAgIGZ1bmN0aW9uIGhhbmRsZUNsaWNrT3V0c2lkZShlKSB7XG4gICAgICBpZiAoZHJvcGRvd25SZWYuY3VycmVudCAmJiAhZHJvcGRvd25SZWYuY3VycmVudC5jb250YWlucyhlLnRhcmdldCkpIHtcbiAgICAgICAgc2V0RHJvcGRvd25PcGVuKGZhbHNlKTtcbiAgICAgIH1cbiAgICB9XG4gICAgZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignbW91c2Vkb3duJywgaGFuZGxlQ2xpY2tPdXRzaWRlKTtcbiAgICByZXR1cm4gKCkgPT4gZG9jdW1lbnQucmVtb3ZlRXZlbnRMaXN0ZW5lcignbW91c2Vkb3duJywgaGFuZGxlQ2xpY2tPdXRzaWRlKTtcbiAgfSwgW10pO1xuXG4gIGNvbnN0IHJlbmRlckljb24gPSAoaWNvbk5hbWUsIGNsYXNzTmFtZSA9ICd3LTQgaC00JykgPT4ge1xuICAgIGNvbnN0IEljb25Db21wb25lbnQgPSBMdWNpZGVJY29uc1tpY29uTmFtZV0gfHwgTHVjaWRlSWNvbnMuU3VuO1xuICAgIHJldHVybiA8SWNvbkNvbXBvbmVudCBjbGFzc05hbWU9e2NsYXNzTmFtZX0gLz47XG4gIH07XG5cbiAgY29uc3QgaGFuZGxlU2VsZWN0TG9jYXRpb24gPSAobG9jKSA9PiB7XG4gICAgc2V0U2VsZWN0ZWRMb2NhdGlvbihsb2MpO1xuICAgIHNldFNlYXJjaFF1ZXJ5KCcnKTtcbiAgICBzZXRTZWFyY2hSZXN1bHRzKFtdKTtcbiAgICBzZXREcm9wZG93bk9wZW4oZmFsc2UpO1xuICB9O1xuXG4gIC8vIEdQUyBHZW9sb2NhdGlvbiBIYW5kbGVyXG4gIGNvbnN0IGhhbmRsZURldGVjdEdQUyA9ICgpID0+IHtcbiAgICBpZiAoIW5hdmlnYXRvci5nZW9sb2NhdGlvbikge1xuICAgICAgc2V0R2VvRXJyb3IoJ0dQUy1PcnR1bmcgd2lyZCB2b24gZGllc2VtIEJyb3dzZXIgbmljaHQgdW50ZXJzdMO8dHp0LicpO1xuICAgICAgc2V0VGltZW91dCgoKSA9PiBzZXRHZW9FcnJvcihudWxsKSwgNDAwMCk7XG4gICAgICByZXR1cm47XG4gICAgfVxuXG4gICAgc2V0SXNMb2NhdGluZyh0cnVlKTtcbiAgICBzZXRHZW9FcnJvcihudWxsKTtcblxuICAgIG5hdmlnYXRvci5nZW9sb2NhdGlvbi5nZXRDdXJyZW50UG9zaXRpb24oXG4gICAgICBhc3luYyAocG9zaXRpb24pID0+IHtcbiAgICAgICAgc2V0SXNMb2NhdGluZyhmYWxzZSk7XG4gICAgICAgIGNvbnN0IGxhdCA9IHBvc2l0aW9uLmNvb3Jkcy5sYXRpdHVkZTtcbiAgICAgICAgY29uc3QgbG9uID0gcG9zaXRpb24uY29vcmRzLmxvbmdpdHVkZTtcblxuICAgICAgICBjb25zdCBncHNMb2NhdGlvbiA9IHtcbiAgICAgICAgICBpZDogYGdwcy0ke2xhdC50b0ZpeGVkKDMpfS0ke2xvbi50b0ZpeGVkKDMpfWAsXG4gICAgICAgICAgbmFtZTogJ01laW4gU3RhbmRvcnQnLFxuICAgICAgICAgIGRpc3BsYXlOYW1lOiBgTWVpbiBTdGFuZG9ydCAoJHtsYXQudG9GaXhlZCgyKX3CsCwgJHtsb24udG9GaXhlZCgyKX3CsClgLFxuICAgICAgICAgIGNvdW50cnk6ICdHUFMnLFxuICAgICAgICAgIGNvdW50cnlDb2RlOiAnR1BTJyxcbiAgICAgICAgICBmbGFnOiAn8J+TjScsXG4gICAgICAgICAgbGF0OiBsYXQsXG4gICAgICAgICAgbG9uOiBsb24sXG4gICAgICAgICAgaXNIUTogZmFsc2UsXG4gICAgICAgIH07XG5cbiAgICAgICAgaGFuZGxlU2VsZWN0TG9jYXRpb24oZ3BzTG9jYXRpb24pO1xuICAgICAgfSxcbiAgICAgIChlcnJvcikgPT4ge1xuICAgICAgICBzZXRJc0xvY2F0aW5nKGZhbHNlKTtcbiAgICAgICAgY29uc29sZS53YXJuKCdHZW9sb2NhdGlvbiBlcnJvcjonLCBlcnJvcik7XG4gICAgICAgIHNldEdlb0Vycm9yKCdTdGFuZG9ydHp1Z3JpZmYgdmVyd2VpZ2VydCBvZGVyIG5pY2h0IGVybWl0dGVsYmFyLicpO1xuICAgICAgICBzZXRUaW1lb3V0KCgpID0+IHNldEdlb0Vycm9yKG51bGwpLCA0MDAwKTtcbiAgICAgIH0sXG4gICAgICB7IHRpbWVvdXQ6IDEwMDAwLCBlbmFibGVIaWdoQWNjdXJhY3k6IGZhbHNlIH1cbiAgICApO1xuICB9O1xuXG4gIGNvbnN0IGNvbmRpdGlvblRleHQgPSB3ZWF0aGVyRGF0YT8uY29uZGl0aW9uS2V5IFxuICAgID8gdChgd2VhdGhlci4ke3dlYXRoZXJEYXRhLmNvbmRpdGlvbktleX1gLCB3ZWF0aGVyRGF0YS5jb25kaXRpb25LZXkpXG4gICAgOiB0KCd3ZWF0aGVyLmNsZWFyJyk7XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlXCIgcmVmPXtkcm9wZG93blJlZn0+XG4gICAgICB7LyogVHJpZ2dlciBQaWxsICovfVxuICAgICAgPGJ1dHRvblxuICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXREcm9wZG93bk9wZW4oIWRyb3Bkb3duT3Blbil9XG4gICAgICAgIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMiBweC0zIHB5LTEuNSByb3VuZGVkLWZ1bGwgYmctc2xhdGUtMTAwLzkwIGhvdmVyOmJnLXNsYXRlLTIwMC84MCB0ZXh0LXNsYXRlLTcwMCBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMC83MCB0ZXh0LXhzIGZvbnQtc2VtaWJvbGQgdHJhbnNpdGlvbi1hbGwgZ3JvdXAgc2hhZG93LTJ4cyBob3Zlcjpib3JkZXItaW5kaWdvLTMwMFwiXG4gICAgICAgIHRpdGxlPXt0KCd3ZWF0aGVyLndlYXRoZXInKX1cbiAgICAgID5cbiAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1zbSBsZWFkaW5nLW5vbmVcIj57c2VsZWN0ZWRMb2NhdGlvbi5mbGFnfTwvc3Bhbj5cbiAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1zbGF0ZS03MDAgZm9udC1tZWRpdW0gaGlkZGVuIHNtOmlubGluZSBtYXgtdy1bMTEwcHhdIHRydW5jYXRlXCI+XG4gICAgICAgICAge3NlbGVjdGVkTG9jYXRpb24ubmFtZX1cbiAgICAgICAgPC9zcGFuPlxuXG4gICAgICAgIHtsb2FkaW5nID8gKFxuICAgICAgICAgIDxSZWZyZXNoQ3cgY2xhc3NOYW1lPVwidy0zLjUgaC0zLjUgdGV4dC1pbmRpZ28tNTAwIGFuaW1hdGUtc3BpblwiIC8+XG4gICAgICAgICkgOiAoXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTFcIj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17d2VhdGhlckRhdGE/Lmljb25Db2xvciB8fCAndGV4dC1hbWJlci01MDAnfT5cbiAgICAgICAgICAgICAge3JlbmRlckljb24od2VhdGhlckRhdGE/Lmljb25OYW1lIHx8ICdTdW4nKX1cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtYm9sZCB0ZXh0LXNsYXRlLTgwMCBmb250LW1vbm9cIj5cbiAgICAgICAgICAgICAge3dlYXRoZXJEYXRhPy50ZW1wZXJhdHVyZSAhPT0gdW5kZWZpbmVkID8gYCR7d2VhdGhlckRhdGEudGVtcGVyYXR1cmV9wrBDYCA6ICctLSd9XG4gICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICl9XG5cbiAgICAgICAgPENoZXZyb25Eb3duIGNsYXNzTmFtZT17YHctMy41IGgtMy41IHRleHQtc2xhdGUtNDAwIHRyYW5zaXRpb24tdHJhbnNmb3JtICR7ZHJvcGRvd25PcGVuID8gJ3JvdGF0ZS0xODAgdGV4dC1pbmRpZ28tNjAwJyA6ICdncm91cC1ob3Zlcjp0ZXh0LXNsYXRlLTYwMCd9YH0gLz5cbiAgICAgIDwvYnV0dG9uPlxuXG4gICAgICB7LyogRHJvcGRvd24gTG9jYXRpb24gU2VsZWN0b3IgJiBXZWF0aGVyIERldGFpbCBGbHlvdXQgKi99XG4gICAgICB7ZHJvcGRvd25PcGVuICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJhYnNvbHV0ZSByaWdodC0wIG10LTIgdy04MCBzbTp3LTk2IGJnLXdoaXRlIHJvdW5kZWQtM3hsIHNoYWRvdy0yeGwgYm9yZGVyIGJvcmRlci1zbGF0ZS0xMDAgcHktMyB6LTUwIGFuaW1hdGUtZmFkZS1pbiBkaXZpZGUteSBkaXZpZGUtc2xhdGUtMTAwIG92ZXJmbG93LWhpZGRlblwiPlxuICAgICAgICAgIHsvKiBBY3RpdmUgTG9jYXRpb24gRGV0YWlsIEhlYWRlciAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInB4LTUgcHktNCBiZy1ncmFkaWVudC10by1iciBmcm9tLWluZGlnby01MC84MCB2aWEtd2hpdGUgdG8tc2xhdGUtNTAvODAgcm91bmRlZC10LTJ4bFwiPlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTIuNVwiPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtMnhsXCI+e3NlbGVjdGVkTG9jYXRpb24uZmxhZ308L3NwYW4+XG4gICAgICAgICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgICAgICAgIDxoNCBjbGFzc05hbWU9XCJ0ZXh0LXNtIGZvbnQtZXh0cmFib2xkIHRleHQtc2xhdGUtOTAwIGxlYWRpbmctdGlnaHRcIj5cbiAgICAgICAgICAgICAgICAgICAge3NlbGVjdGVkTG9jYXRpb24uZGlzcGxheU5hbWUgfHwgc2VsZWN0ZWRMb2NhdGlvbi5uYW1lfVxuICAgICAgICAgICAgICAgICAgPC9oND5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIHVwcGVyY2FzZSBmb250LWJvbGQgdHJhY2tpbmctd2lkZXIgdGV4dC1pbmRpZ28tNjAwXCI+XG4gICAgICAgICAgICAgICAgICAgIHtzZWxlY3RlZExvY2F0aW9uLmlzSFEgPyBgJHt0KCd3ZWF0aGVyLmhxJyl9IOKAoiBBbHRsYW5kc2JlcmdgIDogc2VsZWN0ZWRMb2NhdGlvbi5jb3VudHJ5IHx8ICdTdGFuZG9ydCd9XG4gICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC1yaWdodFwiPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC14bCBmb250LWV4dHJhYm9sZCB0ZXh0LXNsYXRlLTkwMCBmb250LW1vbm8gZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1lbmQgc3BhY2UteC0xLjVcIj5cbiAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17d2VhdGhlckRhdGE/Lmljb25Db2xvciB8fCAndGV4dC1hbWJlci01MDAnfT5cbiAgICAgICAgICAgICAgICAgICAge3JlbmRlckljb24od2VhdGhlckRhdGE/Lmljb25OYW1lIHx8ICdTdW4nLCAndy01IGgtNScpfVxuICAgICAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgICAgICAgPHNwYW4+e3dlYXRoZXJEYXRhPy50ZW1wZXJhdHVyZSAhPT0gdW5kZWZpbmVkID8gYCR7d2VhdGhlckRhdGEudGVtcGVyYXR1cmV9wrBDYCA6ICctLSd9PC9zcGFuPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtWzExcHhdIHRleHQtc2xhdGUtNTAwIGZvbnQtbWVkaXVtIGNhcGl0YWxpemUgbXQtMC41XCI+XG4gICAgICAgICAgICAgICAgICB7Y29uZGl0aW9uVGV4dH1cbiAgICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgIHsvKiBXZWF0aGVyIE1ldHJpY3MgKi99XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm10LTMgcHQtMyBib3JkZXItdCBib3JkZXItc2xhdGUtMjAwLzYwIGdyaWQgZ3JpZC1jb2xzLTIgZ2FwLTIgdGV4dC14cyB0ZXh0LXNsYXRlLTYwMFwiPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIHNwYWNlLXgtMS41XCI+XG4gICAgICAgICAgICAgICAgPERyb3BsZXRzIGNsYXNzTmFtZT1cInctMy41IGgtMy41IHRleHQtYmx1ZS01MDBcIiAvPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtc2xhdGUtNDAwXCI+e3QoJ3dlYXRoZXIuaHVtaWRpdHknKX06PC9zcGFuPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1zbGF0ZS04MDBcIj57d2VhdGhlckRhdGE/Lmh1bWlkaXR5IHx8IDB9JTwvc3Bhbj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0xLjVcIj5cbiAgICAgICAgICAgICAgICA8V2luZCBjbGFzc05hbWU9XCJ3LTMuNSBoLTMuNSB0ZXh0LXRlYWwtNTAwXCIgLz5cbiAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LXNsYXRlLTQwMFwiPnt0KCd3ZWF0aGVyLndpbmQnKX06PC9zcGFuPlxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGQgdGV4dC1zbGF0ZS04MDBcIj57d2VhdGhlckRhdGE/LndpbmRTcGVlZCB8fCAwfSBrbS9oPC9zcGFuPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgey8qIFNlYXJjaCBCb3ggJiBHUFMgU2VjdGlvbiAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMyBzcGFjZS15LTIgYmctc2xhdGUtNTAvNTBcIj5cbiAgICAgICAgICAgIHsvKiBTZWFyY2ggSW5wdXQgZm9yIEFOWSBjaXR5L2FkZHJlc3MgKi99XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlbGF0aXZlXCI+XG4gICAgICAgICAgICAgIDxTZWFyY2ggY2xhc3NOYW1lPVwiYWJzb2x1dGUgbGVmdC0zIHRvcC0xLzIgLXRyYW5zbGF0ZS15LTEvMiB3LTMuNSBoLTMuNSB0ZXh0LXNsYXRlLTQwMFwiIC8+XG4gICAgICAgICAgICAgIDxpbnB1dFxuICAgICAgICAgICAgICAgIHR5cGU9XCJ0ZXh0XCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17c2VhcmNoUXVlcnl9XG4gICAgICAgICAgICAgICAgb25DaGFuZ2U9eyhlKSA9PiBzZXRTZWFyY2hRdWVyeShlLnRhcmdldC52YWx1ZSl9XG4gICAgICAgICAgICAgICAgcGxhY2Vob2xkZXI9XCJTdGFkdCBvZGVyIEFkcmVzc2Ugc3VjaGVuICh6LiBCLiBIYW1idXJnLCBUaW5nbGV2LCBQYXJpcykuLi5cIlxuICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbCBwbC05IHByLTggcHktMiBiZy13aGl0ZSBib3JkZXIgYm9yZGVyLXNsYXRlLTIwMCByb3VuZGVkLXhsIHRleHQteHMgdGV4dC1zbGF0ZS04MDAgcGxhY2Vob2xkZXItc2xhdGUtNDAwIGZvY3VzOm91dGxpbmUtbm9uZSBmb2N1czpyaW5nLTIgZm9jdXM6cmluZy1pbmRpZ28tNTAwLzIwIGZvY3VzOmJvcmRlci1pbmRpZ28tNTAwIGZvbnQtbWVkaXVtXCJcbiAgICAgICAgICAgICAgLz5cbiAgICAgICAgICAgICAge3NlYXJjaFF1ZXJ5ICYmIChcbiAgICAgICAgICAgICAgICA8YnV0dG9uXG4gICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBzZXRTZWFyY2hRdWVyeSgnJyl9XG4gICAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJhYnNvbHV0ZSByaWdodC0yLjUgdG9wLTEvMiAtdHJhbnNsYXRlLXktMS8yIHRleHQtc2xhdGUtNDAwIGhvdmVyOnRleHQtc2xhdGUtNjAwXCJcbiAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICA8WCBjbGFzc05hbWU9XCJ3LTMuNSBoLTMuNVwiIC8+XG4gICAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgICl9XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgey8qIEdQUyBEZXRlY3Rpb24gQnV0dG9uICovfVxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW5cIj5cbiAgICAgICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgICAgIHR5cGU9XCJidXR0b25cIlxuICAgICAgICAgICAgICAgIG9uQ2xpY2s9e2hhbmRsZURldGVjdEdQU31cbiAgICAgICAgICAgICAgICBkaXNhYmxlZD17aXNMb2NhdGluZ31cbiAgICAgICAgICAgICAgICBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTEuNSB0ZXh0LVsxMXB4XSBmb250LXNlbWlib2xkIHRleHQtaW5kaWdvLTYwMCBob3Zlcjp0ZXh0LWluZGlnby03MDAgaG92ZXI6YmctaW5kaWdvLTUwIHB4LTIgcHktMSByb3VuZGVkLWxnIHRyYW5zaXRpb24tY29sb3JzXCJcbiAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgIHtpc0xvY2F0aW5nID8gKFxuICAgICAgICAgICAgICAgICAgPFJlZnJlc2hDdyBjbGFzc05hbWU9XCJ3LTMgaC0zIGFuaW1hdGUtc3BpbiB0ZXh0LWluZGlnby02MDBcIiAvPlxuICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICA8TmF2aWdhdGlvbiBjbGFzc05hbWU9XCJ3LTMgaC0zIHRleHQtaW5kaWdvLTYwMFwiIC8+XG4gICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICA8c3Bhbj5NZWluZW4gU3RhbmRvcnQgZXJtaXR0ZWxuIChHUFMpPC9zcGFuPlxuICAgICAgICAgICAgICA8L2J1dHRvbj5cblxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LVsxMHB4XSB0ZXh0LXNsYXRlLTQwMCBmb250LW1vbm9cIj5PcGVuLU1ldGVvIExpdmU8L3NwYW4+XG4gICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAge2dlb0Vycm9yICYmIChcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJwLTIgYmctcm9zZS01MCBib3JkZXIgYm9yZGVyLXJvc2UtMjAwIHJvdW5kZWQtbGcgdGV4dC1yb3NlLTcwMCB0ZXh0LVsxMXB4XSBmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTEuNVwiPlxuICAgICAgICAgICAgICAgIDxBbGVydENpcmNsZSBjbGFzc05hbWU9XCJ3LTMuNSBoLTMuNSBzaHJpbmstMFwiIC8+XG4gICAgICAgICAgICAgICAgPHNwYW4+e2dlb0Vycm9yfTwvc3Bhbj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApfVxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgey8qIExvY2F0aW9uIFBpY2tlciBMaXN0IG9yIFNlYXJjaCBSZXN1bHRzICovfVxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicHktMlwiPlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJweC00IHB5LTEgdGV4dC1bMTBweF0gZm9udC1ib2xkIHVwcGVyY2FzZSB0cmFja2luZy13aWRlciB0ZXh0LXNsYXRlLTQwMFwiPlxuICAgICAgICAgICAgICB7c2VhcmNoUXVlcnkudHJpbSgpLmxlbmd0aCA+PSAyIFxuICAgICAgICAgICAgICAgID8gKGlzU2VhcmNoaW5nID8gJ1N1Y2hlIGzDpHVmdC4uLicgOiBgR2VmdW5kZW5lIE9ydGUgKCR7c2VhcmNoUmVzdWx0cy5sZW5ndGh9KWApIFxuICAgICAgICAgICAgICAgIDogdCgnd2VhdGhlci5zdGFuZG9ydGUnKX1cbiAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cIm1heC1oLTUyIG92ZXJmbG93LXktYXV0byBweC0yIHNwYWNlLXktMC41IG10LTFcIj5cbiAgICAgICAgICAgICAgey8qIElmIFNlYXJjaGluZywgc2hvdyBHZW9jb2RpbmcgUmVzdWx0cyAqL31cbiAgICAgICAgICAgICAge3NlYXJjaFF1ZXJ5LnRyaW0oKS5sZW5ndGggPj0gMiA/IChcbiAgICAgICAgICAgICAgICBzZWFyY2hSZXN1bHRzLmxlbmd0aCA9PT0gMCAmJiAhaXNTZWFyY2hpbmcgPyAoXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInAtMyB0ZXh0LWNlbnRlciB0ZXh0LXhzIHRleHQtc2xhdGUtNDAwXCI+XG4gICAgICAgICAgICAgICAgICAgIEtlaW5lIFN0w6RkdGUgb2RlciBPcnRlIGbDvHIg4oCee3NlYXJjaFF1ZXJ5feKAnCBnZWZ1bmRlbi5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICBzZWFyY2hSZXN1bHRzLm1hcCgobG9jKSA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgICAgICAgICBrZXk9e2xvYy5pZH1cbiAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVTZWxlY3RMb2NhdGlvbihsb2MpfVxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cInctZnVsbCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gcHgtMyBweS0yIHJvdW5kZWQteGwgdGV4dC14cyBmb250LXNlbWlib2xkIHRleHQtc2xhdGUtNzAwIGhvdmVyOmJnLWluZGlnby01MCBob3Zlcjp0ZXh0LWluZGlnby03MDAgdHJhbnNpdGlvbi1jb2xvcnMgdGV4dC1sZWZ0XCJcbiAgICAgICAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgc3BhY2UteC0yLjUgdHJ1bmNhdGVcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRleHQtYmFzZSBzaHJpbmstMFwiPntsb2MuZmxhZ308L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRydW5jYXRlXCI+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImZvbnQtYm9sZCB0ZXh0LXNsYXRlLTgwMCB0cnVuY2F0ZVwiPntsb2MubmFtZX08L3A+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtWzEwcHhdIHRleHQtc2xhdGUtNDAwIHRydW5jYXRlXCI+e2xvYy5kaXNwbGF5TmFtZX08L3A+XG4gICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgICA8Q2hldnJvbkRvd24gY2xhc3NOYW1lPVwidy0zLjUgaC0zLjUgLXJvdGF0ZS05MCB0ZXh0LXNsYXRlLTMwMCBzaHJpbmstMCBtbC0yXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICAgICAgICAgICApKVxuICAgICAgICAgICAgICAgIClcbiAgICAgICAgICAgICAgKSA6IChcbiAgICAgICAgICAgICAgICAvKiBPdGhlcndpc2Ugc2hvdyBDb21wYW55IExvY2F0aW9ucyAqL1xuICAgICAgICAgICAgICAgIENPTVBBTllfTE9DQVRJT05TLm1hcCgobG9jKSA9PiB7XG4gICAgICAgICAgICAgICAgICBjb25zdCBpc0N1cnJlbnQgPSBsb2MuaWQgPT09IHNlbGVjdGVkTG9jYXRpb24uaWQgfHwgKFxuICAgICAgICAgICAgICAgICAgICBOdW1iZXIobG9jLmxhdCkudG9GaXhlZCgyKSA9PT0gTnVtYmVyKHNlbGVjdGVkTG9jYXRpb24ubGF0KS50b0ZpeGVkKDIpICYmXG4gICAgICAgICAgICAgICAgICAgIE51bWJlcihsb2MubG9uKS50b0ZpeGVkKDIpID09PSBOdW1iZXIoc2VsZWN0ZWRMb2NhdGlvbi5sb24pLnRvRml4ZWQoMilcbiAgICAgICAgICAgICAgICAgICk7XG5cbiAgICAgICAgICAgICAgICAgIHJldHVybiAoXG4gICAgICAgICAgICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgICAgICAgICAgICBrZXk9e2xvYy5pZH1cbiAgICAgICAgICAgICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBoYW5kbGVTZWxlY3RMb2NhdGlvbihsb2MpfVxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT17YHctZnVsbCBmbGV4IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWJldHdlZW4gcHgtMyBweS0yIHJvdW5kZWQteGwgdGV4dC14cyBmb250LXNlbWlib2xkIHRyYW5zaXRpb24tYWxsICR7XG4gICAgICAgICAgICAgICAgICAgICAgICBpc0N1cnJlbnRcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPyAnYmctaW5kaWdvLTUwIHRleHQtaW5kaWdvLTcwMCBmb250LWJvbGQgYm9yZGVyIGJvcmRlci1pbmRpZ28tMTAwIHNoYWRvdy0yeHMnXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDogJ3RleHQtc2xhdGUtNjAwIGhvdmVyOmJnLXNsYXRlLTUwIGhvdmVyOnRleHQtc2xhdGUtOTAwJ1xuICAgICAgICAgICAgICAgICAgICAgIH1gfVxuICAgICAgICAgICAgICAgICAgICA+XG4gICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBzcGFjZS14LTIuNVwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1iYXNlXCI+e2xvYy5mbGFnfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuPntsb2MubmFtZX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICB7bG9jLmlzSFEgJiYgKFxuICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJweC0xLjUgcHktMC41IHRleHQtWzlweF0gZm9udC1leHRyYWJvbGQgcm91bmRlZC1tZCBiZy1pbmRpZ28tMTAwIHRleHQtaW5kaWdvLTcwMFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIEhRXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgICAgICl9XG4gICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgICAge2lzQ3VycmVudCAmJiAoXG4gICAgICAgICAgICAgICAgICAgICAgICA8Q2hlY2sgY2xhc3NOYW1lPVwidy0zLjUgaC0zLjUgdGV4dC1pbmRpZ28tNjAwIHNocmluay0wXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICAgICAgICAgICk7XG4gICAgICAgICAgICAgICAgfSlcbiAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgICl9XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL0h1bWJlcnQvRGVza3RvcC9pbnRyYW5ldC1jb3JwL2Zyb250ZW5kL3NyYy9jb21wb25lbnRzL2xheW91dC9XZWF0aGVyV2lkZ2V0LmpzeCJ9

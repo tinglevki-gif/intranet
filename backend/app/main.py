@@ -13,6 +13,20 @@ from sqlalchemy import text
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("main")
 
+from app.models.role import Role
+from app.models.canteen import WeeklyMenu
+from app.models.schulung import TrainingDocument, TrainingChunk
+from app.models.announcement import Announcement
+from app.models.language import LanguageConfig
+from app.models.system_setting import SystemSetting
+from app.models.ticket import Ticket, TicketMessage
+from app.models.calendar_source import ExternalCalendarSource
+from app.models.geofence import Geofence, VehicleGeofenceEvent, VehicleStay
+from app.models.delivery_tracking import DeliveryTrackingShare
+from app.models.maintenance import VehicleMeta, MaintenanceInterval, MaintenanceLog
+from app.models.reconciliation import TripReconciliation
+from app.models.security import FleetSecurityEvent, FleetSecuritySetting
+
 # Create all database tables on startup
 try:
     Base.metadata.create_all(bind=engine)

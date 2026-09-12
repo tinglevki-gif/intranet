@@ -3,6 +3,7 @@ from datetime import date
 from typing import Optional, List, Dict, Any
 from fastapi import APIRouter, Depends, Query, Path, HTTPException, status
 from sqlalchemy.orm import Session
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User
 from app.models.geofence import Geofence
@@ -76,6 +77,23 @@ def get_fleet_vehicles(
     Liefert die Flottentelemetrie für autorisierte Intranet-Benutzer, aktualisiert Laufleistungen,
     prüft Sicherheitsregeln (Werkshof-Geschwindigkeit & Ruhezeiten) und berechnet Disponenten-Status.
     """
+    if getattr(settings, "IS_TRIAL_BUILD", False):
+        return {
+            "vehicles": [],
+            "total": 0,
+            "active_count": 0,
+            "is_live": False,
+            "cached_at": None,
+            "dispatch_summary": {
+                "total_vehicles": 0,
+                "loading_factory": 0,
+                "outbound_transit": 0,
+                "unloading_site": 0,
+                "inbound_return": 0,
+                "parked_yard": 0
+            }
+        }
+
     data = navkonzept_fleet_service.get_vehicles(force_refresh=force_refresh)
     vehicles = data.get("vehicles", [])
     
