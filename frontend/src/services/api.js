@@ -1125,6 +1125,68 @@ class ApiService {
     const queryString = params.toString() ? `?${params.toString()}` : '';
     return this.request(`/users${queryString}`);
   }
+
+  // Unternehmenskalender & iCal Sync
+  getCalendarSources() {
+    return this.request('/calendar/sources');
+  }
+
+  getCalendarEvents(category = 'ALL', start = null, end = null) {
+    const params = new URLSearchParams();
+    if (category && category !== 'ALL') params.append('category', category);
+    if (start) params.append('start', start);
+    if (end) params.append('end', end);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    return this.request(`/calendar/events${queryString}`);
+  }
+
+  createCalendarEvent(eventData) {
+    return this.request('/calendar/events', {
+      method: 'POST',
+      body: JSON.stringify(eventData),
+    });
+  }
+
+  deleteCalendarEvent(eventId) {
+    return this.request(`/calendar/events/${eventId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  getIcsFeedUrl() {
+    return `${API_BASE_URL}/calendar/feed.ics`;
+  }
+
+  // Admin Calendar Sources Management
+  getAdminCalendarSources() {
+    return this.request('/admin/calendar/sources');
+  }
+
+  createCalendarSource(sourceData) {
+    return this.request('/admin/calendar/sources', {
+      method: 'POST',
+      body: JSON.stringify(sourceData),
+    });
+  }
+
+  updateCalendarSource(sourceId, sourceData) {
+    return this.request(`/admin/calendar/sources/${sourceId}`, {
+      method: 'PUT',
+      body: JSON.stringify(sourceData),
+    });
+  }
+
+  deleteCalendarSource(sourceId) {
+    return this.request(`/admin/calendar/sources/${sourceId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  syncCalendarSource(sourceId) {
+    return this.request(`/admin/calendar/sources/${sourceId}/sync`, {
+      method: 'POST',
+    });
+  }
 }
 
 export const api = new ApiService();
