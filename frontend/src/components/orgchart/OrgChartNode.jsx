@@ -25,6 +25,7 @@ function matchesSearch(item, query) {
 
 export function OrgChartNode({ 
   node, 
+  branchDepartment,
   density = 'detailed',
   searchQuery = '', 
   allExpanded = null,
@@ -32,7 +33,17 @@ export function OrgChartNode({
   onCopyPhone
 }) {
   const { t } = useLanguage();
-  const hasChildren = node.children && node.children.length > 0;
+  const currentBranchDept = branchDepartment || (node.departments && node.departments.length > 0 ? node.departments[0] : node.department);
+
+  const validChildren = (node.children || []).filter((child) => {
+    if (!currentBranchDept) return true;
+    const childDepts = child.departments && Array.isArray(child.departments) && child.departments.length > 0
+      ? child.departments
+      : [child.department];
+    return childDepts.includes(currentBranchDept);
+  });
+
+  const hasChildren = validChildren.length > 0;
   const [isExpanded, setIsExpanded] = useState(true);
 
   // Synchronize with global expand/collapse toggle
@@ -54,6 +65,7 @@ export function OrgChartNode({
       <div className="relative">
         <OrgCard
           node={node}
+          validChildrenCount={validChildren.length}
           density={density}
           searchQuery={searchQuery}
           onSelectEmployee={onSelectEmployee}
@@ -71,7 +83,7 @@ export function OrgChartNode({
             className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 flex items-center space-x-1 px-3 py-1 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-700 rounded-full shadow-md text-[10px] font-bold transition-all z-20 group"
           >
             <Users className="w-3 h-3 text-indigo-500" />
-            <span>{node.children.length} {t('org_chart.direct_reports')}</span>
+            <span>{validChildren.length} {t('org_chart.direct_reports')}</span>
             {isExpanded ? (
               <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
             ) : (
@@ -90,22 +102,23 @@ export function OrgChartNode({
           {/* Children nodes container with horizontal crossbar */}
           <div className="flex items-start justify-center gap-6 sm:gap-10 pt-4 relative">
             {/* Horizontal connector line spanning all children */}
-            {node.children.length > 1 && (
+            {validChildren.length > 1 && (
               <div 
                 className="h-0.5 bg-slate-300 dark:bg-slate-700 absolute top-0"
                 style={{
-                  left: `${100 / (node.children.length * 2)}%`,
-                  right: `${100 / (node.children.length * 2)}%`,
+                  left: `${100 / (validChildren.length * 2)}%`,
+                  right: `${100 / (validChildren.length * 2)}%`,
                 }}
               ></div>
             )}
 
-            {node.children.map((child) => (
+            {validChildren.map((child) => (
               <div key={child.id} className="relative flex flex-col items-center">
                 {/* Vertical drop line down into each child */}
                 <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700 absolute -top-4 left-1/2 -translate-x-1/2"></div>
                 <OrgChartNode 
                   node={child} 
+                  branchDepartment={currentBranchDept}
                   density={density}
                   searchQuery={searchQuery}
                   allExpanded={allExpanded}

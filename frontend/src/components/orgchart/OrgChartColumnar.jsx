@@ -32,6 +32,7 @@ function matchesSearch(item, query) {
 // Single Card Component (Compact or Detailed)
 export function OrgCard({ 
   node, 
+  validChildrenCount,
   density = 'detailed', 
   searchQuery = '', 
   onSelectEmployee, 
@@ -191,11 +192,20 @@ export function OrgCard({
           <span className="truncate">{node.email}</span>
         </span>
 
-        {node.children && node.children.length > 0 && (
-          <span className="flex items-center space-x-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full border border-indigo-100 dark:border-indigo-800">
-            <Users className="w-2.5 h-2.5" />
-            <span>{node.children.length}</span>
-          </span>
+        {validChildrenCount !== undefined ? (
+          validChildrenCount > 0 && (
+            <span className="flex items-center space-x-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full border border-indigo-100 dark:border-indigo-800">
+              <Users className="w-2.5 h-2.5" />
+              <span>{validChildrenCount}</span>
+            </span>
+          )
+        ) : (
+          node.children && node.children.length > 0 && (
+            <span className="flex items-center space-x-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded-full border border-indigo-100 dark:border-indigo-800">
+              <Users className="w-2.5 h-2.5" />
+              <span>{node.children.length}</span>
+            </span>
+          )
         )}
       </div>
     </div>
@@ -205,6 +215,7 @@ export function OrgCard({
 // Vertical Column Sub-Tree (Step-Tree / L-Connectors for subordinates)
 function ColumnSubTree({
   node,
+  branchDepartment,
   density = 'detailed',
   searchQuery = '',
   allExpanded = null,
@@ -212,7 +223,17 @@ function ColumnSubTree({
   onCopyPhone,
   depth = 0
 }) {
-  const hasChildren = node.children && node.children.length > 0;
+  const currentBranchDept = branchDepartment || (node.departments && node.departments.length > 0 ? node.departments[0] : node.department);
+
+  const validChildren = (node.children || []).filter((child) => {
+    if (!currentBranchDept) return true;
+    const childDepts = child.departments && Array.isArray(child.departments) && child.departments.length > 0
+      ? child.departments
+      : [child.department];
+    return childDepts.includes(currentBranchDept);
+  });
+
+  const hasChildren = validChildren.length > 0;
   const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
@@ -233,6 +254,8 @@ function ColumnSubTree({
       <div className="flex items-center space-x-2 relative w-full">
         <OrgCard
           node={node}
+          branchDepartment={currentBranchDept}
+          validChildrenCount={validChildren.length}
           density={density}
           searchQuery={searchQuery}
           onSelectEmployee={onSelectEmployee}
@@ -264,13 +287,14 @@ function ColumnSubTree({
           {/* Vertical spine line */}
           <div className="absolute top-0 bottom-4 left-3 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
 
-          {node.children.map((child) => (
+          {validChildren.map((child) => (
             <div key={child.id} className="relative flex items-center">
               {/* Horizontal step hook connector line */}
               <div className="absolute -left-3 top-6 w-3 h-0.5 bg-slate-300 dark:bg-slate-700"></div>
 
               <ColumnSubTree
                 node={child}
+                branchDepartment={currentBranchDept}
                 density={density}
                 searchQuery={searchQuery}
                 allExpanded={allExpanded}
@@ -336,24 +360,29 @@ export function OrgChartColumnar({
                     />
                   )}
 
-                  {root.children.map((deptDirector) => (
-                    <div key={deptDirector.id} className="relative flex flex-col items-center">
-                      {/* Vertical drop line down into each column head */}
-                      <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700 absolute -top-4 left-1/2 -translate-x-1/2"></div>
+                  {root.children.map((deptDirector) => {
+                    const dept = deptDirector.department;
 
-                      {/* The entire department cascades in this vertical column */}
-                      <div className="flex flex-col items-start bg-slate-100/40 dark:bg-slate-900/40 p-3 sm:p-4 rounded-3xl border border-slate-200/60 dark:border-slate-800 min-w-[280px]">
-                        <ColumnSubTree
-                          node={deptDirector}
-                          density={density}
-                          searchQuery={searchQuery}
-                          allExpanded={allExpanded}
-                          onSelectEmployee={onSelectEmployee}
-                          onCopyPhone={onCopyPhone}
-                        />
+                    return (
+                      <div key={deptDirector.id} className="relative flex flex-col items-center">
+                        {/* Vertical drop line down into each column head */}
+                        <div className="w-0.5 h-4 bg-slate-300 dark:bg-slate-700 absolute -top-4 left-1/2 -translate-x-1/2"></div>
+
+                        {/* The entire department cascades in this vertical column */}
+                        <div className="flex flex-col items-start bg-slate-100/40 dark:bg-slate-900/40 p-3 sm:p-4 rounded-3xl border border-slate-200/60 dark:border-slate-800 min-w-[280px]">
+                          <ColumnSubTree
+                            node={deptDirector}
+                            branchDepartment={dept}
+                            density={density}
+                            searchQuery={searchQuery}
+                            allExpanded={allExpanded}
+                            onSelectEmployee={onSelectEmployee}
+                            onCopyPhone={onCopyPhone}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

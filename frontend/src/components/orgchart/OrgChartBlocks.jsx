@@ -14,12 +14,22 @@ import { UserAvatar } from '../common/UserAvatar';
 import { OrgCard } from './OrgChartColumnar';
 
 // Helper to flatten a branch into a list of members with hierarchy level
-function flattenSubordinates(node, level = 1) {
+function flattenSubordinates(node, branchDepartment, level = 1) {
   let list = [];
-  if (node.children && node.children.length > 0) {
-    node.children.forEach(child => {
+  const currentBranchDept = branchDepartment || (node.departments && node.departments.length > 0 ? node.departments[0] : node.department);
+
+  const validChildren = (node.children || []).filter((child) => {
+    if (!currentBranchDept) return true;
+    const childDepts = child.departments && Array.isArray(child.departments) && child.departments.length > 0
+      ? child.departments
+      : [child.department];
+    return childDepts.includes(currentBranchDept);
+  });
+
+  if (validChildren.length > 0) {
+    validChildren.forEach(child => {
       list.push({ ...child, treeLevel: level });
-      list = list.concat(flattenSubordinates(child, level + 1));
+      list = list.concat(flattenSubordinates(child, currentBranchDept, level + 1));
     });
   }
   return list;
@@ -74,7 +84,8 @@ export function OrgChartBlocks({
                   )}
 
                   {branches.map((branchHead) => {
-                    const allStaff = flattenSubordinates(branchHead, 1);
+                    const dept = branchHead.department;
+                    const allStaff = flattenSubordinates(branchHead, dept, 1);
                     const totalDeptCount = 1 + allStaff.length;
 
                     return (

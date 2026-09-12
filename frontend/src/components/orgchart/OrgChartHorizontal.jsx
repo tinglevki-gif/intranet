@@ -20,13 +20,24 @@ function matchesSearch(item, query) {
 
 function HorizontalTreeNode({
   node,
+  branchDepartment,
   density = 'detailed',
   searchQuery = '',
   allExpanded = null,
   onSelectEmployee,
   onCopyPhone
 }) {
-  const hasChildren = node.children && node.children.length > 0;
+  const currentBranchDept = branchDepartment || (node.departments && node.departments.length > 0 ? node.departments[0] : node.department);
+
+  const validChildren = (node.children || []).filter((child) => {
+    if (!currentBranchDept) return true;
+    const childDepts = child.departments && Array.isArray(child.departments) && child.departments.length > 0
+      ? child.departments
+      : [child.department];
+    return childDepts.includes(currentBranchDept);
+  });
+
+  const hasChildren = validChildren.length > 0;
   const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
@@ -47,6 +58,7 @@ function HorizontalTreeNode({
       <div className="flex items-center space-x-2 relative z-10">
         <OrgCard
           node={node}
+          validChildrenCount={validChildren.length}
           density={density}
           searchQuery={searchQuery}
           onSelectEmployee={onSelectEmployee}
@@ -81,22 +93,23 @@ function HorizontalTreeNode({
           {/* Children vertical stack */}
           <div className="flex flex-col justify-center gap-6 relative py-4">
             {/* Vertical crossbar */}
-            {node.children.length > 1 && (
+            {validChildren.length > 1 && (
               <div 
                 className="w-0.5 bg-slate-300 dark:bg-slate-700 absolute left-0"
                 style={{
-                  top: `${100 / (node.children.length * 2)}%`,
-                  bottom: `${100 / (node.children.length * 2)}%`,
+                  top: `${100 / (validChildren.length * 2)}%`,
+                  bottom: `${100 / (validChildren.length * 2)}%`,
                 }}
               />
             )}
 
-            {node.children.map((child) => (
+            {validChildren.map((child) => (
               <div key={child.id} className="relative flex items-center pl-4">
                 {/* Horizontal branch line into child */}
                 <div className="w-4 h-0.5 bg-slate-300 dark:bg-slate-700 absolute left-0 top-1/2 -translate-y-1/2"></div>
                 <HorizontalTreeNode
                   node={child}
+                  branchDepartment={currentBranchDept}
                   density={density}
                   searchQuery={searchQuery}
                   allExpanded={allExpanded}
