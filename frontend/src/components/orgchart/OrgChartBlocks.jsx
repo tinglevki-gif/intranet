@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { UserAvatar } from '../common/UserAvatar';
-import { OrgCard } from './OrgChartColumnar';
+import { OrgCard, UnattachedSection } from './OrgChartColumnar';
 
 // Helper to flatten a branch into a list of members with hierarchy level
 function flattenSubordinates(node, branchDepartment, level = 1) {
@@ -37,6 +37,7 @@ function flattenSubordinates(node, branchDepartment, level = 1) {
 
 export function OrgChartBlocks({
   roots = [],
+  unattachedNodes = [],
   density = 'detailed',
   searchQuery = '',
   onSelectEmployee,
@@ -44,7 +45,7 @@ export function OrgChartBlocks({
 }) {
   const { t } = useLanguage();
 
-  if (!roots || roots.length === 0) return null;
+  if ((!roots || roots.length === 0) && (!unattachedNodes || unattachedNodes.length === 0)) return null;
 
   return (
     <div className="flex flex-col items-center gap-10 p-8 min-w-max">
@@ -205,6 +206,15 @@ export function OrgChartBlocks({
           </div>
         );
       })}
+
+      {/* Render unattached / standalone employees section at bottom-right */}
+      <UnattachedSection
+        unattachedNodes={unattachedNodes}
+        density={density}
+        searchQuery={searchQuery}
+        onSelectEmployee={onSelectEmployee}
+        onCopyPhone={onCopyPhone}
+      />
     </div>
   );
 }

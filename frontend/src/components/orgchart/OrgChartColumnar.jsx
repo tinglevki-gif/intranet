@@ -7,7 +7,9 @@ import {
   MapPin, 
   ShieldCheck, 
   Users, 
-  Building 
+  Building,
+  UserX,
+  AlertTriangle
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { UserAvatar } from '../common/UserAvatar';
@@ -310,9 +312,61 @@ function ColumnSubTree({
   );
 }
 
+// Unattached / Standalone Employees Section (Renders at bottom-right)
+export function UnattachedSection({ 
+  unattachedNodes = [], 
+  density = 'detailed', 
+  searchQuery = '', 
+  onSelectEmployee, 
+  onCopyPhone 
+}) {
+  const { t } = useLanguage();
+  if (!unattachedNodes || unattachedNodes.length === 0) return null;
+
+  return (
+    <div className="flex flex-col items-end self-end mt-16 pt-8 border-t-2 border-dashed border-slate-300 dark:border-slate-800 w-full">
+      <div className="bg-slate-100/80 dark:bg-slate-900/90 backdrop-blur-md p-6 rounded-3xl border-2 border-dashed border-amber-300 dark:border-amber-700/60 shadow-xl space-y-4 text-left min-w-[300px]">
+        <div className="flex items-center justify-between gap-4 pb-3 border-b border-amber-200/80 dark:border-amber-900/50">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 rounded-2xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-800 shrink-0">
+              <UserX className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                Mitarbeiter ohne Vorgesetzten ({unattachedNodes.length})
+              </h4>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                Ohne direkte Zuordnung in der Unternehmenshierarchie
+              </p>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700 shrink-0">
+            Ohne Vorgesetzten
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end gap-4 pt-1">
+          {unattachedNodes.map((node) => (
+            <OrgCard
+              key={node.id}
+              node={node}
+              density={density}
+              searchQuery={searchQuery}
+              onSelectEmployee={onSelectEmployee}
+              onCopyPhone={onCopyPhone}
+              className="border-dashed border-amber-300 dark:border-amber-700 bg-amber-50/40 dark:bg-amber-950/30 hover:border-amber-500"
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Full Hybrid / Columnar Layout Component
 export function OrgChartColumnar({
   roots = [],
+  unattachedNodes = [],
   density = 'detailed',
   searchQuery = '',
   allExpanded = null,
@@ -321,7 +375,7 @@ export function OrgChartColumnar({
 }) {
   const { t } = useLanguage();
 
-  if (!roots || roots.length === 0) return null;
+  if ((!roots || roots.length === 0) && (!unattachedNodes || unattachedNodes.length === 0)) return null;
 
   return (
     <div className="flex flex-col items-center gap-12 p-8 min-w-max">
@@ -389,6 +443,15 @@ export function OrgChartColumnar({
           </div>
         );
       })}
+
+      {/* Render unattached / standalone employees section at bottom-right */}
+      <UnattachedSection
+        unattachedNodes={unattachedNodes}
+        density={density}
+        searchQuery={searchQuery}
+        onSelectEmployee={onSelectEmployee}
+        onCopyPhone={onCopyPhone}
+      />
     </div>
   );
 }

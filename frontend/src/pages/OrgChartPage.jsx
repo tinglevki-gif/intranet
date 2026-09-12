@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { api } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
 import { OrgChartCanvas } from '../components/orgchart/OrgChartCanvas';
-import { OrgChartColumnar } from '../components/orgchart/OrgChartColumnar';
+import { OrgChartColumnar, UnattachedSection } from '../components/orgchart/OrgChartColumnar';
 import { OrgChartNode } from '../components/orgchart/OrgChartNode';
 import { OrgChartBlocks } from '../components/orgchart/OrgChartBlocks';
 import { OrgChartHorizontal } from '../components/orgchart/OrgChartHorizontal';
@@ -127,6 +127,30 @@ export function OrgChartPage() {
       .map(filterNode)
       .filter(Boolean);
   }, [treeData, selectedDepartment]);
+
+  // Separate hierarchical tree roots from unattached employees (no supervisor & no subordinates)
+  const { mainRoots, unattachedNodes } = useMemo(() => {
+    if (!filteredTreeData || filteredTreeData.length === 0) {
+      return { mainRoots: [], unattachedNodes: [] };
+    }
+
+    const mainRoots = [];
+    const unattachedNodes = [];
+
+    filteredTreeData.forEach((root) => {
+      const hasSupervisors = (root.supervisor_ids && root.supervisor_ids.length > 0) || root.supervisor_id;
+      const hasChildren = root.children && root.children.length > 0;
+      
+      // Node is unattached if it has no supervisor AND no subordinates AND is not top management root
+      if (!hasSupervisors && !hasChildren && root.role !== 'MANAGEMENT') {
+        unattachedNodes.push(root);
+      } else {
+        mainRoots.push(root);
+      }
+    });
+
+    return { mainRoots, unattachedNodes };
+  }, [filteredTreeData]);
 
   const handleCopyPhone = (phone) => {
     navigator.clipboard?.writeText?.(phone);
@@ -381,7 +405,8 @@ export function OrgChartPage() {
           {/* Layout Mode Switcher Render */}
           {viewMode === 'hybrid' && (
             <OrgChartColumnar
-              roots={filteredTreeData}
+              roots={mainRoots}
+              unattachedNodes={unattachedNodes}
               density={density}
               searchQuery={search}
               allExpanded={allExpanded}
@@ -392,7 +417,7 @@ export function OrgChartPage() {
 
           {viewMode === 'tree' && (
             <div className="flex flex-col items-center gap-12 p-8 min-w-max">
-              {filteredTreeData.map((root) => (
+              {mainRoots.map((root) => (
                 <OrgChartNode
                   key={root.id}
                   node={root}
@@ -403,12 +428,20 @@ export function OrgChartPage() {
                   onCopyPhone={handleCopyPhone}
                 />
               ))}
+              <UnattachedSection
+                unattachedNodes={unattachedNodes}
+                density={density}
+                searchQuery={search}
+                onSelectEmployee={setSelectedEmployee}
+                onCopyPhone={handleCopyPhone}
+              />
             </div>
           )}
 
           {viewMode === 'blocks' && (
             <OrgChartBlocks
-              roots={filteredTreeData}
+              roots={mainRoots}
+              unattachedNodes={unattachedNodes}
               density={density}
               searchQuery={search}
               onSelectEmployee={setSelectedEmployee}
@@ -418,7 +451,8 @@ export function OrgChartPage() {
 
           {viewMode === 'horizontal' && (
             <OrgChartHorizontal
-              roots={filteredTreeData}
+              roots={mainRoots}
+              unattachedNodes={unattachedNodes}
               density={density}
               searchQuery={search}
               allExpanded={allExpanded}

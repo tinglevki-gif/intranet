@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { OrgCard } from './OrgChartColumnar';
+import { OrgCard, UnattachedSection } from './OrgChartColumnar';
 
 function matchesSearch(item, query) {
   if (!query) return false;
@@ -104,9 +104,10 @@ function HorizontalTreeNode({
             )}
 
             {validChildren.map((child) => (
-              <div key={child.id} className="relative flex items-center pl-4">
+              <div key={child.id} className="relative flex items-center">
                 {/* Horizontal branch line into child */}
-                <div className="w-4 h-0.5 bg-slate-300 dark:bg-slate-700 absolute left-0 top-1/2 -translate-y-1/2"></div>
+                <div className="w-8 h-0.5 bg-slate-300 dark:bg-slate-700 absolute -left-8 top-1/2 -translate-y-1/2"></div>
+
                 <HorizontalTreeNode
                   node={child}
                   branchDepartment={currentBranchDept}
@@ -127,13 +128,14 @@ function HorizontalTreeNode({
 
 export function OrgChartHorizontal({
   roots = [],
+  unattachedNodes = [],
   density = 'detailed',
   searchQuery = '',
   allExpanded = null,
   onSelectEmployee,
   onCopyPhone
 }) {
-  if (!roots || roots.length === 0) return null;
+  if ((!roots || roots.length === 0) && (!unattachedNodes || unattachedNodes.length === 0)) return null;
 
   return (
     <div className="flex flex-col items-start gap-12 p-8 min-w-max">
@@ -148,6 +150,15 @@ export function OrgChartHorizontal({
           onCopyPhone={onCopyPhone}
         />
       ))}
+
+      {/* Render unattached / standalone employees section at bottom-right */}
+      <UnattachedSection
+        unattachedNodes={unattachedNodes}
+        density={density}
+        searchQuery={searchQuery}
+        onSelectEmployee={onSelectEmployee}
+        onCopyPhone={onCopyPhone}
+      />
     </div>
   );
 }
