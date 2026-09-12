@@ -46,6 +46,7 @@ class UserUpdate(BaseModel):
     allowed_modules: Optional[List[str]] = None
     custom_permissions: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
+    password: Optional[str] = None
 class SelfProfileUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None

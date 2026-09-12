@@ -433,7 +433,8 @@ def update_admin_user(
         raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
 
     # Safety: Prevent SuperAdmin from self-deactivating or self-demoting
-    if current_user.id == user.id:
+    cur_user_role_str = user.role.value if hasattr(user.role, 'value') else str(user.role)
+    if current_user.id == user.id and cur_user_role_str == "ADMIN":
         if user_in.is_active is False:
             raise HTTPException(
                 status_code=400,

@@ -58,6 +58,25 @@ const INTRANET_MODULES = [
 
 const ALL_MODULE_KEYS = INTRANET_MODULES.map((m) => m.key);
 
+const STANDARD_LOCATIONS = [
+  'Tinglev HQ (Brandenburg, DE 🇩🇪)',
+  'Berlin (DE 🇩🇪)',
+  'München (DE 🇩🇪)',
+  'Frankfurt (DE 🇩🇪)',
+  'Hamburg (DE 🇩🇪)',
+];
+
+const normalizeLocation = (loc) => {
+  if (!loc) return 'Tinglev HQ (Brandenburg, DE 🇩🇪)';
+  const lower = loc.trim().toLowerCase();
+  if (lower.includes('tinglev') || lower.includes('brandenburg')) return 'Tinglev HQ (Brandenburg, DE 🇩🇪)';
+  if (lower.includes('berlin')) return 'Berlin (DE 🇩🇪)';
+  if (lower.includes('münchen') || lower.includes('munchen')) return 'München (DE 🇩🇪)';
+  if (lower.includes('frankfurt')) return 'Frankfurt (DE 🇩🇪)';
+  if (lower.includes('hamburg')) return 'Hamburg (DE 🇩🇪)';
+  return loc;
+};
+
 export function UserModal({ 
   isOpen, 
   onClose, 
@@ -80,7 +99,7 @@ export function UserModal({
     custom_role_id: null,
     department: 'Softwareentwicklung',
     position: 'Full Stack Entwickler',
-    location: 'Tinglev HQ Brandenburg',
+    location: 'Tinglev HQ (Brandenburg, DE 🇩🇪)',
     phone: '',
     mobile: '',
     supervisor_id: '',
@@ -137,7 +156,7 @@ export function UserModal({
         custom_role_id: userToEdit.custom_role_id || null,
         department: userToEdit.department || 'General',
         position: userToEdit.position || 'Mitarbeiter',
-        location: userToEdit.location || 'Tinglev HQ Brandenburg',
+        location: normalizeLocation(userToEdit.location),
         phone: userToEdit.phone || '',
         mobile: userToEdit.mobile || '',
         supervisor_id: userToEdit.supervisor_id ? String(userToEdit.supervisor_id) : '',
@@ -737,22 +756,12 @@ export function UserModal({
                       onChange={handleChange}
                       className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-medium text-slate-800"
                     >
-                      <option value="Tinglev HQ Brandenburg">Tinglev HQ (Brandenburg, DE 🇩🇪)</option>
-                      <option value="Tinglev HQ (Brandenburg, DE 🇩🇪)">Tinglev HQ (Brandenburg, DE 🇩🇪) [DB]</option>
-                      <option value="Berlin Office">Berlin (DE 🇩🇪)</option>
-                      <option value="Berlin (DE 🇩🇪)">Berlin (DE 🇩🇪) [DB]</option>
-                      <option value="München Headquarter">München (DE 🇩🇪)</option>
-                      <option value="Frankfurt Office">Frankfurt (DE 🇩🇪)</option>
-                      <option value="Hamburg Office">Hamburg (DE 🇩🇪)</option>
-                      {formData.location && ![
-                        'Tinglev HQ Brandenburg',
-                        'Tinglev HQ (Brandenburg, DE 🇩🇪)',
-                        'Berlin Office',
-                        'Berlin (DE 🇩🇪)',
-                        'München Headquarter',
-                        'Frankfurt Office',
-                        'Hamburg Office'
-                      ].includes(formData.location) && (
+                      {STANDARD_LOCATIONS.map((loc) => (
+                        <option key={loc} value={loc}>
+                          {loc}
+                        </option>
+                      ))}
+                      {formData.location && !STANDARD_LOCATIONS.includes(formData.location) && (
                         <option value={formData.location}>{formData.location}</option>
                       )}
                     </select>
