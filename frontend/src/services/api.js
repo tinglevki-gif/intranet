@@ -130,6 +130,40 @@ class ApiService {
     return this.request('/auth/me');
   }
 
+  // User Self-Service (Profile, Photo, Password)
+  updateMyProfile(payload) {
+    return this.put('/users/me/profile', payload);
+  }
+
+  updateMyPassword(payload) {
+    return this.put('/users/me/password', payload);
+  }
+
+  async uploadMyAvatar(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = this.getToken();
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${API_BASE_URL}/users/me/avatar`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ detail: 'Upload-Fehler' }));
+      throw new Error(err.detail || 'Fehler beim Hochladen des Profilbilds');
+    }
+    return await response.json();
+  }
+
+  deleteMyAvatar() {
+    return this.delete('/users/me/avatar');
+  }
+
+
   // Navigation
   getMenu() {
     return this.request('/navigation/menu');

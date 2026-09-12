@@ -1,12 +1,42 @@
+import os
+import uuid
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User, RoleEnum
-from app.schemas.user import UserResponse, UserDirectoryResponse, OrgChartNodeResponse, UserCreate
+from app.schemas.user import (
+    UserResponse, 
+    UserDirectoryResponse, 
+    OrgChartNodeResponse, 
+    UserCreate,
+    SelfProfileUpdate,
+    SelfPasswordUpdate
+)
 from app.services.auth_service import get_current_user, require_roles
-from app.core.security import get_password_hash
+from app.core.security import get_password_hash, verify_password
+
+BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+UPLOAD_ROOT = os.path.join(BACKEND_DIR, "uploads")
+AVATAR_DIR = os.path.join(UPLOAD_ROOT, "avatars")
+os.makedirs(AVATAR_DIR, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/jpg"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+
+def remove_user_avatar_file(avatar_url: Optional[str]):
+    if not avatar_url:
+        return
+    if avatar_url.startswith("/uploads/avatars/"):
+        filename = os.path.basename(avatar_url)
+        file_path = os.path.join(AVATAR_DIR, filename)
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                print(f"Warning: Could not remove avatar file {file_path}: {e}")
 
 router = APIRouter()
 
@@ -222,3 +252,110 @@ def patch_user_permissions(
         "can_manage_canteen": user.can_manage_canteen,
         "allowed_modules": user.allowed_modules
     }
+
+# =========================================================================
+# SELF-SERVICE PROFILE & PASSWORD ENDPOINTS (AVAILABLE TO ALL AUTH USERS)
+# =========================================================================
+
+@router.put("/me/profile", response_model=UserResponse)
+@router.patch("/me/profile", response_model=UserResponse)
+def update_my_profile(
+    profile_in: SelfProfileUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Allows any authenticated user to update their own personal profile fields."""
+    if profile_in.first_name is not None:
+        current_user.first_name = profile_in.first_name.strip() if profile_in.first_name else None
+    if profile_in.last_name is not None:
+        current_user.last_name = profile_in.last_name.strip() if profile_in.last_name else None
+    
+    if profile_in.full_name is not None and profile_in.full_name.strip():
+        current_user.full_name = profile_in.full_name.strip()
+    elif profile_in.first_name or profile_in.last_name:
+        current_user.full_name = f"{current_user.first_name or ''} {current_user.last_name or ''}".strip()
+
+    if profile_in.phone is not None:
+        current_user.phone = profile_in.phone.strip() if profile_in.phone else None
+    if profile_in.mobile is not None:
+        current_user.mobile = profile_in.mobile.strip() if profile_in.mobile else None
+    if profile_in.location is not None:
+        current_user.location = profile_in.location.strip() if profile_in.location else current_user.location
+
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.put("/me/password", response_model=UserResponse)
+def update_my_password(
+    password_in: SelfPasswordUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Allows any authenticated user to change their own password."""
+    if not password_in.new_password or len(password_in.new_password.strip()) < 4:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Das neue Passwort muss mindestens 4 Zeichen lang sein."
+        )
+
+    # Verify current password if user has an existing password set
+    if current_user.hashed_password and password_in.current_password:
+        if not verify_password(password_in.current_password, current_user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Das aktuelle Passwort ist falsch."
+            )
+
+    current_user.hashed_password = get_password_hash(password_in.new_password.strip())
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.post("/me/avatar", response_model=UserResponse)
+async def upload_my_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Allows any authenticated user to upload/update their own profile photo."""
+    file_ext = os.path.splitext(file.filename)[1].lower() if file.filename else ".png"
+    if file_ext not in ALLOWED_EXTENSIONS or file.content_type not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ungültiges Dateiformat. Erlaubt sind JPG, PNG, WebP und GIF."
+        )
+
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Die Bilddatei ist zu groß. Maximale Größe: 5 MB."
+        )
+
+    # Remove previous local avatar file
+    remove_user_avatar_file(current_user.avatar_url)
+
+    unique_filename = f"user_{current_user.id}_{uuid.uuid4().hex[:8]}{file_ext}"
+    dest_path = os.path.join(AVATAR_DIR, unique_filename)
+
+    with open(dest_path, "wb") as f:
+        f.write(content)
+
+    current_user.avatar_url = f"/uploads/avatars/{unique_filename}"
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.delete("/me/avatar", response_model=UserResponse)
+def delete_my_avatar(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Allows any authenticated user to delete their own custom profile photo."""
+    remove_user_avatar_file(current_user.avatar_url)
+    current_user.avatar_url = None
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+

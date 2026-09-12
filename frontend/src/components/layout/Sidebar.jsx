@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -6,12 +6,14 @@ import { useNews } from '../../context/NewsContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { TinglevLogo } from '../common/TinglevLogo';
 import { UserAvatar } from '../common/UserAvatar';
+import { UserProfileModal } from '../user/UserProfileModal';
 
 export function Sidebar({ isOpen, onClose }) {
   const { menuSections, user, menuLoading } = useAuth();
   const { unreadCount } = useNews();
   const { t } = useLanguage();
   const location = useLocation();
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Helper to safely render dynamic Lucide icon by name
   const renderIcon = (iconName, className = 'w-5 h-5') => {
@@ -137,21 +139,33 @@ export function Sidebar({ isOpen, onClose }) {
 
         {/* Quick User summary in Sidebar footer */}
         <div className="p-4 border-t border-[#002B49]/80 bg-[#001424]/40">
-          <div className="flex items-center space-x-3 p-2 rounded-xl bg-[#002B49]/50 border border-[#003E6B]/60">
+          <button
+            type="button"
+            onClick={() => setShowProfileModal(true)}
+            className="w-full flex items-center space-x-3 p-2 rounded-xl bg-[#002B49]/50 border border-[#003E6B]/60 hover:bg-[#003E6B]/80 hover:border-[#008DD2]/80 transition-all text-left group cursor-pointer"
+            title="Mein Profil & Passwort bearbeiten"
+          >
             <UserAvatar
               src={user?.avatar_url}
               name={user?.full_name}
               size="md"
-              className="ring-2 ring-[#009FE3]/50 shrink-0"
+              className="ring-2 ring-[#009FE3]/50 shrink-0 group-hover:scale-105 transition-transform"
               rounded="rounded-full"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white truncate">{user?.full_name}</p>
-              <p className="text-[11px] text-slate-400 truncate">{user?.department}</p>
+              <p className="text-xs font-semibold text-white truncate group-hover:text-[#72ccf0] transition-colors">{user?.full_name}</p>
+              <p className="text-[11px] text-slate-400 truncate">{user?.department || 'General'}</p>
             </div>
-          </div>
+            <LucideIcons.Settings className="w-4 h-4 text-slate-400 group-hover:text-white shrink-0 transition-colors" />
+          </button>
         </div>
       </aside>
+
+      {/* User Self-Service Profile Modal */}
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </>
   );
 }

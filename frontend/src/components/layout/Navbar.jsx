@@ -9,7 +9,8 @@ import {
   CheckCheck,
   Check,
   Smartphone,
-  Download
+  Download,
+  UserCog
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -19,6 +20,7 @@ import { UserAvatar } from '../common/UserAvatar';
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { ThemeSelector } from './ThemeSelector';
 import { TrialBadge } from './TrialBadge';
+import { UserProfileModal } from '../user/UserProfileModal';
 
 const NOTIFICATIONS_STORAGE_KEY = 'intranet_read_notif_ids';
 
@@ -28,6 +30,7 @@ export function Navbar({ onToggleSidebar }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Load read notification IDs from localStorage
   const [readNotifIds, setReadNotifIds] = useState(() => {
@@ -237,6 +240,21 @@ export function Navbar({ onToggleSidebar }) {
                 </div>
               </div>
 
+              {/* Profile & Password Edit Action */}
+              <div className="px-3 py-1.5 border-t border-slate-100 dark:border-[#002B49]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    setShowProfileModal(true);
+                  }}
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs font-bold text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-colors text-left cursor-pointer"
+                >
+                  <UserCog className="w-4 h-4 text-indigo-500 shrink-0" />
+                  <span>{t('navbar.my_profile', 'Mein Profil & Passwort')}</span>
+                </button>
+              </div>
+
               {/* Theme Preference in User Drawer */}
               <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/40 dark:border-[#002B49] dark:bg-[#00223D]/40">
                 <div className="flex items-center justify-between mb-1.5">
@@ -290,6 +308,12 @@ export function Navbar({ onToggleSidebar }) {
           )}
         </div>
       </div>
+
+      {/* User Profile & Password Modal */}
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </header>
   );
 }

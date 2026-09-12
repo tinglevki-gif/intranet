@@ -46,7 +46,17 @@ class UserUpdate(BaseModel):
     allowed_modules: Optional[List[str]] = None
     custom_permissions: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
-    password: Optional[str] = None
+class SelfProfileUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    mobile: Optional[str] = None
+    location: Optional[str] = None
+
+class SelfPasswordUpdate(BaseModel):
+    current_password: Optional[str] = None
+    new_password: str
 
 class UserResponse(UserBase):
     id: int
