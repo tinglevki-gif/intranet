@@ -130,7 +130,7 @@ export function TischplanReader() {
           </h3>
 
           {/* Top Row: Tische 10 bis 18 */}
-          <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
+          <div className="grid grid-cols-9 gap-1.5 mb-2 items-stretch print:gap-1 print:mb-1">
             {data?.halle1?.rowTop?.map((table) => {
               const tableId = `h1-${table.tischNumber}`;
               return (
@@ -146,7 +146,7 @@ export function TischplanReader() {
           </div>
 
           {/* Bottom Row: Tische 1 bis 9 */}
-          <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
+          <div className="grid grid-cols-9 gap-1.5 mb-2 items-stretch print:gap-1 print:mb-1">
             {data?.halle1?.rowBottom?.map((table) => {
               const tableId = `h1-${table.tischNumber}`;
               return (
@@ -191,7 +191,7 @@ export function TischplanReader() {
           </h3>
 
           {/* Top Row: Tische 10 bis 18 */}
-          <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
+          <div className="grid grid-cols-9 gap-1.5 mb-2 items-stretch print:gap-1 print:mb-1">
             {data?.halle2?.rowTop?.map((table) => {
               const tableId = `h2-${table.tischNumber}`;
               return (
@@ -207,7 +207,7 @@ export function TischplanReader() {
           </div>
 
           {/* Bottom Row: Tische 1 bis 9 */}
-          <div className="grid grid-cols-9 gap-1.5 mb-2 print:gap-1 print:mb-1">
+          <div className="grid grid-cols-9 gap-1.5 mb-2 items-stretch print:gap-1 print:mb-1">
             {data?.halle2?.rowBottom?.map((table) => {
               const tableId = `h2-${table.tischNumber}`;
               return (
@@ -221,6 +221,7 @@ export function TischplanReader() {
               );
             })}
           </div>
+
 
           {/* Halle 2 Footer Totals */}
           <div className="pt-1.5 border-t border-amber-200/80 flex flex-wrap items-center gap-x-5 text-[10.5px] print:text-[9.5px]">
@@ -341,15 +342,15 @@ function TableGridBox({ table, tableId, note, onNoteChange }) {
   };
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="flex flex-col items-center w-full h-full justify-between">
       {/* Table Header */}
       {renderHeader(table?.headerText)}
 
-      {/* Table Content Box */}
-      <div className="w-full bg-white border border-[#b8b8b8] rounded-[2px] p-1 flex flex-col justify-between h-28 print:h-[84px] shadow-2xs overflow-hidden">
+      {/* Table Content Box (Harmonious Auto Height to show all elements without scrollbars) */}
+      <div className="w-full bg-white border border-[#b8b8b8] rounded-[2px] p-1 flex flex-col justify-between min-h-[112px] h-full shadow-2xs">
         
-        {/* Top: Elements list scroll area */}
-        <div className="flex-1 overflow-y-auto print:overflow-hidden overflow-x-hidden space-y-0.5 font-mono text-[7.5px] print:text-[6.5px] leading-[9.5px] print:leading-[8px]">
+        {/* Top: Elements list area (all elements fully visible) */}
+        <div className="flex-1 space-y-0.5 font-mono text-[7.5px] print:text-[6.5px] leading-[9.5px] print:leading-[8px] pb-1">
           {hasElements ? (
             table.elements.map((elText, idx) => (
               <div 
@@ -362,11 +363,12 @@ function TableGridBox({ table, tableId, note, onNoteChange }) {
               </div>
             ))
           ) : (
-            <div className="h-full flex items-center justify-center text-[8px] text-slate-300 italic">
+            <div className="h-full flex items-center justify-center text-[8px] text-slate-300 italic min-h-[40px]">
               {/* Empty space */}
             </div>
           )}
         </div>
+
 
         {/* Middle/Bottom: Interactive Anmerkung / Annotation Line */}
         <div className="pt-0.5">
