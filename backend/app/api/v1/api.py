@@ -21,7 +21,8 @@ from app.api.v1.endpoints import (
     public_tracking,
     technik,
     transportmatrix,
-    powerbi
+    powerbi,
+    license
 )
 
 api_router = APIRouter()
