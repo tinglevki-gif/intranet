@@ -384,31 +384,7 @@ export function MinimalDashboard({
             </div>
           )}
 
-          {/* Quick Launcher Shortcuts */}
-          {showTools && (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-100 dark:border-slate-800 shadow-card space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  {t('tools.title', 'Schnellzugriff & Portale')}
-                </span>
-              </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                {toolsList.map((tl, i) => (
-                  <a
-                    key={i}
-                    href={tl.url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2.5 rounded-xl bg-slate-50 hover:bg-indigo-50/70 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-600 transition-colors flex items-center justify-between text-xs font-semibold group"
-                  >
-                    <span className="truncate">{tl.title}</span>
-                    <ExternalLink className="w-3 h-3 text-slate-400 group-hover:text-indigo-600 shrink-0 ml-1" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

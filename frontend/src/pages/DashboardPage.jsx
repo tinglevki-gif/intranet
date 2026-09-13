@@ -145,7 +145,6 @@ export function DashboardPage() {
                 announcements={data?.announcements} 
                 onRefresh={fetchDashboard} 
               />
-              <QuickLauncher tools={data?.quick_tools} />
             </div>
 
             {showCalendar && (
