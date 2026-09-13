@@ -1322,6 +1322,11 @@ class ApiService {
       body: JSON.stringify(orderData),
     });
   }
+
+  // Power BI Report Integration
+  getPowerBiMengenberechnungConfig() {
+    return this.request('/powerbi/mengenberechnung/config');
+  }
 }
 
 export const api = new ApiService();

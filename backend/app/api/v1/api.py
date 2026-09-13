@@ -19,9 +19,9 @@ from app.api.v1.endpoints import (
     search,
     fleet,
     public_tracking,
-    license,
     technik,
-    transportmatrix
+    transportmatrix,
+    powerbi
 )
 
 api_router = APIRouter()
@@ -52,4 +52,5 @@ api_router.include_router(fleet.router, prefix="/fleet", tags=["Flottenortung & 
 api_router.include_router(public_tracking.router, prefix="/public", tags=["Öffentliche Live-Lieferverfolgung (Baustelle / ETA)"])
 api_router.include_router(technik.router, prefix="/technik", tags=["Technik & Elementübersicht CAD"])
 api_router.include_router(transportmatrix.router, prefix="/transportmatrix", tags=["TransportMatrix & Logistiksteuerung"])
+api_router.include_router(powerbi.router, prefix="/powerbi", tags=["Power BI Analytics & Mengenberechnung"])
 

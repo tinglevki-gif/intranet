@@ -39,6 +39,14 @@ class Settings(BaseModel):
     NAVKONZEPT_FIRM_ID: int = int(os.getenv("NAVKONZEPT_FIRM_ID", "332"))
     NAVKONZEPT_API_URL: str = os.getenv("NAVKONZEPT_API_URL", "https://portal.navkonzept.com/api/map/leaflet/ajaxGetTableData")
     
+    # Single Corporate License Power BI Embed Integration
+    POWERBI_EMBED_URL: str = os.getenv("POWERBI_EMBED_URL", "")
+    POWERBI_REPORT_ID: str = os.getenv("POWERBI_REPORT_ID", "mengenberechnung-v4")
+    POWERBI_CLIENT_ID: Optional[str] = os.getenv("POWERBI_CLIENT_ID", None)
+    POWERBI_TENANT_ID: Optional[str] = os.getenv("POWERBI_TENANT_ID", None)
+    POWERBI_CLIENT_SECRET: Optional[str] = os.getenv("POWERBI_CLIENT_SECRET", None)
+    POWERBI_WORKSPACE_ID: Optional[str] = os.getenv("POWERBI_WORKSPACE_ID", None)
+    
     # CORS Origins
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:5173",

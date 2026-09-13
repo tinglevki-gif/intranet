@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { ElementUebersichtWidget } from '../components/technik/ElementUebersichtWidget';
+import { PowerBIReportWidget } from '../components/technik/PowerBIReportWidget';
 
 export function TechnikPage() {
   const { t } = useLanguage();
@@ -147,71 +148,8 @@ export function TechnikPage() {
         <ElementUebersichtWidget />
       ) : (
         <>
-          {/* Telemetry Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Betriebsbereite Anlagen</p>
-              <p className="text-2xl font-extrabold text-emerald-600 mt-1">4 / 4 Online</p>
-              <p className="text-[11px] text-slate-400 mt-1">Keine ungeplanten Stillstände</p>
-            </div>
-            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gesamtstromverbrauch</p>
-              <p className="text-2xl font-extrabold text-slate-900 mt-1">1.420 kW/h</p>
-              <p className="text-[11px] text-emerald-600 font-semibold mt-1">Im Normalbereich</p>
-            </div>
-            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Druckluft &amp; Hydraulik</p>
-              <p className="text-2xl font-extrabold text-indigo-600 mt-1">7.8 bar</p>
-              <p className="text-[11px] text-slate-400 mt-1">Konstanter Netzdruck</p>
-            </div>
-            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-card">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Öl- &amp; Filterwechsel</p>
-              <p className="text-2xl font-extrabold text-amber-600 mt-1">1 Anstehend</p>
-              <p className="text-[11px] text-slate-400 mt-1">Portalkran Demag 32t</p>
-            </div>
-          </div>
-
-          {/* Machine Status Cards */}
-          <div className="space-y-4">
-            <h2 className="text-base font-extrabold text-slate-900">Produktionsstraßen &amp; Hauptmaschinen</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {machines.map((m) => (
-                <div key={m.id} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-card space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-900 text-white font-mono text-[11px] font-bold">
-                          {m.id}
-                        </span>
-                        <h3 className="font-bold text-slate-900 text-sm">{m.name}</h3>
-                      </div>
-                      <p className="text-xs text-slate-400 mt-1">{m.location}</p>
-                    </div>
-                    {getStatusBadge(m.status)}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs border-t border-slate-100 pt-3">
-                    <div className="bg-slate-50 p-2.5 rounded-2xl">
-                      <span className="text-[10px] text-slate-400 block">Verfügbarkeit (Uptime):</span>
-                      <span className="font-bold text-slate-800 font-mono">{m.uptime}</span>
-                    </div>
-                    <div className="bg-slate-50 p-2.5 rounded-2xl">
-                      <span className="text-[10px] text-slate-400 block">Aktuelle Auslastung:</span>
-                      <span className="font-bold text-indigo-600 font-mono">{m.load}</span>
-                    </div>
-                    <div className="bg-slate-50 p-2.5 rounded-2xl">
-                      <span className="text-[10px] text-slate-400 block">Sensortemperatur:</span>
-                      <span className="font-bold text-slate-800 font-mono">{m.temperature}</span>
-                    </div>
-                    <div className="bg-slate-50 p-2.5 rounded-2xl">
-                      <span className="text-[10px] text-slate-400 block">Nächste Wartung:</span>
-                      <span className="font-bold text-slate-800 font-mono">{m.nextInspection}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Live Power BI Mengenberechnung_V4 Report Integration */}
+          <PowerBIReportWidget />
 
           {/* Support Ticket Submission */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-card space-y-4">
