@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 
 export function LoginPage() {
-  const [email, setEmail] = useState('admin@empresa.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -137,11 +137,6 @@ export function LoginPage() {
             </button>
           </form>
         </div>
-
-        {/* German Intellectual Property & Copyright Notice */}
-        <p className="mt-8 text-center text-xs text-slate-400/90 font-medium tracking-wide">
-          Demo ist geistiges Eigentum der Organic Creation Group • Alle Rechte vorbehalten 2026
-        </p>
       </div>
     </div>
   );

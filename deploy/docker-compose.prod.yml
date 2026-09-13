@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   # -------------------------------------------------------------
-  # 1. PostgreSQL Database with pgvector Extension
+  # 1. PostgreSQL Database with pgvector Extension (Internal Network Only)
   # -------------------------------------------------------------
   db:
     image: pgvector/pgvector:pg16
@@ -27,7 +27,7 @@ services:
   # -------------------------------------------------------------
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: tiglev-intranet-backend
     restart: unless-stopped
@@ -58,7 +58,7 @@ services:
   # -------------------------------------------------------------
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
     container_name: tiglev-intranet-frontend
     restart: unless-stopped

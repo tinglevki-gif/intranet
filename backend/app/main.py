@@ -243,11 +243,18 @@ async def startup_event():
 # Configure CORS for local development and frontend client
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    return response
 
 # Mount Static Files for Uploads (Avatars, Public Assets, News Cover Images)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_ROOT), name="uploads")
