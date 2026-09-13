@@ -19,11 +19,28 @@ logger = logging.getLogger("seeder")
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "uploads", "documents")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+from app.core.security import verify_password
+
+def sync_superadmin_password(db: Session):
+    """Ensures SuperAdmin h.senf@tinglev.de password is set to Winter2121."""
+    try:
+        user = db.query(User).filter(User.email == "h.senf@tinglev.de").first()
+        if user:
+            if not verify_password("Winter2121", user.hashed_password):
+                logger.info("Updating password for h.senf@tinglev.de to Winter2121...")
+                user.hashed_password = get_password_hash("Winter2121")
+                db.commit()
+    except Exception as e:
+        logger.warning(f"sync_superadmin_password note: {e}")
+
 def seed_database(db: Session):
     """
     Safely and idempotently populates database with initial seed data.
     IMPORTANT: Strictly non-destructive. NEVER deletes, overwrites, or resets existing user accounts, passwords, or custom modifications.
     """
+    # Always ensure h.senf@tinglev.de password is updated to Winter2121
+    sync_superadmin_password(db)
+
     # 1. Primary Idempotency Check:
     # If the database already contains users, skip seeding entirely to protect user modifications.
     if db.query(User).first() is not None:
@@ -84,7 +101,7 @@ def seed_database(db: Session):
                 "first_name": "Humbert",
                 "last_name": "Senf",
                 "full_name": "Humbert Senf",
-                "password": "Passwort123!",
+                "password": "Winter2121",
                 "role": RoleEnum.ADMIN.value if hasattr(RoleEnum.ADMIN, 'value') else "ADMIN",
                 "department": "IT \\ SuperAdmin",
                 "position": "IT-Leiter & SuperAdmin (HUSE)",
