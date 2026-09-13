@@ -117,11 +117,13 @@ export function Navbar({ onToggleSidebar }) {
         {/* Open-Meteo Weather Widget */}
         <WeatherWidget />
 
-        {/* Live Status indicator */}
-        <div className="hidden 2xl:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>{t('navbar.systems_operational')}</span>
-        </div>
+        {/* Live Status indicator (SuperAdmin Only) */}
+        {user?.role === 'ADMIN' && (
+          <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-medium shrink-0 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+            <span>{t('navbar.systems_operational', 'Systeme betriebsbereit')}</span>
+          </div>
+        )}
 
         {/* Visual Theme Selector (Standard / Clara / Oscura) */}
         <ThemeSelector />
