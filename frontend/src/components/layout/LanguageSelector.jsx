@@ -4,6 +4,10 @@ import { useLanguage } from '../../context/LanguageContext';
 export function LanguageSelector({ compact = false }) {
   const { language, setLanguage, languages } = useLanguage();
 
+  if (!languages || languages.length <= 1) {
+    return null;
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
       {languages.map((lang) => {

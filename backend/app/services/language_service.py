@@ -18,7 +18,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "English",
         "flag": "🇬🇧",
         "locale": "en-US",
-        "is_active": True,
+        "is_active": False,
         "is_default": False,
         "order": 2
     },
@@ -28,7 +28,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Español",
         "flag": "🇪🇸",
         "locale": "es-ES",
-        "is_active": True,
+        "is_active": False,
         "is_default": False,
         "order": 3
     },
@@ -38,7 +38,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Polski",
         "flag": "🇵🇱",
         "locale": "pl-PL",
-        "is_active": True,
+        "is_active": False,
         "is_default": False,
         "order": 4
     },
@@ -48,7 +48,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Türkçe",
         "flag": "🇹🇷",
         "locale": "tr-TR",
-        "is_active": True,
+        "is_active": False,
         "is_default": False,
         "order": 5
     },
@@ -58,7 +58,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Dansk",
         "flag": "🇩🇰",
         "locale": "da-DK",
-        "is_active": True,
+        "is_active": False,
         "is_default": False,
         "order": 6
     }
@@ -71,16 +71,14 @@ def seed_default_languages(db: Session):
         if not existing:
             new_lang = LanguageConfig(**lang_data)
             db.add(new_lang)
-        else:
-            # Ensure seeded languages are active
-            existing.is_active = True
-    db.commit()
+    
+    # Set non-German languages to inactive if only DE is meant to be active initially
+    db.query(LanguageConfig).filter(LanguageConfig.code != "de").update({LanguageConfig.is_active: False})
+    
+    # Ensure DE is default and active
+    de_lang = db.query(LanguageConfig).filter(LanguageConfig.code == "de").first()
+    if de_lang:
+        de_lang.is_default = True
+        de_lang.is_active = True
 
-    # Ensure at least one language is default
-    default_lang = db.query(LanguageConfig).filter(LanguageConfig.is_default == True).first()
-    if not default_lang:
-        de_lang = db.query(LanguageConfig).filter(LanguageConfig.code == "de").first()
-        if de_lang:
-            de_lang.is_default = True
-            de_lang.is_active = True
-            db.commit()
+    db.commit()
