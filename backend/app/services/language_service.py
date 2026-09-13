@@ -18,7 +18,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "English",
         "flag": "🇬🇧",
         "locale": "en-US",
-        "is_active": False,
+        "is_active": True,
         "is_default": False,
         "order": 2
     },
@@ -28,7 +28,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Español",
         "flag": "🇪🇸",
         "locale": "es-ES",
-        "is_active": False,
+        "is_active": True,
         "is_default": False,
         "order": 3
     },
@@ -38,7 +38,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Polski",
         "flag": "🇵🇱",
         "locale": "pl-PL",
-        "is_active": False,
+        "is_active": True,
         "is_default": False,
         "order": 4
     },
@@ -48,7 +48,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Türkçe",
         "flag": "🇹🇷",
         "locale": "tr-TR",
-        "is_active": False,
+        "is_active": True,
         "is_default": False,
         "order": 5
     },
@@ -58,7 +58,7 @@ DEFAULT_LANGUAGES = [
         "native_name": "Dansk",
         "flag": "🇩🇰",
         "locale": "da-DK",
-        "is_active": False,
+        "is_active": True,
         "is_default": False,
         "order": 6
     }
@@ -71,6 +71,9 @@ def seed_default_languages(db: Session):
         if not existing:
             new_lang = LanguageConfig(**lang_data)
             db.add(new_lang)
+        else:
+            # Ensure seeded languages are active
+            existing.is_active = True
     db.commit()
 
     # Ensure at least one language is default

@@ -8,31 +8,38 @@ export function LanguageProvider({ children }) {
   const [activeLanguagesList, setActiveLanguagesList] = useState(DEFAULT_LANGUAGES);
   const [defaultLanguageCode, setDefaultLanguageCode] = useState('de');
 
-  // Exclusively German ('de')
-  const [language, setLanguageState] = useState('de');
+  // Active language state (restored from localStorage or 'de')
+  const [language, setLanguageState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('intranet_lang');
+      return saved && (translations[saved] || DEFAULT_LANGUAGES.some((l) => l.code === saved)) ? saved : 'de';
+    } catch {
+      return 'de';
+    }
+  });
 
   // Fetch active languages from backend
   const fetchActiveLanguages = useCallback(async () => {
     try {
       const data = await api.getActiveLanguages();
       if (data && data.languages && data.languages.length > 0) {
-        const formatted = data.languages.filter(l => l.code === 'de').map((l) => ({
+        const formatted = data.languages.map((l) => ({
           code: l.code,
           label: l.native_name || l.name,
           name: l.name,
           flag: l.flag,
           country: l.code.toUpperCase(),
           locale: l.locale,
-          is_default: true,
-          is_active: true,
+          is_default: l.is_default,
+          is_active: l.is_active,
           order: l.order,
         }));
         if (formatted.length > 0) {
           setActiveLanguagesList(formatted);
         }
-        setDefaultLanguageCode('de');
-        setLanguageState('de');
-        localStorage.setItem('intranet_lang', 'de');
+        if (data.default_language) {
+          setDefaultLanguageCode(data.default_language);
+        }
       }
     } catch (err) {
       console.warn('Backend-Sprachkonfiguration konnte nicht geladen werden, verwende lokale Fallbacks:', err);
@@ -43,12 +50,31 @@ export function LanguageProvider({ children }) {
     fetchActiveLanguages();
   }, [fetchActiveLanguages]);
 
-  const setLanguage = () => {
-    setLanguageState('de');
-    localStorage.setItem('intranet_lang', 'de');
+  // Keep <html lang="..."> synced
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+  }, [language]);
+
+  const setLanguage = (newLangCode) => {
+    if (!newLangCode) return;
+    setLanguageState(newLangCode);
+    try {
+      localStorage.setItem('intranet_lang', newLangCode);
+    } catch (e) {
+      console.error('Error saving language to localStorage:', e);
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = newLangCode;
+    }
   };
 
-  const currentLanguage = DEFAULT_LANGUAGES[0];
+  const currentLanguage =
+    activeLanguagesList.find((l) => l.code === language) ||
+    DEFAULT_LANGUAGES.find((l) => l.code === language) ||
+    activeLanguagesList[0] ||
+    DEFAULT_LANGUAGES[0];
 
   // Translation helper function supporting nested dot keys e.g. "navbar.search_placeholder"
   const t = (keyPath, fallback = null) => {
@@ -66,7 +92,7 @@ export function LanguageProvider({ children }) {
       }
     }
 
-    if (result !== undefined) {
+    if (result !== undefined && typeof result === 'string') {
       return result;
     }
 
@@ -81,7 +107,7 @@ export function LanguageProvider({ children }) {
       }
     }
 
-    if (deResult !== undefined) {
+    if (deResult !== undefined && typeof deResult === 'string') {
       return deResult;
     }
 

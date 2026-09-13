@@ -7,6 +7,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { TinglevLogo } from '../common/TinglevLogo';
 import { UserAvatar } from '../common/UserAvatar';
 import { UserProfileModal } from '../user/UserProfileModal';
+import { LanguageSelector } from './LanguageSelector';
 
 export function Sidebar({ isOpen, onClose }) {
   const { menuSections, user, menuLoading } = useAuth();
@@ -138,7 +139,11 @@ export function Sidebar({ isOpen, onClose }) {
         </div>
 
         {/* Quick User summary in Sidebar footer */}
-        <div className="p-4 border-t border-[#002B49]/80 bg-[#001424]/40">
+        <div className="p-4 border-t border-[#002B49]/80 bg-[#001424]/40 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#72ccf0]/70">Sprache / Language</span>
+            <LanguageSelector />
+          </div>
           <button
             type="button"
             onClick={() => setShowProfileModal(true)}

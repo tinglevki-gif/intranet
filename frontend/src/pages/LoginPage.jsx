@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useBranding } from '../context/BrandingContext';
 import { TinglevMark } from '../components/common/TinglevLogo';
 import { ThemeSelector } from '../components/layout/ThemeSelector';
+import { LanguageSelector } from '../components/layout/LanguageSelector';
 import { 
   Lock, 
   Mail, 
@@ -43,8 +44,9 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#001424] flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Top right theme switcher */}
-      <div className="absolute top-6 right-6 z-20">
+      {/* Top right theme & language switcher */}
+      <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
+        <LanguageSelector />
         <ThemeSelector />
       </div>
 

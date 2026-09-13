@@ -19,6 +19,7 @@ import { WeatherWidget } from './WeatherWidget';
 import { UserAvatar } from '../common/UserAvatar';
 import { GlobalSearchBar } from './GlobalSearchBar';
 import { ThemeSelector } from './ThemeSelector';
+import { LanguageSelector } from './LanguageSelector';
 import { TrialBadge } from './TrialBadge';
 import { UserProfileModal } from '../user/UserProfileModal';
 
@@ -124,6 +125,9 @@ export function Navbar({ onToggleSidebar }) {
 
         {/* Visual Theme Selector (Standard / Clara / Oscura) */}
         <ThemeSelector />
+
+        {/* Language Selector (DE, EN, ES, PL, TR, DA) */}
+        <LanguageSelector />
 
         {/* Notification Bell */}
         <div className="relative" ref={notifMenuRef}>
