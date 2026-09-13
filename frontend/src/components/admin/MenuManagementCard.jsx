@@ -20,6 +20,14 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
+const STANDARD_SECTIONS = [
+  'Hauptbereich',
+  'Arbeitsbereich',
+  'Personal & HR',
+  'IT & Systeme',
+  'Administration'
+];
+
 export function MenuManagementCard() {
   const { refreshMenu } = useAuth();
   const { t } = useLanguage();
@@ -30,6 +38,7 @@ export function MenuManagementCard() {
   const [error, setError] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [draggedItemId, setDraggedItemId] = useState(null);
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -73,25 +82,84 @@ export function MenuManagementCard() {
     }
   };
 
-  // Move Item Up or Down within its section or globally
-  const handleMove = async (index, direction) => {
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= menuItems.length) return;
+  // Move Item Up or Down within its section or across sections
+  const handleMoveItem = async (itemId, direction) => {
+    const item = menuItems.find((it) => it.id === itemId);
+    if (!item) return;
 
-    const newItems = [...menuItems];
-    const temp = newItems[index];
-    newItems[index] = newItems[targetIndex];
-    newItems[targetIndex] = temp;
+    const grouped = {};
+    STANDARD_SECTIONS.forEach((sec) => (grouped[sec] = []));
 
-    // Recalculate order indices (1-indexed)
-    const reorderPayload = newItems.map((item, idx) => ({
-      id: item.id,
-      order: idx + 1,
-      section: item.section
-    }));
+    menuItems.forEach((it) => {
+      const sec = it.section || 'Hauptbereich';
+      if (!grouped[sec]) grouped[sec] = [];
+      grouped[sec].push({ ...it });
+    });
+
+    const currentSec = item.section || 'Hauptbereich';
+    const secItems = grouped[currentSec] || [];
+    const itemIdx = secItems.findIndex((it) => it.id === itemId);
+
+    if (itemIdx === -1) return;
+
+    const targetIdx = itemIdx + direction;
+
+    if (targetIdx >= 0 && targetIdx < secItems.length) {
+      // Swap within the same section
+      const temp = secItems[itemIdx];
+      secItems[itemIdx] = secItems[targetIdx];
+      secItems[targetIdx] = temp;
+    } else if (direction === -1) {
+      // Move to previous section
+      const secIdx = STANDARD_SECTIONS.indexOf(currentSec);
+      if (secIdx > 0) {
+        const prevSec = STANDARD_SECTIONS[secIdx - 1];
+        const [moved] = secItems.splice(itemIdx, 1);
+        moved.section = prevSec;
+        grouped[prevSec].push(moved);
+      } else {
+        return; // At top of first section
+      }
+    } else if (direction === 1) {
+      // Move to next section
+      const secIdx = STANDARD_SECTIONS.indexOf(currentSec);
+      if (secIdx >= 0 && secIdx < STANDARD_SECTIONS.length - 1) {
+        const nextSec = STANDARD_SECTIONS[secIdx + 1];
+        const [moved] = secItems.splice(itemIdx, 1);
+        moved.section = nextSec;
+        grouped[nextSec].unshift(moved);
+      } else {
+        return; // At bottom of last section
+      }
+    }
+
+    // Flatten and re-assign orders 1..N
+    const newItems = [];
+    let currentOrder = 1;
+    STANDARD_SECTIONS.forEach((sec) => {
+      (grouped[sec] || []).forEach((it) => {
+        it.order = currentOrder++;
+        newItems.push(it);
+      });
+    });
+
+    Object.keys(grouped).forEach((sec) => {
+      if (!STANDARD_SECTIONS.includes(sec)) {
+        grouped[sec].forEach((it) => {
+          it.order = currentOrder++;
+          newItems.push(it);
+        });
+      }
+    });
 
     setMenuItems(newItems);
     setSaving(true);
+
+    const reorderPayload = newItems.map((it) => ({
+      id: it.id,
+      order: it.order,
+      section: it.section
+    }));
 
     try {
       const savedItems = await api.reorderMenuItems(reorderPayload);
@@ -100,7 +168,118 @@ export function MenuManagementCard() {
       showToast('Menü-Reihenfolge erfolgreich aktualisiert & global synchronisiert!');
     } catch (err) {
       setError(err.message || 'Fehler beim Speichern der Menüreihenfolge.');
-      // Revert on error
+      fetchMenuItems();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Directly change item's section dropdown
+  const handleSectionChange = async (itemId, newSection) => {
+    const item = menuItems.find((it) => it.id === itemId);
+    if (!item || item.section === newSection) return;
+
+    const newItems = menuItems.map((it) => (it.id === itemId ? { ...it, section: newSection } : it));
+
+    const grouped = {};
+    STANDARD_SECTIONS.forEach((sec) => (grouped[sec] = []));
+    newItems.forEach((it) => {
+      const sec = it.section || 'Hauptbereich';
+      if (!grouped[sec]) grouped[sec] = [];
+      grouped[sec].push({ ...it });
+    });
+
+    const orderedItems = [];
+    let currentOrder = 1;
+    STANDARD_SECTIONS.forEach((sec) => {
+      (grouped[sec] || []).forEach((it) => {
+        it.order = currentOrder++;
+        orderedItems.push(it);
+      });
+    });
+
+    Object.keys(grouped).forEach((sec) => {
+      if (!STANDARD_SECTIONS.includes(sec)) {
+        grouped[sec].forEach((it) => {
+          it.order = currentOrder++;
+          orderedItems.push(it);
+        });
+      }
+    });
+
+    setMenuItems(orderedItems);
+    setSaving(true);
+
+    const reorderPayload = orderedItems.map((it) => ({
+      id: it.id,
+      order: it.order,
+      section: it.section
+    }));
+
+    try {
+      const savedItems = await api.reorderMenuItems(reorderPayload);
+      setMenuItems(savedItems);
+      await refreshMenu();
+      showToast(`Menüpunkt in den Bereich "${newSection}" verschoben.`);
+    } catch (err) {
+      setError(err.message || 'Fehler beim Ändern des Menübereichs.');
+      fetchMenuItems();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Drag & Drop handlers
+  const handleDragStart = (e, id) => {
+    setDraggedItemId(id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e, targetItemId, targetSection) => {
+    e.preventDefault();
+    if (!draggedItemId || draggedItemId === targetItemId) return;
+
+    const dragged = menuItems.find((it) => it.id === draggedItemId);
+    if (!dragged) return;
+
+    const itemsWithoutDragged = menuItems.filter((it) => it.id !== draggedItemId);
+    const targetIdx = itemsWithoutDragged.findIndex((it) => it.id === targetItemId);
+
+    const updatedDragged = { ...dragged, section: targetSection };
+
+    if (targetIdx !== -1) {
+      itemsWithoutDragged.splice(targetIdx, 0, updatedDragged);
+    } else {
+      itemsWithoutDragged.push(updatedDragged);
+    }
+
+    const reordered = itemsWithoutDragged.map((it, idx) => ({
+      ...it,
+      order: idx + 1
+    }));
+
+    setMenuItems(reordered);
+    setSaving(true);
+    setDraggedItemId(null);
+
+    const reorderPayload = reordered.map((it) => ({
+      id: it.id,
+      order: it.order,
+      section: it.section
+    }));
+
+    try {
+      const savedItems = await api.reorderMenuItems(reorderPayload);
+      setMenuItems(savedItems);
+      await refreshMenu();
+      showToast('Menüpunkte erfolgreich per Drag & Drop neu angeordnet!');
+    } catch (err) {
+      setError(err.message || 'Fehler beim Speichern der Menüreihenfolge.');
       fetchMenuItems();
     } finally {
       setSaving(false);
@@ -139,8 +318,9 @@ export function MenuManagementCard() {
   });
 
   const sectionsMap = {};
+  STANDARD_SECTIONS.forEach((sec) => (sectionsMap[sec] = []));
   filteredItems.forEach((it) => {
-    const sec = it.section || 'Allgemein';
+    const sec = it.section || 'Hauptbereich';
     if (!sectionsMap[sec]) sectionsMap[sec] = [];
     sectionsMap[sec].push(it);
   });
@@ -163,7 +343,7 @@ export function MenuManagementCard() {
               </span>
             </div>
             <p className="text-xs text-slate-500">
-              Steuern Sie die exakte Sortierung und globale Sichtbarkeit aller Haupt- und Untermenüs für alle Rollen.
+              Sortieren Sie Menüpunkte per Drag & Drop oder Pfeiltasten und steuern Sie deren Sichtbarkeit global.
             </p>
           </div>
         </div>
@@ -197,7 +377,7 @@ export function MenuManagementCard() {
         <div className="space-y-0.5">
           <span className="font-bold">Sofortige globale Auswirkung:</span>
           <p className="text-blue-800 text-[11px] leading-relaxed">
-            Änderungen der Reihenfolge oder Deaktivierungen von Menüpunkten greifen <strong>in Echtzeit auf alle Benutzergruppen</strong> (Mitarbeiter, HR, IT und alle SuperAdmins) im gesamten Unternehmen durch.
+            Änderungen der Reihenfolge oder Deaktivierungen von Menüpunkten greifen <strong>in Echtzeit auf alle Benutzergruppen</strong> im gesamten Unternehmen durch.
           </p>
         </div>
       </div>
@@ -244,6 +424,7 @@ export function MenuManagementCard() {
       ) : (
         <div className="space-y-6">
           {Object.entries(sectionsMap).map(([sectionName, items]) => {
+            if (items.length === 0 && searchQuery) return null;
             const translatedSection = t(`nav_sections.${sectionName}`, sectionName);
 
             return (
@@ -260,37 +441,61 @@ export function MenuManagementCard() {
                   </div>
                 </div>
 
-                <div className="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-xs">
-                  {items.map((item) => {
-                    const globalIndex = menuItems.findIndex((it) => it.id === item.id);
-                    const isFirst = globalIndex === 0;
-                    const isLast = globalIndex === menuItems.length - 1;
+                <div 
+                  className="divide-y divide-slate-100 border border-slate-200/80 rounded-2xl overflow-hidden bg-white shadow-xs min-h-[50px]"
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => {
+                    if (items.length === 0) {
+                      handleDrop(e, null, sectionName);
+                    }
+                  }}
+                >
+                  {items.map((item, secIndex) => {
+                    const isFirstInSection = secIndex === 0;
+                    const isLastInSection = secIndex === items.length - 1;
 
                     return (
                       <div
                         key={item.id}
-                        className={`p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
-                          item.is_active ? 'hover:bg-slate-50/60' : 'bg-slate-50/70 opacity-65'
+                        draggable={!saving}
+                        onDragStart={(e) => handleDragStart(e, item.id)}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, item.id, sectionName)}
+                        className={`p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all cursor-move ${
+                          draggedItemId === item.id ? 'opacity-40 bg-indigo-50/50 border-2 border-dashed border-indigo-400' : ''
+                        } ${
+                          item.is_active ? 'hover:bg-slate-50/80' : 'bg-slate-50/70 opacity-65'
                         }`}
                       >
-                        {/* Left: Icon, Position, Label & Metadata */}
+                        {/* Left: Drag Handle, Position & Move Controls */}
                         <div className="flex items-center space-x-3 min-w-0">
+                          {/* Drag handle icon */}
+                          <div className="p-1 text-slate-300 hover:text-slate-500 cursor-grab active:cursor-grabbing shrink-0" title="Ziehen zum Neu-Anordnen">
+                            <GripVertical className="w-4 h-4" />
+                          </div>
+
                           {/* Move up / down control buttons */}
                           <div className="flex flex-col items-center gap-0.5 shrink-0">
                             <button
-                              onClick={() => handleMove(globalIndex, -1)}
-                              disabled={isFirst || saving}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMoveItem(item.id, -1);
+                              }}
+                              disabled={saving}
                               className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-md disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
                               title="Nach oben verschieben"
                             >
                               <ArrowUp className="w-3.5 h-3.5" />
                             </button>
                             <span className="text-[10px] font-mono font-bold text-slate-400">
-                              #{item.order}
+                              #{secIndex + 1}
                             </span>
                             <button
-                              onClick={() => handleMove(globalIndex, 1)}
-                              disabled={isLast || saving}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMoveItem(item.id, 1);
+                              }}
+                              disabled={saving}
                               className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-md disabled:opacity-20 disabled:hover:bg-transparent transition-colors"
                               title="Nach unten verschieben"
                             >
@@ -303,7 +508,7 @@ export function MenuManagementCard() {
                           </div>
 
                           <div className="space-y-0.5 min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-xs font-bold text-slate-900 truncate">
                                 {t(`nav_items.${item.key}`, item.label)}
                               </span>
@@ -319,7 +524,7 @@ export function MenuManagementCard() {
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+                            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono flex-wrap">
                               <span>{item.path}</span>
                               <span>•</span>
                               <span className="text-slate-500 font-sans">
@@ -329,8 +534,24 @@ export function MenuManagementCard() {
                           </div>
                         </div>
 
-                        {/* Right: Active Toggle Switch */}
+                        {/* Right: Section Dropdown & Active Toggle Switch */}
                         <div className="flex items-center justify-end space-x-3 shrink-0 self-end sm:self-auto">
+                          {/* Section Selector */}
+                          <select
+                            value={item.section || 'Hauptbereich'}
+                            onChange={(e) => handleSectionChange(item.id, e.target.value)}
+                            disabled={saving}
+                            className="text-[11px] font-semibold bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                            title="Bereich verschieben"
+                          >
+                            {STANDARD_SECTIONS.map((sec) => (
+                              <option key={sec} value={sec}>
+                                {t(`nav_sections.${sec}`, sec)}
+                              </option>
+                            ))}
+                          </select>
+
+                          {/* Active Toggle */}
                           <button
                             onClick={() => handleToggleActive(item)}
                             className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border ${
